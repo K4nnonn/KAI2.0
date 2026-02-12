@@ -1,0 +1,81 @@
+--- C:\Software Builds\kai-backend-complete\main.py
++++ C:\Software Builds\repo_shadow\repo\services\api\main.py
+@@ -1118,6 +1118,20 @@
+         return ""
+     cleaned = re.sub(r"[^a-zA-Z0-9]+", " ", value.strip().lower())
+     return re.sub(r"\s+", " ", cleaned).strip()
++
++def _normalize_audit_business_unit(value: str | None) -> str | None:
++    if not value:
++        return None
++    cleaned = _normalize_text(value)
++    if not cleaned:
++        return None
++    if "529 states" in cleaned:
++        return "529 States"
++    if re.search(r"\b529\s*(az|ct|de|ma|nh)\b", cleaned):
++        return "529 States"
++    if re.search(r"\bfidelity\s+529\s*(az|ct|de|ma|nh)\b", cleaned):
++        return "529 States"
++    return value
+ 
+ 
+ def _tokenize_text(value: str | None) -> list[str]:
+@@ -5399,6 +5413,18 @@
+     return {"status": "healthy", "service": "Kai Platform API"}
+ 
+ 
++@app.get("/api/version")
++async def version_info():
++    """Build/version metadata for provenance checks."""
++    return {
++        "status": "ok",
++        "service": "Kai Platform API",
++        "version": app.version,
++        "git_sha": os.environ.get("GIT_SHA") or os.environ.get("BUILD_SHA") or "unknown",
++        "build_time": os.environ.get("BUILD_TIME") or os.environ.get("BUILD_TIMESTAMP") or "unknown",
++    }
++
++
+ @app.get("/api/jobs/health")
+ async def job_queue_health():
+     if not JOB_QUEUE_ENABLED:
+@@ -6927,10 +6953,17 @@
+         job_id = enqueue_job("audit_generate", request.model_dump())
+         return {"status": "queued", "job_id": job_id}
+     try:
++        account_name = request.account_name
++        business_unit = request.business_unit or account_name
++        canonical = _normalize_audit_business_unit(business_unit) or _normalize_audit_business_unit(account_name)
++        if canonical:
++            account_name = canonical
++            business_unit = canonical
++
+         # Prefer blob storage if configured; only fall back to demo if explicitly requested
+         data_dir = None
+         try:
+-            data_dir = _download_account_data(request.account_name, request.data_prefix)
++            data_dir = _download_account_data(account_name, request.data_prefix)
+         except HTTPException as exc:
+             if exc.status_code == 404 and request.use_mock_data:
+                 data_dir = ROOT / "demo_for_testing" / "kelvin_co_demo_data"
+@@ -6961,16 +6994,16 @@
+         engine = UnifiedAuditEngine(
+             template_path=template_path,
+             data_directory=data_dir,
+-            business_unit=request.business_unit,
++            business_unit=business_unit,
+             business_context={},
+         )
+ 
+         # Generate audit
+         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+-        output_file = output_dir / f"Audit_{request.account_name}_{timestamp}.xlsx"
++        output_file = output_dir / f"Audit_{account_name}_{timestamp}.xlsx"
+ 
+         result = engine.generate_audit(
+-            account_name=request.account_name,
++            account_name=account_name,
+             output_path=output_file,
+         )
+ 

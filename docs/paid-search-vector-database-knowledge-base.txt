@@ -1,0 +1,435 @@
+The Paid Search Ontology: A Comprehensive Knowledge Base for Vector Database Integration
+1. Architectural Hierarchy and Entity Relationships in Paid Search
+The fundamental data structure of any robust vector database designed for Paid Search applications must be rooted in the rigid, hierarchical ontology employed by the dominant advertising platforms, specifically Google Ads and Microsoft Advertising. These platforms do not operate as unstructured data lakes but rather as strictly typed, nested entity relationship models where configuration settings, access permissions, and performance data inherit attributes top-down from the root account level to the specific creative node. Understanding this schema is the prerequisite for accurate data retrieval, ensuring that a vector database does not merely index text strings but understands the functional constraints and relational context of every data point.
+1.1 Account-Level Architecture and Governance
+The Account serves as the root node of the advertising entity, functioning as the primary container for all subsequent advertising activity, billing relationships, and user access controls. In the context of database schema design, the Account is the parent object from which all Campaign and Ad Group entities inherit their existential parameters.
+1.1.1 Identity and Authentication
+At its core, an account is associated with unique credentials—specifically an email address and password—that provide authentication access.1 In the Google Ads ecosystem, the account is uniquely identified by a 10-digit Customer ID (CID), which serves as the primary key for all API interactions and data retrieval processes.2 This ID is not merely a label but the anchor for billing information, time zone settings, and currency configurations—parameters that are immutable once established.3 A vector database must index these immutable properties as metadata attached to the Account node, as they dictate the temporal and financial context of all downstream performance data. For instance, a query regarding "daily spend" is meaningless without the currency context defined at this root level.
+1.1.2 The Manager Account (MCC) Hierarchy
+For large-scale enterprise operations or agency management, the architecture extends upward into a parent-child relationship known as the Manager Account (formerly My Client Center or MCC) in Google Ads, or simply a "Customer" or "Manager Account" in Microsoft Advertising.4 This layer introduces complex permission inheritance models.
+Resource Sharing: In the Microsoft ecosystem, this hierarchical structure is functional, not just administrative. It allows for the sharing of critical campaign resources, such as Universal Event Tracking (UET) tags and remarketing lists, across multiple child advertiser accounts.4 This implies that in a vector database, an audience list entity might not reside within a single advertiser account but may be a shared object referenced by multiple account nodes.
+User Roles and Permissions: The Microsoft Advertising security model defines specific roles that a knowledge base must distinguish. The user who initiates the account creation is automatically granted the Super Admin role (Role ID 41), which holds the highest privileges, including the ability to manage other users and billing.4 Distinct from this is the Aggregator role (Role ID 33), which manages the mapping between the Customer ID and linked Advertiser Accounts.4 Standard users, by contrast, operate within a restricted scope, able to manage campaigns but lacking the authority to alter the high-level payment or user access infrastructure.
+1.1.3 System Limits and Scalability Constraints
+A critical function of a Paid Search knowledge base is to prevent "hallucinations" regarding platform scalability. The vector database must contain hard-coded limits that define the boundaries of account expansion.
+Campaign Limits: A Google Ads account is capped at 10,000 campaigns, a figure that includes both active and paused entities.5 This limit forces a consolidation strategy for large enterprises; a system cannot simply recommend "creating a new campaign for every product" without hitting this ceiling.
+Ad Limits: The system supports up to 4 million ads per account.5
+Targeting Limits: There is a ceiling of 5 million ad group targeting items (keywords, placements, audience lists) per account.5
+Exclusion Lists: An account can maintain up to 65,000 account-level placement exclusions and 20 shared placement exclusion lists, each containing up to 65,000 exclusions.5
+Business Data: An account is limited to 100 user-generated feeds or business data sets.5
+1.2 Campaign-Level Architecture
+The Campaign functions as the primary operational unit for objective setting, budget allocation, and high-level targeting. It acts as a container for Ad Groups and is the level where the advertiser defines the "rules of engagement" for the auction.
+1.2.1 Budget and Objective Inheritance
+The campaign is the exclusive residence of the daily budget setting. This creates a functional constraint where all Ad Groups within a campaign compete for the same pool of funds.1 Consequently, a vector database must understand that performance queries regarding "budget constraints" must be resolved at the campaign level, not the ad group level. Furthermore, campaigns are strictly typed. A single campaign container can only support one primary advertising network or format—Search, Display, Video, Shopping, or Performance Max.2 A Search campaign cannot contain a Video ad group; this mutual exclusivity is a rigid schema rule.
+1.2.2 Geographic and Temporal Targeting
+Targeting scopes generally encompass Location and Language settings. If a campaign is configured to target "France," every ad group and keyword within that campaign inherits this constraint.1 However, a nuanced understanding of platform divergence is required here. While Google Ads restricts location targeting to the campaign level, Microsoft Advertising offers a distinct architectural advantage: it allows for Location Targeting and Ad Scheduling at the Ad Group level.6 This implies that in a Microsoft-specific schema, the vector database must look for geo-targeting attributes at a lower granular node than in a Google-specific schema. Additionally, Microsoft allows for Time Zone settings at the campaign level, whereas Google restricts this to the account level.7
+1.3 Ad Group-Level Architecture
+The Ad Group is the thematic clustering unit within the hierarchy. Its primary function is to establish a tight semantic relationship between the targeting criteria (Keywords or Audiences) and the creative messaging (Ads).1
+1.3.1 Thematic Consistency and Granularity
+The defining principle of the Ad Group is "tight theming." It aggregates ads and keywords that share a direct semantic link.2 For video campaigns, this restriction is even tighter: an ad group can only contain video ads of the same format. For instance, running both TrueView in-stream and in-display ads requires the creation of two distinct ad groups.1 Best practices suggest limiting ad groups to 7–10 distinct themes per campaign and approximately 20 keywords per ad group to maintain relevance.2
+1.3.2 Capacity and Limits
+Volume: A single campaign can house up to 20,000 ad groups.5
+Targeting Depth: Each ad group can contain up to 20,000 targeting items.5
+Active Creative: There is a strict limit of 50 active text ads per ad group.5
+Performance Max: This campaign type has a specific limit of 1,000 listing groups per asset group.5
+2. Keyword Semantics, Matching Logic, and Query Parsing
+The mechanism by which an advertiser connects with a user query has evolved from simple string matching to complex semantic analysis. A vector database for Paid Search must distinguish between the syntactic matching of the past and the intent-based matching of the 2025 landscape. This section defines the taxonomy of keyword match types and the precise logic of query parsing.
+2.1 Keyword Match Types and Taxonomy
+Keywords act as the triggers for the ad auction. The "Match Type" defines the strictness of the relationship between the advertiser's bid term and the user's search query.
+2.1.1 Broad Match: The Semantic Net
+Broad Match is the default match type and represents the most expansive interpretative logic in the system. It allows ads to appear for searches that relate to the meaning of the keyword, even if the query contains none of the original terms.2
+Mechanism: It utilizes a vast array of signals to determine relevance, including the user's recent search history, the semantic content of the landing page, and other keywords present in the ad group.9
+Strategic Role: Broad match is designed to work in tandem with Smart Bidding. It is the only match type capable of leveraging all available auction-time signals to predict conversion probability, effectively shifting the bidding focus from the "keyword" to the "user intent".9
+Syntax: None (entered as raw text, e.g., running shoes).
+2.1.2 Phrase Match: The Contextual Bridge
+Phrase Match serves as the middle ground between reach and precision. Historically, this match type required the exact sequence of words (e.g., "red shoes" only matched "buy red shoes"). In the modern ontology, Phrase Match triggers on the meaning of the phrase.8
+Logic: The query must include the meaning of the keyword, either implied or specific. It allows for additional words before or after the core phrase, provided the fundamental meaning is preserved.9
+Syntax: Quotation marks (e.g., "running shoes").
+2.1.3 Exact Match: The Precision Tool
+Exact Match is the most restrictive type, designed to target users with a specific, high-intent query.
+Logic: It triggers only for searches that share the same meaning or intent as the keyword.8 While it theoretically targets the "exact" term, modern "Close Variant" logic means it will still capture plurals, misspellings, and functional synonyms.
+Syntax: Square brackets (e.g., [running shoes]).
+2.2 Negative Keywords and Exclusion Logic
+Negative keywords operate on a fundamentally different logic than positive keywords. They act as filters, and their matching mechanism is far more literal and less semantic.
+2.2.1 Syntactic Rigidity
+A crucial distinction for the knowledge base is that negative keywords do not match to close variants.11 This is a frequent source of campaign inefficiency.
+No Expansion: If an advertiser excludes the term flowers (broad match negative), the system will not block the query "red flower" (singular) or "flwers" (misspelling). The vector database must explicitly note that advertisers need to add synonyms, singular/plural versions, and common misspellings to their negative lists to ensure coverage.11
+Symbol Sensitivity: The system treats symbols specifically:
+Ignored: Periods (.) and plus signs (+) are ignored. Blue+car is read as blue car.
+Distinct: Ampersands (&) and accent marks are treated as unique characters. Sidewalk cafe and sidewalk café are considered two different negative keywords.11
+Invalid: Symbols like ! @ % ^ () = {} ; ~ are not permitted and will cause error flags.11
+2.2.2 Negative Match Type Hierarchy
+Negative Broad Match: This is the default setting. The ad is blocked only if all the negative terms are present in the search query, regardless of their order. If the query contains only some of the terms, the ad may still display.11
+Negative Phrase Match: A stricter filter. The ad is blocked only if the query contains the exact keyword terms in the exact same order. Additional words may exist before or after the phrase.11
+Negative Exact Match: The strictest filter. The ad is blocked only if the query matches the negative keyword exactly, with no extra words.11
+2.2.3 Token Limits and Parsing Rules
+The search engine's parser imposes a token limit on negative keyword evaluation. If a negative keyword appears after the 16th word in a user's search query, it is ignored.11 For example, if a user searches for a 20-word string and the negative term "discount" appears at word 17, the ad will still serve. This edge case is critical for analyzing long-tail voice search queries.
+2.3 Search Term Semantics and "Close Variants"
+The concept of "Close Variants" has redefined the utility of match types. Even Exact Match keywords will trigger for queries involving misspellings, singular/plural forms, acronyms, stemming (e.g., floor vs. flooring), abbreviations, and accents.8 This implies that the vector database should categorize match types not by string rigidity, but by intent precision. Broad match targets "related intent," while Exact match targets "same intent".9
+3. Creative Asset Ontology and Specifications
+The "Creative" in Paid Search is no longer a static text file but a dynamic assembly of modular assets. The vector database must contain a precise specification layer for these assets to validate ad copy and troubleshoot disapproval issues.
+3.1 Responsive Search Ads (RSAs)
+RSAs are the standard text ad format, utilizing machine learning to mix and match assets to find the optimal combination for a specific user.
+3.1.1 RSA Component Constraints
+The RSA format is defined by strict quantity and character limits.
+
+Component
+Minimum Required
+Maximum Allowed
+Character Limit
+Notes
+Headlines
+3
+15
+30
+Google recommends providing at least 10 unique headlines to maximize machine learning efficacy.2
+Descriptions
+2
+4
+90
+Distinct messaging is required to prevent redundancy.2
+Display Path
+0
+2
+15
+Appended to the domain (e.g., example.com/Path1/Path2).14
+Final URL
+1
+1
+N/A
+Must be a valid URL.14
+3.1.2 The Pinning Mechanism
+Advertisers retain control over asset placement through "pinning." Assets can be pinned to specific positions (Headline 1, 2, 3 or Description 1, 2).15
+Trade-off: Pinning restricts the machine learning model's ability to test combinations, which generally results in a lower "Ad Strength" score.15
+Visibility Guarantee: Assets pinned to Headline 1, Headline 2, or Description 1 are guaranteed to show. However, assets pinned to Headline 3 or Description 2 are not guaranteed, as these positions are optional and may be omitted on smaller screens.15
+3.2 Dynamic Search Ads (DSAs)
+DSAs operate without keywords, utilizing the advertiser's website index to target queries.
+Crawling Mechanism: Google's organic crawler indexes page titles, headings, and body content to determine relevance.16
+Targeting Methods:
+All Webpages: Targets the entire domain.17
+Categories: Targets specific thematic sections of the site based on Google's taxonomy.17
+Page Feeds: A manual spreadsheet of URLs, allowing advertisers to apply "Custom Labels" for granular targeting.17
+Creative Structure: The advertiser writes the Description (90 chars), but the Headline is dynamically generated by the engine based on the user's query and the landing page title.16
+3.3 Ad Assets (Extensions) Specifications
+Ad Assets (formerly extensions) expand the physical footprint of the ad on the SERP, improving Click-Through Rate (CTR).
+3.3.1 Sitelink Assets
+Function: Direct deep links to specific pages on the site.
+Specifications: Headline text (25 chars), Description Line 1 (35 chars), Description Line 2 (35 chars).19
+Display Logic: A minimum of 2 sitelinks is required for them to appear. Up to 4 sitelinks can show on Search.19 Note that in double-width languages (Chinese, Japanese, Korean), the character limit is reduced to 12.19
+3.3.2 Callout Assets
+Function: Non-clickable text highlights (e.g., "24/7 Support").
+Limit: 25 characters per callout.20
+Capacity: Up to 20 callouts can be associated per level (account, campaign, ad group).20
+3.3.3 Structured Snippet Assets
+Function: A list of items preceded by a predefined header.
+Limit: 25 characters per value. A minimum of 3 values is required.20
+Headers: The header list is fixed and immutable: Amenities, Brands, Courses, Degree programs, Destinations, Featured hotels, Insurance coverage, Models, Neighborhoods, Service catalog, Shows, Styles, Types.20
+3.3.4 Price Assets
+Function: Interactive cards displaying product pricing tiers.
+Limit: Header (25 chars), Description (25 chars). Minimum 3 items required.22
+Qualifiers: Advertisers can select qualifiers such as "From," "Up to," and "Average" to contextualize the price.23
+3.3.5 Lead Form Assets
+Function: A native form that captures user data directly on the SERP.
+Specs: Headline (30 chars), Description (200 chars), Business Name (25 chars).24
+Visuals: Requires a background image with a 1200x628 (1.91:1) aspect ratio.24
+3.4 Image Asset Specifications (Display & Performance Max)
+Visual assets have rigorous aspect ratio and file size constraints that are critical for validation.
+Aspect Ratio
+Recommended Dimensions
+Minimum Dimensions
+Max File Size
+Landscape (1.91:1)
+1200 x 628
+600 x 314
+5120 KB
+Square (1:1)
+1200 x 1200
+300 x 300
+5120 KB
+Vertical (4:5)
+960 x 1200
+480 x 600
+5120 KB
+Portrait (9:16)
+1080 x 1920
+600 x 1067
+5120 KB
+Logos: Must be square (1:1), with 1200 x 1200 recommended. Landscape logos (4:1) are optional (1200 x 300).24
+File Types: JPG, PNG are standard. Display ads also accept GIF.24
+4. Audience Targeting and Identity Resolution
+Paid search has transitioned from a purely keyword-based targeting model to an audience-layered approach. The vector database must capture the mechanisms for identifying, segmenting, and targeting users based on identity and behavior.
+4.1 First-Party Data: Customer Match
+Customer Match allows advertisers to leverage first-party Personally Identifiable Information (PII) to target users across the Google and Microsoft ecosystems.
+4.1.1 Hashing and Security Protocols
+Algorithm: All data must be hashed using the SHA256 standard.27
+Formatting Rules:
+Emails: Must be converted to lowercase with all leading/trailing whitespace removed prior to hashing.
+Phone Numbers: Must conform to the E.164 standard.28
+Upload Methods: Plain text files uploaded via the Google Ads UI are hashed automatically by the browser. However, uploads via the API must be pre-hashed by the advertiser before transmission.27
+4.1.2 Match Rate Logic and Benchmarks
+Definition: The match rate is the percentage of the uploaded customer list that can be successfully linked to a known Google user account.27
+Benchmarks: Advertisers should expect match rates between 29% and 62%.29
+Optimization: The inclusion of multiple match keys in a single row drastically improves performance. Uploading two keys (e.g., Email + Phone) increases match rates by an average of 28%, while three keys can drive a 35% increase.27
+Membership Duration: By default, lists have no expiration (often denoted as 540 days in API attributes), meaning users remain in the audience until removed or the list is deleted.27
+4.1.3 Account Eligibility
+Access to the full Customer Match suite (specifically the ability to "Target" rather than just "Observe") is gated by account maturity.
+Requirements:
+A history of good policy compliance.
+A good payment history.
+At least 90 days of Google Ads account history.
+More than $50,000 USD in total lifetime spend.30
+4.2 Microsoft Advertising Unique Audience Capabilities
+Microsoft Advertising leverages its ownership of LinkedIn to provide B2B targeting capabilities that are structurally absent from Google Ads.
+4.2.1 LinkedIn Profile Targeting
+This feature allows for targeting based on professional attributes across Search, Shopping, and Dynamic Search Ads.31
+Dimensions:
+Company: Access to a database of approximately 80,000 companies.
+Industry: Segmentation across 148 distinct industries.
+Job Function: 26 functional categories (e.g., Engineering, Sales).31
+Usage Mechanics: LinkedIn targeting often functions as a Bid Only (Observation) modifier, allowing advertisers to increase bids for users matching specific professional profiles. However, "Target and Bid" is also supported for narrowing reach exclusively to these segments.32
+Performance Impact: Internal Microsoft data suggests that ads utilizing LinkedIn targeting see a 16% higher Click-Through Rate (CTR) and a 64% higher conversion rate compared to non-targeted users.31
+4.3 Google Audience Taxonomy
+Affinity Segments: Groups users based on long-term habits and interests (e.g., "Technophiles").33
+In-Market Segments: Targets users who are actively researching or comparing products, indicating high recent intent.33
+Detailed Demographics: A granular layer covering Parental status, Homeownership, Education, and Employment (Industry/Company size).33
+Custom Segments: Advertisers can build audiences based on search keywords (interests) or URLs (websites) that the target user is likely to visit.33
+5. Algorithmic Bidding and Auction Dynamics
+The modern auction is governed by "Smart Bidding," a suite of automated strategies that utilize machine learning to determine the optimal bid at the moment of the query. A vector database must index the inputs (signals), the learning process, and the specific strategies involved.
+5.1 The Learning Phase and Bidding Exploration
+When a new strategy is launched or significant changes are made, the algorithm enters a "Learning" or "Bidding Exploration" phase.
+5.1.1 Duration and Data Thresholds
+Timeframe: The learning phase typically lasts 7 days (one week), but in low-volume scenarios, it can extend to 2-3 weeks.35
+Data Requirements: While Data-Driven Attribution has lowered the barrier, a historical baseline of 30 conversions per month is often recommended for stability.37 For low-volume accounts, Portfolio Bidding strategies allow multiple campaigns to share a single bid strategy, pooling data to meet these thresholds.38
+Re-learning Triggers: The algorithm may reset or re-enter the learning phase if:
+The budget changes significantly (often cited as >20%).
+The bid strategy target (e.g., tCPA) is altered.
+Conversion actions are modified.36
+5.1.2 Bidding Exploration Logic
+During this phase, the system actively experiments with bids—raising and lowering them to map the elasticity of the auction curve. This process is necessary to gather performance data but can result in temporary volatility in CPA or ROAS.36
+5.2 Auction-Time Signals
+Smart Bidding utilizes a much wider array of signals than manual bidding, evaluating them in real-time.
+Contextual Signals: Device type, Physical Location, Location Intent, Weekday/Time of Day, Browser, Operating System, and Interface Language.39
+Behavioral Signals: Remarketing list membership, Recency of site visit, and Ad Characteristics (e.g., which specific creative asset is being served).39
+5.3 Bidding Strategies Taxonomy
+Target CPA (tCPA): Optimizes bids to achieve a specific Cost Per Acquisition.
+Target ROAS (tROAS): Optimizes for Return on Ad Spend. This strategy requires transaction values to be passed back to the platform via conversion tracking.40
+Maximize Conversions: Attempts to spend the entire daily budget to achieve the highest volume of conversions, regardless of cost efficiency (unless a bid cap is applied).40
+Maximize Conversion Value: Focuses on generating the highest total revenue/value within the budget.40
+5.4 Auction Insights Report
+To analyze the competitive landscape, the Auction Insights report provides six critical metrics that define an advertiser's position relative to the market 41:
+Metric
+Definition
+Impression Share
+The percentage of eligible impressions the advertiser received.
+Overlap Rate
+How often a competitor's ad appeared in the same auction.
+Outranking Share
+How often the advertiser's ad ranked higher than a competitor's (or showed when the competitor's did not).
+Position Above Rate
+How often the competitor ranked higher when both ads appeared.
+Top of Page Rate
+Frequency of appearing anywhere above organic results.
+Absolute Top of Page Rate
+Frequency of appearing as the very first result on the SERP.
+6. Attribution Modeling and Measurement
+Attribution allows advertisers to assign credit to the various touchpoints in a user's journey. The attribution landscape has undergone a radical shift leading into 2025, driven by privacy regulations and the deprecation of legacy models.
+6.1 The Deprecation of Rules-Based Models
+As of 2025, Google has formally deprecated "Rules-Based" attribution models.
+Retired Models: First-Click, Linear, Time Decay, and Position-Based models are no longer available for new conversion actions. They have been removed from the interface.43
+Current Standards:
+Data-Driven Attribution (DDA): This is now the default and recommended model. It utilizes machine learning to assign fractional credit based on the incremental impact of each touchpoint. It calculates the probability lift provided by specific ads by comparing the paths of users who converted against those who did not.43
+Last-Click: This model remains available but is generally discouraged. It assigns 100% of the credit to the final interaction. It is retained primarily for advertisers with extremely short sales cycles or those requiring conservative reporting continuity.43
+6.2 Data Parameters and Future-Proofing
+Conversion Environment: As of June 2025, the conversion_environment parameter is mandatory for all offline conversion imports. This parameter indicates whether the conversion occurred on the web, in-app, or in another environment, providing critical context for the bidding algorithms.43
+Incremental Attribution: In April 2025, Meta introduced an "Incremental Attribution" metric to determine if a conversion was causally linked to ad exposure. While specific to Meta, this trend highlights the industry shift toward causality over correlation.45
+6.3 Lookback Windows and Platform Variance
+Google: Offers adjustable conversion windows (e.g., 30 days, 90 days) to match the business sales cycle.
+Microsoft: Defaults to 30 days but provides customizable options.46
+Meta vs. Google: A vector database should note that Meta's default attribution is 7-day click + 1-day view, whereas Google Search defaults to a click-based window, creating discrepancies when comparing cross-platform data.45
+7. Platform Divergence: Microsoft Advertising vs. Google Ads
+While Google Ads and Microsoft Advertising share a common lineage and basic syntax (PPC, CPC, CTR), their structural divergences are critical for advanced strategy. A vector database cannot treat them as identical entities.
+7.1 Syndicated Partner Network Transparency
+Google Search Partners: Advertisers can opt into or out of the Search Partner network globally. However, transparency is limited; advertisers cannot easily access a granular list of every partner site where ads appeared, nor can they opt out of specific partner sites individually.7
+Microsoft Syndicated Partners: Microsoft provides significantly higher transparency. Advertisers can access a report detailing specific domains within the Syndicated Partner Network and, crucially, can exclude specific underperforming partner sites while keeping the rest of the network active.7
+7.2 Demographics and Audience Profile
+Microsoft Audience: The user base skews older (54% are over the age of 45) and more affluent (one-third have a household income greater than $100,000). This demographic profile is often associated with desktop usage in corporate environments, driven by Windows default settings.32
+Google Audience: The user base is younger (50% under 35) and dominates mobile traffic volume.48
+7.3 Cost and Performance Benchmarks
+Cost Efficiency: Microsoft Advertising CPCs are typically lower—benchmarks suggest approximately 33% lower than Google Ads—due to lower competition intensity.48
+Import Functionality: Microsoft offers a robust "Google Import" tool that maps Google campaigns to Microsoft structure. However, because of the differences in location targeting (Campaign vs. Ad Group level), these imports require careful validation.7
+7.4 Application Programming Interface (API) Access
+For automated management, the platforms offer distinct API endpoints.
+Google: Uses the Google Ads API for all campaign management.
+Microsoft: Offers the Bing Ads API, which includes specific services like the CampaignManagementService. It also supports a distinct Content API for shopping feeds and Hotel Ads API.50 Microsoft also supports "Microsoft Advertising Scripts" (JavaScript-based) for browser-based automation, similar to Google.52
+8. Future Horizons: Agentic Commerce and 2026 Outlook
+The vector database must account for emerging trends that are reshaping the fundamental definitions of search and conversion.
+8.1 Agentic Commerce and AI Integration
+Definition: "Agentic commerce" refers to a model where AI systems complete shopping-related tasks on behalf of users, moving beyond simple information retrieval to transactional execution.53
+Universal Commerce Protocol (UCP): Google is developing the UCP, an open standard designed to allow AI agents, retailers, and payment systems to interact seamlessly. This protocol aims to standardize product discovery and checkout across the full shopping journey, enabling AI agents (like those in Gemini) to execute purchases directly.53
+Google Gemini: The integration of Gemini into the Google Ads ecosystem allows for the creation of conversational experiences. Gemini Enterprise for Customer Experience is already being deployed by major retailers to provide personalized AI agents.54
+8.2 Psychological Triggers in Content
+Emerging research into user behavior suggests that specific, precise timestamps (e.g., a "19-minute video" vs. a "20-minute video") act as psychological triggers, creating a sense of authenticity and exclusivity. This nuance is becoming relevant for ad copy optimization and video asset creation.55
+9. Diagnostic Workflows and Quality Control
+A static database of rules is insufficient; the knowledge base must contain procedural logic for troubleshooting and optimization. This section outlines the decision trees for diagnosing performance issues.
+9.1 Quality Score (QS) Mechanics
+Quality Score is the diagnostic metric (on a 1-10 scale) that directly influences Ad Rank and Cost Per Click (CPC).
+Components:
+Expected CTR: The probability of a click, normalized for ad position.
+Ad Relevance: The semantic match between the ad copy and the search query.
+Landing Page Experience: Factors include load time, mobile-friendliness, content relevance, and transparency.56
+Formula: While the exact formula is proprietary, the effective Ad Rank is generally calculated as Quality Score × Max CPC Bid (with additional thresholds for ad formats).2
+9.2 Troubleshooting Performance Drops
+When conversion volume drops or CPA rises, a systematic diagnosis is required. The vector database should index this logic flow 58:
+Check Change History: Verify if a user altered the budget, bid strategy, or paused a high-performing keyword.58
+Analyze Auction Insights: Determine if a new competitor has entered the market or if an existing competitor has increased their Impression Share (Overlap Rate).41
+Review Search Terms: Check for "broad match expansion" where high-volume but irrelevant queries have started triggering ads. This requires the addition of negative keywords.58
+Validate Tracking: Check the "Global Pings" or tag fire rate. A sudden drop in tag fires usually indicates a website code failure rather than an advertising issue.60
+Examine Seasonality: Use Google Trends to determine if the drop is market-wide or account-specific.59
+9.3 Experimentation Framework
+To test changes safely, Custom Experiments are utilized.
+Split Methods:
+Cookie-Based: Users are assigned to a control or test group and will only ever see one version of the campaign. This ensures a consistent user experience but requires a larger sample size for significance.61
+Search-Based: Users are randomized at the query level. A user might see the Control ad on their first search and the Test ad on their second. This achieves statistical significance faster but risks inconsistent messaging.61
+Sync: Modern experiments feature a "Sync" option, ensuring that routine optimizations made to the base campaign are automatically mirrored to the trial arm, isolating the specific variable being tested.62
+10. Reference Data: Tables and Limits
+10.1 Ad Asset Character Limits Reference Table
+Asset Type
+Element
+Max Characters
+Notes
+RSA
+Headline
+30
+Up to 15 headlines allowed.
+RSA
+Description
+90
+Up to 4 descriptions allowed.
+Sitelink
+Headline
+25
+12 characters for double-width languages.
+Sitelink
+Description
+35
+2 lines allowed per sitelink.
+Callout
+Text
+25
+Non-clickable text.
+Structured Snippet
+Value
+25
+Minimum 3 values required.
+Price
+Header
+25
+Must include 3+ items.
+Price
+Description
+25
+
+Lead Form
+Headline
+30
+
+Lead Form
+Description
+200
+
+Business Name
+Name
+25
+
+13
+10.2 Account Limit Reference Table
+Entity
+Limit
+Scope
+Campaigns
+10,000
+Per Account (Active + Paused)
+Ad Groups
+20,000
+Per Campaign
+Keywords
+20,000
+Per Ad Group (Targeting Items)
+Negative Keywords
+10,000
+Per Campaign
+Negative Keyword Lists
+20
+Per Account (Shared)
+Placement Exclusions
+65,000
+Per Account
+Shared Budgets
+11,000
+Per Account
+5
+11. Conclusion: Synthesis of the Paid Search Ontology
+The Paid Search ecosystem is defined by a rigorous interaction between rigid hierarchical structures (Account > Campaign > Ad Group) and fluid algorithmic dynamics (Smart Bidding, Broad Match, Data-Driven Attribution). For a vector database to be truly "robust," it must index not just the static rules (character limits, setting locations) but also the causal relationships: how a change in Attribution Model (to DDA) necessitates a change in Bidding Strategy (to tCPA), and how the expansion of Broad Match semantics requires a more rigorous application of Negative Keyword logic.
+The integration of Microsoft Advertising introduces specific variances—notably LinkedIn Profile Targeting, Syndicated Partner transparency, and Ad Group-level location targeting—that distinguish it from Google's ecosystem. A complete knowledge base must treat these platforms as distinct but related entities, sharing a common syntax but differing in architectural execution. Furthermore, looking toward 2026, the rise of Agentic Commerce and the Universal Commerce Protocol indicates that the database schema will soon need to accommodate AI-to-AI transaction layers, moving beyond human-targeted advertising to machine-targeted commerce. This report provides the granular, citation-backed schema required to populate such a database effectively.
+Works cited
+About your account organization - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/1704396?hl=en
+The Ultimate Guide to Your Google Ads Account Structure - PPC Hero, accessed January 12, 2026, https://ppchero.com/the-ultimate-guide-to-your-google-ads-account-structure/
+The perfect Google Ads campaign structure: A guide for 2026, accessed January 12, 2026, https://leadsbridge.com/blog/google-ads-campaign-structure/
+Account Hierarchy and User Permissions - Microsoft Advertising API, accessed January 12, 2026, https://learn.microsoft.com/en-us/advertising/guides/account-hierarchy-permissions?view=bingads-13
+About your Google Ads account limits, accessed January 12, 2026, https://support.google.com/google-ads/answer/6372658?hl=en
+Google Ads or Microsoft Ads?: Which Platform Wins for Your ..., accessed January 12, 2026, https://ppchero.com/google-ads-or-microsoft-ads-which-platform-wins-for-your-advertising-goals/
+Should You Bother Using Microsoft Advertising for Paid Search?, accessed January 12, 2026, https://www.zionandzion.com/should-you-bother-using-microsoft-advertising-bing-ads-for-paid-search/
+PPC Keyword Match Types: A Guide for 2025 - Beyond Your Brand, accessed January 12, 2026, https://www.beyondyourbrand.co.uk/blog/what-are-ppc-keyword-match-types
+About keyword matching options - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/7478529?hl=en-GB
+The ABCs of Account Structure - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/14752782?hl=en
+About negative keywords - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/2453972?hl=en-GB
+Negative Keyword Match Types - Google AdWords - Metric Theory, accessed January 12, 2026, https://metrictheory.com/blog/negative-keyword-match-types-when-to-use-broad-match/
+Google Responsive Search Ads: Tips, Benefits, and Best Practices, accessed January 12, 2026, https://ostenpowers.com.au/blog/google-responsive-search-ads/
+Responsive Search Ads: The Ultimate Guide (2025), accessed January 12, 2026, https://seizemarketingagency.com/responsive-search-ads/
+About responsive search ads - Google Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/7684791?hl=en
+Dynamic Search Ads & How to Use Them | LeadOrigin, accessed January 12, 2026, https://leadorigin.com/dynamic-search-ads-guide/
+accessed January 12, 2026, https://support.google.com/google-ads/answer/2497706?hl=en
+Dynamic Search Ads: The Only Guide You'll Need - Hallam, accessed January 12, 2026, https://hallam.agency/blog/dynamic-search-ads-guide/
+About sitelink assets - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/2375416?hl=en
+What Are Google Ad Assets & How to Use Them (With Examples), accessed January 12, 2026, https://www.takeflyte.com/blog/google-ad-assets
+Google Ads Structured Snippets – The Ultimate Guide - Ed Leake, accessed January 12, 2026, https://edleake.com/the-ultimate-guide-to-google-ads-structured-snippets/
+About price assets - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/7065415?hl=en
+About price assets - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/7065415?hl=en-GB
+Google Ads specs: ad formats, sizes, and best practices, accessed January 12, 2026, https://support.google.com/google-ads/answer/13676244?hl=en
+Demand Gen campaign asset specs and best practices - Google Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/13704860?hl=en
+Image assets format requirements - Advertising Policies Help, accessed January 12, 2026, https://support.google.com/adspolicy/answer/10347108?hl=en
+About Customer Match match rates - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/10534785?hl=en
+Get started with Customer Match | Google Ads API, accessed January 12, 2026, https://developers.google.com/google-ads/api/docs/remarketing/audience-segments/customer-match/get-started
+Customer Match Best Practices - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/10010286?hl=en
+5 Minute Guide to Using Customer Match Lists in Google Ads, accessed January 12, 2026, https://www.deepfootprints.co.uk/2025/01/21/5-minute-guide-for-using-customer-match-in-google-ads/
+Reach specific audiences with LinkedIn Profile Targeting, accessed January 12, 2026, https://about.ads.microsoft.com/en/blog/post/march-2022/reach-specific-audiences-with-linkedin-profile-targeting
+How To Target LinkedIn Users Through Microsoft Ads - Adzooma, accessed January 12, 2026, https://adzooma.com/blog/target-linkedin-users-microsoft-ads/
+7 Types of Audience Segments in Google Ads - InterTeam Marketing, accessed January 12, 2026, https://www.interteammarketing.com/blog/types-of-google-ads-audience-targeting
+Google Ads Audience Targeting: Strategies That Work in 2025, accessed January 12, 2026, https://kpplaybook.com/resources/google-ads-audience-targeting-strategies-webinar-recap/
+Google Ads Learning Phase: Everything You Need to Know - Decocre, accessed January 12, 2026, https://decocre.com/blog/google-ads-learning-phase/
+Google Ads Bidding Exploration: What It Is, How Long It Lasts, and ..., accessed January 12, 2026, https://www.karooya.com/blog/google-ads-bidding-exploration-what-it-is-how-long-it-lasts-and-how-to-manage-it/
+Display Smart Bidding Guide - Google, accessed January 12, 2026, https://services.google.com/fh/files/misc/gda_smart_bidding_guide.pdf
+When and How to Use Each Google Ads Smart Bidding Strategy, accessed January 12, 2026, https://www.optmyzr.com/blog/smart-bidding-strategies/
+About Smart Bidding - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/7065882?hl=en
+Smart Moves: A Guide to Google Ads Bidding Strategies - Linear, accessed January 12, 2026, https://lineardesign.com/blog/bidding-strategy-google-ads/
+Use auction insights to compare performance - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/2579754?hl=en
+How to Use the Google Ads Auction Insights Report - GlowMetrics, accessed January 12, 2026, https://glowmetrics.com/blog/how-to-use-the-google-ads-auction-insights-report/
+Attribution in Google Ads: What You Need to Know in 2025 | PPC Live, accessed January 12, 2026, https://ppc.live/library/strategy/attribution-in-google-ads-what-you-need-to-know-in-2025/
+Google to sunset 4 attribution models in Ads and Analytics, accessed January 12, 2026, https://searchengineland.com/google-sunsets-attribution-models-395297
+Ultimate Guide to Ads Attribution Integration in 2025 - growth-onomics, accessed January 12, 2026, https://growth-onomics.com/ads-attribution-integration-guide/
+Microsoft Advertising and Google Ads feature comparison (EN‑Global), accessed January 12, 2026, https://about.ads.microsoft.com/content/dam/sites/msa-about/global/common/content-lib/pdf/microsoft-advertising-and-google-ads-feature-comparison.pdf
+Google Ads or Microsoft Advertising: Which is Better for ... - Intellitonic, accessed January 12, 2026, https://intellitonic.com/blog/google-ads-vs-bing-ads/
+Microsoft Ads vs Google Ads: Which Is Best for You | TDMP, accessed January 12, 2026, https://www.tdmp.co.uk/insights/microsoft-advertising-vs-google-ads-which-best-your-brand
+Bing Paid Advertising: How It Works and Compares to Google Ads, accessed January 12, 2026, https://kme.digital/bing-paid-advertising-how-it-works-and-compares-to-google-ads/
+Microsoft Advertising API, accessed January 12, 2026, https://learn.microsoft.com/en-us/advertising/
+Bing Ads API Overview - Microsoft Advertising API - Microsoft Learn, accessed January 12, 2026, https://learn.microsoft.com/en-us/advertising/guides/?view=bingads-13
+Advertising/advertising/scripts/reference-overview.md at main - GitHub, accessed January 12, 2026, https://github.com/MicrosoftDocs/Advertising/blob/main/advertising/scripts/reference-overview.md
+Google Gemini and Search gain agentic commerce tools backed by Flipkart, Wayfair and Target: How shopping will change, accessed January 12, 2026, https://www.livemint.com/technology/tech-news/google-gemini-and-search-gain-agentic-commerce-tools-backed-by-flipkart-wayfair-and-target-how-shopping-will-change-11768234293860.html
+Sundar Pichai explains how Google AI is transforming retail, shopping experiences, and delivery in 2026, accessed January 12, 2026, https://timesofindia.indiatimes.com/technology/tech-news/sundar-pichai-explains-how-google-ai-is-transforming-retail-shopping-experiences-and-delivery-in-2026/articleshow/126476487.cms
+What’s the Umair viral video Pakistan 7:11 minutes trend, and how it may have a notorious link with the 19-minute video, accessed January 12, 2026, https://m.economictimes.com/news/new-updates/whats-the-umair-viral-video-pakistan-711-minutes-trend-and-how-it-may-have-a-notorious-link-with-the-19-minute-video/articleshow/126487195.cms
+How to Improve Quality Score in Google Ads: The Ultimate 2025 Guide, accessed January 12, 2026, https://www.landermagic.com/blog/how-to-improve-quality-score
+Why Quality Score Still Deserves Your Attention in 2025 - Optmyzr, accessed January 12, 2026, https://www.optmyzr.com/blog/google-ads-quality-score/
+10-Step Guide to Troubleshoot Drops in Google Ads Conversions, accessed January 12, 2026, https://www.vladimirjones.com/blog/10-step-guide-to-troubleshoot-drops-in-google-ads-conversions
+How to recover from Google Ads performance drops, accessed January 12, 2026, https://searchengineland.com/google-ads-performance-drops-recover-444357
+Troubleshooting performance fluctuations and changes in Google ..., accessed January 12, 2026, https://support.google.com/google-ads/answer/12077891?hl=en
+Set up a custom experiment - Google Ads Help, accessed January 12, 2026, https://support.google.com/google-ads/answer/6261395?hl=en
+Test Campaigns with Ease with Ads Experiments – Google Ads, accessed January 12, 2026, https://business.google.com/en-all/ad-tools/google-ad-experiments/

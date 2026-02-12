@@ -1,0 +1,14 @@
+{
+  "id": "GET_SA360_OAUTH_STATUS_CONNECTED",
+  "pillar": "functionality",
+  "kind": "get",
+  "request": {
+    "url": "/api/sa360/oauth/status?session_id=${SESSION_ID}"
+  },
+  "expect": {
+    "__status": 200,
+    "__ok": true,
+    "connected": true
+  }
+}
+

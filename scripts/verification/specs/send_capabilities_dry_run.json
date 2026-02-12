@@ -1,0 +1,23 @@
+{
+  "id": "SEND_CAPABILITIES_DRY_RUN",
+  "pillar": "functionality",
+  "kind": "send",
+  "request": {
+    "message": "What can you do?",
+    "ai_enabled": true,
+    "dry_run": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant",
+    "model": "rules"
+  },
+  "budgets": {
+    "p95_latency_ms": 1000,
+    "samples": 7
+  },
+  "assert": {
+    "reply_min_len": 80,
+    "reply_not_contains": ["api key", "access token", "refresh token"]
+  }
+}

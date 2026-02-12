@@ -1,0 +1,52 @@
+{
+  "cases": [
+    {
+      "name": "performance_account_last_week",
+      "message": "How did the Mobility Recharge account perform last week?",
+      "expected": {
+        "intent": "performance",
+        "run_planner": true
+      }
+    },
+    {
+      "name": "audit_request",
+      "message": "Run a PPC audit for Mobility",
+      "expected": {
+        "intent": "audit",
+        "run_planner": true
+      }
+    },
+    {
+      "name": "seasonality_request",
+      "message": "What is the seasonality trend for Mobility Recharge this year?",
+      "expected": {
+        "intent": "seasonality",
+        "run_trends": true,
+        "run_planner": false
+      }
+    },
+    {
+      "name": "general_strategy",
+      "message": "What is our budget strategy for next quarter?",
+      "expected": {
+        "intent": "general_chat",
+        "run_planner": false,
+        "run_trends": false
+      }
+    },
+    {
+      "name": "serp_intent",
+      "message": "Check this landing page for soft 404 issues",
+      "expected": {
+        "intent": "serp"
+      }
+    },
+    {
+      "name": "creative_intent",
+      "message": "Generate ad copy for a pizza delivery business",
+      "expected": {
+        "intent": "creative"
+      }
+    }
+  ]
+}

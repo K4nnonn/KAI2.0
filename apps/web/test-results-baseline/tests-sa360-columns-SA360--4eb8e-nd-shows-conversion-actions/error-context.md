@@ -1,0 +1,6222 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - img [ref=e6]
+      - generic [ref=e17]:
+        - generic [ref=e18]: KAI
+        - generic [ref=e19]: kelvin AI
+    - navigation [ref=e20]:
+      - button "AI assistant for PPC tasks - I can help with audits, creative, analysis, and strategic insights" [ref=e21] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: Kai Chat
+      - button "100+ point Google Ads audit with industry benchmarks and actionable recommendations" [ref=e26] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e30]: Klaudit Audit
+      - button "Generate RSA headlines and descriptions with Google Ads character validation" [ref=e31] [cursor=pointer]:
+        - img [ref=e33]
+        - generic [ref=e35]: Creative Studio
+      - button "Analyze Performance Max campaigns for channel mix, efficiency, and mobile app waste" [ref=e36] [cursor=pointer]:
+        - img [ref=e38]
+        - generic [ref=e40]: PMax Deep Dive
+      - button "Check URL health, detect soft 404s, and monitor search rankings" [ref=e41] [cursor=pointer]:
+        - img [ref=e43]
+        - generic [ref=e45]: SERP Monitor
+      - button "Env & Keys" [ref=e46] [cursor=pointer]:
+        - img [ref=e48]
+        - generic [ref=e50]: Env & Keys
+      - button "Browse SA360 conversion action columns available to your connected account(s)" [ref=e51] [cursor=pointer]:
+        - img [ref=e53]
+        - generic [ref=e55]: SA360 Columns
+      - button "Full technical architecture map with system flows and external dependencies" [ref=e56] [cursor=pointer]:
+        - img [ref=e58]
+        - generic [ref=e60]: Info
+      - button "Configure your preferences, API keys, and platform settings" [ref=e61] [cursor=pointer]:
+        - img [ref=e63]
+        - generic [ref=e65]: Settings
+  - main [ref=e66]:
+    - generic [ref=e67]:
+      - generic [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - heading "SA360 Columns (Conversion Actions)" [level=4] [ref=e71]
+            - paragraph [ref=e72]: Browse the conversion action names this user can reference in prompts. Values shown are for LAST_30_DAYS.
+          - generic [ref=e73]:
+            - generic [ref=e75]: SA360 connected
+            - generic "Refresh SA360 status" [ref=e76]:
+              - button [ref=e77] [cursor=pointer]:
+                - img [ref=e78]
+        - generic [ref=e80]:
+          - generic [ref=e82]:
+            - generic [ref=e83]: Account (by name)
+            - generic [ref=e84]:
+              - combobox "Account (by name)" [ref=e85]: Havas_Shell_GoogleAds_US_Mobility Loyalty (7902313748)
+              - button "Open" [ref=e87] [cursor=pointer]:
+                - img [ref=e88]
+              - group:
+                - generic: Account (by name)
+          - button "Reload accounts" [ref=e90] [cursor=pointer]: Reload accounts
+          - generic [ref=e91]:
+            - generic: Search columns
+            - generic [ref=e92]:
+              - textbox "Search columns" [ref=e93]:
+                - /placeholder: e.g., store visits, directions, fuel rewards
+              - group:
+                - generic: Search columns
+        - alert [ref=e94]:
+          - img [ref=e96]
+          - generic [ref=e98]: Account saved
+      - generic [ref=e100]:
+        - generic [ref=e101]:
+          - heading "Showing 361 of 361 columns for Havas_Shell_GoogleAds_US_Mobility Loyalty" [level=6] [ref=e102]
+          - button "Refresh columns" [ref=e103] [cursor=pointer]: Refresh columns
+        - table "SA360 conversion columns" [ref=e105]:
+          - rowgroup [ref=e106]:
+            - row "Name Category Conversions All conversions All conv value Metric key" [ref=e107]:
+              - columnheader "Name" [ref=e108]
+              - columnheader "Category" [ref=e109]
+              - columnheader "Conversions" [ref=e110]
+              - columnheader "All conversions" [ref=e111]
+              - columnheader "All conv value" [ref=e112]
+              - columnheader "Metric key" [ref=e113]
+          - rowgroup [ref=e114]:
+            - row "Local actions - Directions enabled GET_DIRECTIONS 0 164748 27067875.973527275 custom:local_actions_directions Copy metric key Use in chat" [ref=e115]:
+              - cell "Local actions - Directions enabled" [ref=e116]:
+                - paragraph [ref=e117]: Local actions - Directions
+                - text: enabled
+              - cell "GET_DIRECTIONS" [ref=e118]
+              - cell "0" [ref=e119]
+              - cell "164748" [ref=e120]
+              - cell "27067875.973527275" [ref=e121]
+              - cell "custom:local_actions_directions Copy metric key Use in chat" [ref=e122]:
+                - generic [ref=e123]:
+                  - generic [ref=e124]: custom:local_actions_directions
+                  - generic "Copy metric key" [ref=e125]:
+                    - button [ref=e126] [cursor=pointer]:
+                      - img [ref=e127]
+                  - generic "Use in chat" [ref=e129]:
+                    - button [ref=e130] [cursor=pointer]:
+                      - img [ref=e131]
+            - row "Local actions - Other engagements enabled ENGAGEMENT 0 120879 141988.052500765 custom:local_actions_other_engagements Copy metric key Use in chat" [ref=e133]:
+              - cell "Local actions - Other engagements enabled" [ref=e134]:
+                - paragraph [ref=e135]: Local actions - Other engagements
+                - text: enabled
+              - cell "ENGAGEMENT" [ref=e136]
+              - cell "0" [ref=e137]
+              - cell "120879" [ref=e138]
+              - cell "141988.052500765" [ref=e139]
+              - cell "custom:local_actions_other_engagements Copy metric key Use in chat" [ref=e140]:
+                - generic [ref=e141]:
+                  - generic [ref=e142]: custom:local_actions_other_engagements
+                  - generic "Copy metric key" [ref=e143]:
+                    - button [ref=e144] [cursor=pointer]:
+                      - img [ref=e145]
+                  - generic "Use in chat" [ref=e147]:
+                    - button [ref=e148] [cursor=pointer]:
+                      - img [ref=e149]
+            - row "Store visits enabled STORE_VISIT 0 112030.893839 131984.363238775 custom:store_visits Copy metric key Use in chat" [ref=e151]:
+              - cell "Store visits enabled" [ref=e152]:
+                - paragraph [ref=e153]: Store visits
+                - text: enabled
+              - cell "STORE_VISIT" [ref=e154]
+              - cell "0" [ref=e155]
+              - cell "112030.893839" [ref=e156]
+              - cell "131984.363238775" [ref=e157]
+              - cell "custom:store_visits Copy metric key Use in chat" [ref=e158]:
+                - generic [ref=e159]:
+                  - generic [ref=e160]: custom:store_visits
+                  - generic "Copy metric key" [ref=e161]:
+                    - button [ref=e162] [cursor=pointer]:
+                      - img [ref=e163]
+                  - generic "Use in chat" [ref=e165]:
+                    - button [ref=e166] [cursor=pointer]:
+                      - img [ref=e167]
+            - row "Store sales enabled STORE_SALE 0 99381 46662494.95254514 custom:store_sales Copy metric key Use in chat" [ref=e169]:
+              - cell "Store sales enabled" [ref=e170]:
+                - paragraph [ref=e171]: Store sales
+                - text: enabled
+              - cell "STORE_SALE" [ref=e172]
+              - cell "0" [ref=e173]
+              - cell "99381" [ref=e174]
+              - cell "46662494.95254514" [ref=e175]
+              - cell "custom:store_sales Copy metric key Use in chat" [ref=e176]:
+                - generic [ref=e177]:
+                  - generic [ref=e178]: custom:store_sales
+                  - generic "Copy metric key" [ref=e179]:
+                    - button [ref=e180] [cursor=pointer]:
+                      - img [ref=e181]
+                  - generic "Use in chat" [ref=e183]:
+                    - button [ref=e184] [cursor=pointer]:
+                      - img [ref=e185]
+            - row "Clicks to call enabled CONTACT 0 27891 32804.179961192 custom:clicks_to_call Copy metric key Use in chat" [ref=e187]:
+              - cell "Clicks to call enabled" [ref=e188]:
+                - paragraph [ref=e189]: Clicks to call
+                - text: enabled
+              - cell "CONTACT" [ref=e190]
+              - cell "0" [ref=e191]
+              - cell "27891" [ref=e192]
+              - cell "32804.179961192" [ref=e193]
+              - cell "custom:clicks_to_call Copy metric key Use in chat" [ref=e194]:
+                - generic [ref=e195]:
+                  - generic [ref=e196]: custom:clicks_to_call
+                  - generic "Copy metric key" [ref=e197]:
+                    - button [ref=e198] [cursor=pointer]:
+                      - img [ref=e199]
+                  - generic "Use in chat" [ref=e201]:
+                    - button [ref=e202] [cursor=pointer]:
+                      - img [ref=e203]
+            - row "Shell Global - Page View enabled PAGE_VIEW 0 24952.4211 0 custom:shell_global_page_view Copy metric key Use in chat" [ref=e205]:
+              - cell "Shell Global - Page View enabled" [ref=e206]:
+                - paragraph [ref=e207]: Shell Global - Page View
+                - text: enabled
+              - cell "PAGE_VIEW" [ref=e208]
+              - cell "0" [ref=e209]
+              - cell "24952.4211" [ref=e210]
+              - cell "0" [ref=e211]
+              - cell "custom:shell_global_page_view Copy metric key Use in chat" [ref=e212]:
+                - generic [ref=e213]:
+                  - generic [ref=e214]: custom:shell_global_page_view
+                  - generic "Copy metric key" [ref=e215]:
+                    - button [ref=e216] [cursor=pointer]:
+                      - img [ref=e217]
+                  - generic "Use in chat" [ref=e219]:
+                    - button [ref=e220] [cursor=pointer]:
+                      - img [ref=e221]
+            - row "ALL_Shell_GLO_Visits_AllPages_STD_2023-12-20 enabled DEFAULT 0 13493 0 custom:all_shell_glo_visits_allpages_std_2023_12_20 Copy metric key Use in chat" [ref=e223]:
+              - cell "ALL_Shell_GLO_Visits_AllPages_STD_2023-12-20 enabled" [ref=e224]:
+                - paragraph [ref=e225]: ALL_Shell_GLO_Visits_AllPages_STD_2023-12-20
+                - text: enabled
+              - cell "DEFAULT" [ref=e226]
+              - cell "0" [ref=e227]
+              - cell "13493" [ref=e228]
+              - cell "0" [ref=e229]
+              - cell "custom:all_shell_glo_visits_allpages_std_2023_12_20 Copy metric key Use in chat" [ref=e230]:
+                - generic [ref=e231]:
+                  - generic [ref=e232]: custom:all_shell_glo_visits_allpages_std_2023_12_20
+                  - generic "Copy metric key" [ref=e233]:
+                    - button [ref=e234] [cursor=pointer]:
+                      - img [ref=e235]
+                  - generic "Use in chat" [ref=e237]:
+                    - button [ref=e238] [cursor=pointer]:
+                      - img [ref=e239]
+            - row "ALL_Shell_GLO_Visits_Allpages_UNQ_2023-11-30 enabled DEFAULT 0 6858 0 custom:all_shell_glo_visits_allpages_unq_2023_11_30 Copy metric key Use in chat" [ref=e241]:
+              - cell "ALL_Shell_GLO_Visits_Allpages_UNQ_2023-11-30 enabled" [ref=e242]:
+                - paragraph [ref=e243]: ALL_Shell_GLO_Visits_Allpages_UNQ_2023-11-30
+                - text: enabled
+              - cell "DEFAULT" [ref=e244]
+              - cell "0" [ref=e245]
+              - cell "6858" [ref=e246]
+              - cell "0" [ref=e247]
+              - cell "custom:all_shell_glo_visits_allpages_unq_2023_11_30 Copy metric key Use in chat" [ref=e248]:
+                - generic [ref=e249]:
+                  - generic [ref=e250]: custom:all_shell_glo_visits_allpages_unq_2023_11_30
+                  - generic "Copy metric key" [ref=e251]:
+                    - button [ref=e252] [cursor=pointer]:
+                      - img [ref=e253]
+                  - generic "Use in chat" [ref=e255]:
+                    - button [ref=e256] [cursor=pointer]:
+                      - img [ref=e257]
+            - row "Local actions - Website visits enabled PAGE_VIEW 0 6371 7479.234606609 custom:local_actions_website_visits Copy metric key Use in chat" [ref=e259]:
+              - cell "Local actions - Website visits enabled" [ref=e260]:
+                - paragraph [ref=e261]: Local actions - Website visits
+                - text: enabled
+              - cell "PAGE_VIEW" [ref=e262]
+              - cell "0" [ref=e263]
+              - cell "6371" [ref=e264]
+              - cell "7479.234606609" [ref=e265]
+              - cell "custom:local_actions_website_visits Copy metric key Use in chat" [ref=e266]:
+                - generic [ref=e267]:
+                  - generic [ref=e268]: custom:local_actions_website_visits
+                  - generic "Copy metric key" [ref=e269]:
+                    - button [ref=e270] [cursor=pointer]:
+                      - img [ref=e271]
+                  - generic "Use in chat" [ref=e273]:
+                    - button [ref=e274] [cursor=pointer]:
+                      - img [ref=e275]
+            - row "Google Analytics - engaged_30s - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT 0 3278 0 custom:google_analytics_engaged_30s_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e277]:
+              - cell "Google Analytics - engaged_30s - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e278]:
+                - paragraph [ref=e279]: Google Analytics - engaged_30s - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e280]
+              - cell "0" [ref=e281]
+              - cell "3278" [ref=e282]
+              - cell "0" [ref=e283]
+              - cell "custom:google_analytics_engaged_30s_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e284]:
+                - generic [ref=e285]:
+                  - generic [ref=e286]: custom:google_analytics_engaged_30s_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e287]:
+                    - button [ref=e288] [cursor=pointer]:
+                      - img [ref=e289]
+                  - generic "Use in chat" [ref=e291]:
+                    - button [ref=e292] [cursor=pointer]:
+                      - img [ref=e293]
+            - row "Shell US & Canada (Android) Session Begin 9.30 enabled DEFAULT 0 2707 3190.453608948 custom:shell_us_canada_android_session_begin_9_30 Copy metric key Use in chat" [ref=e295]:
+              - cell "Shell US & Canada (Android) Session Begin 9.30 enabled" [ref=e296]:
+                - paragraph [ref=e297]: Shell US & Canada (Android) Session Begin 9.30
+                - text: enabled
+              - cell "DEFAULT" [ref=e298]
+              - cell "0" [ref=e299]
+              - cell "2707" [ref=e300]
+              - cell "3190.453608948" [ref=e301]
+              - cell "custom:shell_us_canada_android_session_begin_9_30 Copy metric key Use in chat" [ref=e302]:
+                - generic [ref=e303]:
+                  - generic [ref=e304]: custom:shell_us_canada_android_session_begin_9_30
+                  - generic "Copy metric key" [ref=e305]:
+                    - button [ref=e306] [cursor=pointer]:
+                      - img [ref=e307]
+                  - generic "Use in chat" [ref=e309]:
+                    - button [ref=e310] [cursor=pointer]:
+                      - img [ref=e311]
+            - row "ENG_Shell_USA_OnClick-Fuel-Rewards-Sign-Up_Unique_2024-11-22 enabled DEFAULT 1683 2129 0 custom:eng_shell_usa_onclick_fuel_rewards_sign_up_unique_2024_11_22 Copy metric key Use in chat" [ref=e313]:
+              - cell "ENG_Shell_USA_OnClick-Fuel-Rewards-Sign-Up_Unique_2024-11-22 enabled" [ref=e314]:
+                - paragraph [ref=e315]: ENG_Shell_USA_OnClick-Fuel-Rewards-Sign-Up_Unique_2024-11-22
+                - text: enabled
+              - cell "DEFAULT" [ref=e316]
+              - cell "1683" [ref=e317]
+              - cell "2129" [ref=e318]
+              - cell "0" [ref=e319]
+              - cell "custom:eng_shell_usa_onclick_fuel_rewards_sign_up_unique_2024_11_22 Copy metric key Use in chat" [ref=e320]:
+                - generic [ref=e321]:
+                  - generic [ref=e322]: custom:eng_shell_usa_onclick_fuel_rewards_sign_up_unique_2024_11_22
+                  - generic "Copy metric key" [ref=e323]:
+                    - button [ref=e324] [cursor=pointer]:
+                      - img [ref=e325]
+                  - generic "Use in chat" [ref=e327]:
+                    - button [ref=e328] [cursor=pointer]:
+                      - img [ref=e329]
+            - row "Shell US & Canada (Android) Payment Type Link 9.12 enabled DEFAULT 0 1387 1630.035920045 custom:shell_us_canada_android_payment_type_link_9_12 Copy metric key Use in chat" [ref=e331]:
+              - cell "Shell US & Canada (Android) Payment Type Link 9.12 enabled" [ref=e332]:
+                - paragraph [ref=e333]: Shell US & Canada (Android) Payment Type Link 9.12
+                - text: enabled
+              - cell "DEFAULT" [ref=e334]
+              - cell "0" [ref=e335]
+              - cell "1387" [ref=e336]
+              - cell "1630.035920045" [ref=e337]
+              - cell "custom:shell_us_canada_android_payment_type_link_9_12 Copy metric key Use in chat" [ref=e338]:
+                - generic [ref=e339]:
+                  - generic [ref=e340]: custom:shell_us_canada_android_payment_type_link_9_12
+                  - generic "Copy metric key" [ref=e341]:
+                    - button [ref=e342] [cursor=pointer]:
+                      - img [ref=e343]
+                  - generic "Use in chat" [ref=e345]:
+                    - button [ref=e346] [cursor=pointer]:
+                      - img [ref=e347]
+            - row "Shell US & Canada (Android) first_open enabled DOWNLOAD 0 1261 0 custom:shell_us_canada_android_first_open Copy metric key Use in chat" [ref=e349]:
+              - cell "Shell US & Canada (Android) first_open enabled" [ref=e350]:
+                - paragraph [ref=e351]: Shell US & Canada (Android) first_open
+                - text: enabled
+              - cell "DOWNLOAD" [ref=e352]
+              - cell "0" [ref=e353]
+              - cell "1261" [ref=e354]
+              - cell "0" [ref=e355]
+              - cell "custom:shell_us_canada_android_first_open Copy metric key Use in chat" [ref=e356]:
+                - generic [ref=e357]:
+                  - generic [ref=e358]: custom:shell_us_canada_android_first_open
+                  - generic "Copy metric key" [ref=e359]:
+                    - button [ref=e360] [cursor=pointer]:
+                      - img [ref=e361]
+                  - generic "Use in chat" [ref=e363]:
+                    - button [ref=e364] [cursor=pointer]:
+                      - img [ref=e365]
+            - row "Shell US & Canada (Android) Pay At Pump 9.12 enabled DEFAULT 0 1137 1339.847797282 custom:shell_us_canada_android_pay_at_pump_9_12 Copy metric key Use in chat" [ref=e367]:
+              - cell "Shell US & Canada (Android) Pay At Pump 9.12 enabled" [ref=e368]:
+                - paragraph [ref=e369]: Shell US & Canada (Android) Pay At Pump 9.12
+                - text: enabled
+              - cell "DEFAULT" [ref=e370]
+              - cell "0" [ref=e371]
+              - cell "1137" [ref=e372]
+              - cell "1339.847797282" [ref=e373]
+              - cell "custom:shell_us_canada_android_pay_at_pump_9_12 Copy metric key Use in chat" [ref=e374]:
+                - generic [ref=e375]:
+                  - generic [ref=e376]: custom:shell_us_canada_android_pay_at_pump_9_12
+                  - generic "Copy metric key" [ref=e377]:
+                    - button [ref=e378] [cursor=pointer]:
+                      - img [ref=e379]
+                  - generic "Use in chat" [ref=e381]:
+                    - button [ref=e382] [cursor=pointer]:
+                      - img [ref=e383]
+            - row "Google Analytics - download_the_app_widget - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT 0 953 0 custom:google_analytics_download_the_app_widget_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e385]:
+              - cell "Google Analytics - download_the_app_widget - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e386]:
+                - paragraph [ref=e387]: Google Analytics - download_the_app_widget - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e388]
+              - cell "0" [ref=e389]
+              - cell "953" [ref=e390]
+              - cell "0" [ref=e391]
+              - cell "custom:google_analytics_download_the_app_widget_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e392]:
+                - generic [ref=e393]:
+                  - generic [ref=e394]: custom:google_analytics_download_the_app_widget_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e395]:
+                    - button [ref=e396] [cursor=pointer]:
+                      - img [ref=e397]
+                  - generic "Use in chat" [ref=e399]:
+                    - button [ref=e400] [cursor=pointer]:
+                      - img [ref=e401]
+            - row "Kochava - Shell US & Canada - Android - ecommerce_purchase enabled PURCHASE 0 813 0 custom:kochava_shell_us_canada_android_ecommerce_purchase Copy metric key Use in chat" [ref=e403]:
+              - cell "Kochava - Shell US & Canada - Android - ecommerce_purchase enabled" [ref=e404]:
+                - paragraph [ref=e405]: Kochava - Shell US & Canada - Android - ecommerce_purchase
+                - text: enabled
+              - cell "PURCHASE" [ref=e406]
+              - cell "0" [ref=e407]
+              - cell "813" [ref=e408]
+              - cell "0" [ref=e409]
+              - cell "custom:kochava_shell_us_canada_android_ecommerce_purchase Copy metric key Use in chat" [ref=e410]:
+                - generic [ref=e411]:
+                  - generic [ref=e412]: custom:kochava_shell_us_canada_android_ecommerce_purchase
+                  - generic "Copy metric key" [ref=e413]:
+                    - button [ref=e414] [cursor=pointer]:
+                      - img [ref=e415]
+                  - generic "Use in chat" [ref=e417]:
+                    - button [ref=e418] [cursor=pointer]:
+                      - img [ref=e419]
+            - row "Kochava - Shell US & Canada - Android - first_open enabled DEFAULT 0 794 0 custom:kochava_shell_us_canada_android_first_open Copy metric key Use in chat" [ref=e421]:
+              - cell "Kochava - Shell US & Canada - Android - first_open enabled" [ref=e422]:
+                - paragraph [ref=e423]: Kochava - Shell US & Canada - Android - first_open
+                - text: enabled
+              - cell "DEFAULT" [ref=e424]
+              - cell "0" [ref=e425]
+              - cell "794" [ref=e426]
+              - cell "0" [ref=e427]
+              - cell "custom:kochava_shell_us_canada_android_first_open Copy metric key Use in chat" [ref=e428]:
+                - generic [ref=e429]:
+                  - generic [ref=e430]: custom:kochava_shell_us_canada_android_first_open
+                  - generic "Copy metric key" [ref=e431]:
+                    - button [ref=e432] [cursor=pointer]:
+                      - img [ref=e433]
+                  - generic "Use in chat" [ref=e435]:
+                    - button [ref=e436] [cursor=pointer]:
+                      - img [ref=e437]
+            - row "Shell US & Canada (Android) Locate Station 9.12 enabled DEFAULT 0 675 792.281028353 custom:shell_us_canada_android_locate_station_9_12 Copy metric key Use in chat" [ref=e439]:
+              - cell "Shell US & Canada (Android) Locate Station 9.12 enabled" [ref=e440]:
+                - paragraph [ref=e441]: Shell US & Canada (Android) Locate Station 9.12
+                - text: enabled
+              - cell "DEFAULT" [ref=e442]
+              - cell "0" [ref=e443]
+              - cell "675" [ref=e444]
+              - cell "792.281028353" [ref=e445]
+              - cell "custom:shell_us_canada_android_locate_station_9_12 Copy metric key Use in chat" [ref=e446]:
+                - generic [ref=e447]:
+                  - generic [ref=e448]: custom:shell_us_canada_android_locate_station_9_12
+                  - generic "Copy metric key" [ref=e449]:
+                    - button [ref=e450] [cursor=pointer]:
+                      - img [ref=e451]
+                  - generic "Use in chat" [ref=e453]:
+                    - button [ref=e454] [cursor=pointer]:
+                      - img [ref=e455]
+            - row "Shell US & Canada (iOS) first_open enabled DOWNLOAD 0 648 0 custom:shell_us_canada_ios_first_open Copy metric key Use in chat" [ref=e457]:
+              - cell "Shell US & Canada (iOS) first_open enabled" [ref=e458]:
+                - paragraph [ref=e459]: Shell US & Canada (iOS) first_open
+                - text: enabled
+              - cell "DOWNLOAD" [ref=e460]
+              - cell "0" [ref=e461]
+              - cell "648" [ref=e462]
+              - cell "0" [ref=e463]
+              - cell "custom:shell_us_canada_ios_first_open Copy metric key Use in chat" [ref=e464]:
+                - generic [ref=e465]:
+                  - generic [ref=e466]: custom:shell_us_canada_ios_first_open
+                  - generic "Copy metric key" [ref=e467]:
+                    - button [ref=e468] [cursor=pointer]:
+                      - img [ref=e469]
+                  - generic "Use in chat" [ref=e471]:
+                    - button [ref=e472] [cursor=pointer]:
+                      - img [ref=e473]
+            - row "Google Analytics - renewable_race_fuel_app_FR - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT 0 602 0 custom:google_analytics_renewable_race_fuel_app_fr_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e475]:
+              - cell "Google Analytics - renewable_race_fuel_app_FR - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e476]:
+                - paragraph [ref=e477]: Google Analytics - renewable_race_fuel_app_FR - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e478]
+              - cell "0" [ref=e479]
+              - cell "602" [ref=e480]
+              - cell "0" [ref=e481]
+              - cell "custom:google_analytics_renewable_race_fuel_app_fr_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e482]:
+                - generic [ref=e483]:
+                  - generic [ref=e484]: custom:google_analytics_renewable_race_fuel_app_fr_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e485]:
+                    - button [ref=e486] [cursor=pointer]:
+                      - img [ref=e487]
+                  - generic "Use in chat" [ref=e489]:
+                    - button [ref=e490] [cursor=pointer]:
+                      - img [ref=e491]
+            - row "Shell Global - App Download enabled DEFAULT 0 518.906828 12203.129961678 custom:shell_global_app_download Copy metric key Use in chat" [ref=e493]:
+              - cell "Shell Global - App Download enabled" [ref=e494]:
+                - paragraph [ref=e495]: Shell Global - App Download
+                - text: enabled
+              - cell "DEFAULT" [ref=e496]
+              - cell "0" [ref=e497]
+              - cell "518.906828" [ref=e498]
+              - cell "12203.129961678" [ref=e499]
+              - cell "custom:shell_global_app_download Copy metric key Use in chat" [ref=e500]:
+                - generic [ref=e501]:
+                  - generic [ref=e502]: custom:shell_global_app_download
+                  - generic "Copy metric key" [ref=e503]:
+                    - button [ref=e504] [cursor=pointer]:
+                      - img [ref=e505]
+                  - generic "Use in chat" [ref=e507]:
+                    - button [ref=e508] [cursor=pointer]:
+                      - img [ref=e509]
+            - row "Shell US & Canada (Android) View Product 9.12 enabled DEFAULT 0 311 365.355306214 custom:shell_us_canada_android_view_product_9_12 Copy metric key Use in chat" [ref=e511]:
+              - cell "Shell US & Canada (Android) View Product 9.12 enabled" [ref=e512]:
+                - paragraph [ref=e513]: Shell US & Canada (Android) View Product 9.12
+                - text: enabled
+              - cell "DEFAULT" [ref=e514]
+              - cell "0" [ref=e515]
+              - cell "311" [ref=e516]
+              - cell "365.355306214" [ref=e517]
+              - cell "custom:shell_us_canada_android_view_product_9_12 Copy metric key Use in chat" [ref=e518]:
+                - generic [ref=e519]:
+                  - generic [ref=e520]: custom:shell_us_canada_android_view_product_9_12
+                  - generic "Copy metric key" [ref=e521]:
+                    - button [ref=e522] [cursor=pointer]:
+                      - img [ref=e523]
+                  - generic "Use in chat" [ref=e525]:
+                    - button [ref=e526] [cursor=pointer]:
+                      - img [ref=e527]
+            - row "YouTube follow-on views enabled 0 304 357.118887617 custom:youtube_follow_on_views Copy metric key Use in chat" [ref=e529]:
+              - cell "YouTube follow-on views enabled" [ref=e530]:
+                - paragraph [ref=e531]: YouTube follow-on views
+                - text: enabled
+              - cell [ref=e532]
+              - cell "0" [ref=e533]
+              - cell "304" [ref=e534]
+              - cell "357.118887617" [ref=e535]
+              - cell "custom:youtube_follow_on_views Copy metric key Use in chat" [ref=e536]:
+                - generic [ref=e537]:
+                  - generic [ref=e538]: custom:youtube_follow_on_views
+                  - generic "Copy metric key" [ref=e539]:
+                    - button [ref=e540] [cursor=pointer]:
+                      - img [ref=e541]
+                  - generic "Use in chat" [ref=e543]:
+                    - button [ref=e544] [cursor=pointer]:
+                      - img [ref=e545]
+            - row "ALL_Shell_GLO_Lead_App Download_Unique_2023-12 enabled DEFAULT 0 252 0 custom:all_shell_glo_lead_app_download_unique_2023_12 Copy metric key Use in chat" [ref=e547]:
+              - cell "ALL_Shell_GLO_Lead_App Download_Unique_2023-12 enabled" [ref=e548]:
+                - paragraph [ref=e549]: ALL_Shell_GLO_Lead_App Download_Unique_2023-12
+                - text: enabled
+              - cell "DEFAULT" [ref=e550]
+              - cell "0" [ref=e551]
+              - cell "252" [ref=e552]
+              - cell "0" [ref=e553]
+              - cell "custom:all_shell_glo_lead_app_download_unique_2023_12 Copy metric key Use in chat" [ref=e554]:
+                - generic [ref=e555]:
+                  - generic [ref=e556]: custom:all_shell_glo_lead_app_download_unique_2023_12
+                  - generic "Copy metric key" [ref=e557]:
+                    - button [ref=e558] [cursor=pointer]:
+                      - img [ref=e559]
+                  - generic "Use in chat" [ref=e561]:
+                    - button [ref=e562] [cursor=pointer]:
+                      - img [ref=e563]
+            - row "ENG_Shell Mobility_OnClick_Android Download_Unique_2025-04-16 enabled DEFAULT 0 239 0 custom:eng_shell_mobility_onclick_android_download_unique_2025_04_16 Copy metric key Use in chat" [ref=e565]:
+              - cell "ENG_Shell Mobility_OnClick_Android Download_Unique_2025-04-16 enabled" [ref=e566]:
+                - paragraph [ref=e567]: ENG_Shell Mobility_OnClick_Android Download_Unique_2025-04-16
+                - text: enabled
+              - cell "DEFAULT" [ref=e568]
+              - cell "0" [ref=e569]
+              - cell "239" [ref=e570]
+              - cell "0" [ref=e571]
+              - cell "custom:eng_shell_mobility_onclick_android_download_unique_2025_04_16 Copy metric key Use in chat" [ref=e572]:
+                - generic [ref=e573]:
+                  - generic [ref=e574]: custom:eng_shell_mobility_onclick_android_download_unique_2025_04_16
+                  - generic "Copy metric key" [ref=e575]:
+                    - button [ref=e576] [cursor=pointer]:
+                      - img [ref=e577]
+                  - generic "Use in chat" [ref=e579]:
+                    - button [ref=e580] [cursor=pointer]:
+                      - img [ref=e581]
+            - row "Shell US & Canada (Android) Loyalty Account Link 9.12 enabled DEFAULT 0 217 255.268701665 custom:shell_us_canada_android_loyalty_account_link_9_12 Copy metric key Use in chat" [ref=e583]:
+              - cell "Shell US & Canada (Android) Loyalty Account Link 9.12 enabled" [ref=e584]:
+                - paragraph [ref=e585]: Shell US & Canada (Android) Loyalty Account Link 9.12
+                - text: enabled
+              - cell "DEFAULT" [ref=e586]
+              - cell "0" [ref=e587]
+              - cell "217" [ref=e588]
+              - cell "255.268701665" [ref=e589]
+              - cell "custom:shell_us_canada_android_loyalty_account_link_9_12 Copy metric key Use in chat" [ref=e590]:
+                - generic [ref=e591]:
+                  - generic [ref=e592]: custom:shell_us_canada_android_loyalty_account_link_9_12
+                  - generic "Copy metric key" [ref=e593]:
+                    - button [ref=e594] [cursor=pointer]:
+                      - img [ref=e595]
+                  - generic "Use in chat" [ref=e597]:
+                    - button [ref=e598] [cursor=pointer]:
+                      - img [ref=e599]
+            - row "Local actions - Menu views enabled PAGE_VIEW 0 194 227.55489075 custom:local_actions_menu_views Copy metric key Use in chat" [ref=e601]:
+              - cell "Local actions - Menu views enabled" [ref=e602]:
+                - paragraph [ref=e603]: Local actions - Menu views
+                - text: enabled
+              - cell "PAGE_VIEW" [ref=e604]
+              - cell "0" [ref=e605]
+              - cell "194" [ref=e606]
+              - cell "227.55489075" [ref=e607]
+              - cell "custom:local_actions_menu_views Copy metric key Use in chat" [ref=e608]:
+                - generic [ref=e609]:
+                  - generic [ref=e610]: custom:local_actions_menu_views
+                  - generic "Copy metric key" [ref=e611]:
+                    - button [ref=e612] [cursor=pointer]:
+                      - img [ref=e613]
+                  - generic "Use in chat" [ref=e615]:
+                    - button [ref=e616] [cursor=pointer]:
+                      - img [ref=e617]
+            - row "Shell Global - Retailer Map enabled GET_DIRECTIONS 0 192.956268 0 custom:shell_global_retailer_map Copy metric key Use in chat" [ref=e619]:
+              - cell "Shell Global - Retailer Map enabled" [ref=e620]:
+                - paragraph [ref=e621]: Shell Global - Retailer Map
+                - text: enabled
+              - cell "GET_DIRECTIONS" [ref=e622]
+              - cell "0" [ref=e623]
+              - cell "192.956268" [ref=e624]
+              - cell "0" [ref=e625]
+              - cell "custom:shell_global_retailer_map Copy metric key Use in chat" [ref=e626]:
+                - generic [ref=e627]:
+                  - generic [ref=e628]: custom:shell_global_retailer_map
+                  - generic "Copy metric key" [ref=e629]:
+                    - button [ref=e630] [cursor=pointer]:
+                      - img [ref=e631]
+                  - generic "Use in chat" [ref=e633]:
+                    - button [ref=e634] [cursor=pointer]:
+                      - img [ref=e635]
+            - row "Kochava - Shell US & Canada - Android - custom_6 - payment_type_link enabled DEFAULT 0 161 0 custom:kochava_shell_us_canada_android_custom_6_payment_type_link Copy metric key Use in chat" [ref=e637]:
+              - cell "Kochava - Shell US & Canada - Android - custom_6 - payment_type_link enabled" [ref=e638]:
+                - paragraph [ref=e639]: Kochava - Shell US & Canada - Android - custom_6 - payment_type_link
+                - text: enabled
+              - cell "DEFAULT" [ref=e640]
+              - cell "0" [ref=e641]
+              - cell "161" [ref=e642]
+              - cell "0" [ref=e643]
+              - cell "custom:kochava_shell_us_canada_android_custom_6_payment_type_link Copy metric key Use in chat" [ref=e644]:
+                - generic [ref=e645]:
+                  - generic [ref=e646]: custom:kochava_shell_us_canada_android_custom_6_payment_type_link
+                  - generic "Copy metric key" [ref=e647]:
+                    - button [ref=e648] [cursor=pointer]:
+                      - img [ref=e649]
+                  - generic "Use in chat" [ref=e651]:
+                    - button [ref=e652] [cursor=pointer]:
+                      - img [ref=e653]
+            - row "Kochava - Shell US & Canada - Android - custom_4 - sign_in enabled DEFAULT 0 135 0 custom:kochava_shell_us_canada_android_custom_4_sign_in Copy metric key Use in chat" [ref=e655]:
+              - cell "Kochava - Shell US & Canada - Android - custom_4 - sign_in enabled" [ref=e656]:
+                - paragraph [ref=e657]: Kochava - Shell US & Canada - Android - custom_4 - sign_in
+                - text: enabled
+              - cell "DEFAULT" [ref=e658]
+              - cell "0" [ref=e659]
+              - cell "135" [ref=e660]
+              - cell "0" [ref=e661]
+              - cell "custom:kochava_shell_us_canada_android_custom_4_sign_in Copy metric key Use in chat" [ref=e662]:
+                - generic [ref=e663]:
+                  - generic [ref=e664]: custom:kochava_shell_us_canada_android_custom_4_sign_in
+                  - generic "Copy metric key" [ref=e665]:
+                    - button [ref=e666] [cursor=pointer]:
+                      - img [ref=e667]
+                  - generic "Use in chat" [ref=e669]:
+                    - button [ref=e670] [cursor=pointer]:
+                      - img [ref=e671]
+            - row "Kochava - Shell US & Canada - Android - custom_1 - locate_station enabled DEFAULT 0 128 0 custom:kochava_shell_us_canada_android_custom_1_locate_station Copy metric key Use in chat" [ref=e673]:
+              - cell "Kochava - Shell US & Canada - Android - custom_1 - locate_station enabled" [ref=e674]:
+                - paragraph [ref=e675]: Kochava - Shell US & Canada - Android - custom_1 - locate_station
+                - text: enabled
+              - cell "DEFAULT" [ref=e676]
+              - cell "0" [ref=e677]
+              - cell "128" [ref=e678]
+              - cell "0" [ref=e679]
+              - cell "custom:kochava_shell_us_canada_android_custom_1_locate_station Copy metric key Use in chat" [ref=e680]:
+                - generic [ref=e681]:
+                  - generic [ref=e682]: custom:kochava_shell_us_canada_android_custom_1_locate_station
+                  - generic "Copy metric key" [ref=e683]:
+                    - button [ref=e684] [cursor=pointer]:
+                      - img [ref=e685]
+                  - generic "Use in chat" [ref=e687]:
+                    - button [ref=e688] [cursor=pointer]:
+                      - img [ref=e689]
+            - row "Kochava - Shell US & Canada - Android - view_item enabled DEFAULT 0 110 0 custom:kochava_shell_us_canada_android_view_item Copy metric key Use in chat" [ref=e691]:
+              - cell "Kochava - Shell US & Canada - Android - view_item enabled" [ref=e692]:
+                - paragraph [ref=e693]: Kochava - Shell US & Canada - Android - view_item
+                - text: enabled
+              - cell "DEFAULT" [ref=e694]
+              - cell "0" [ref=e695]
+              - cell "110" [ref=e696]
+              - cell "0" [ref=e697]
+              - cell "custom:kochava_shell_us_canada_android_view_item Copy metric key Use in chat" [ref=e698]:
+                - generic [ref=e699]:
+                  - generic [ref=e700]: custom:kochava_shell_us_canada_android_view_item
+                  - generic "Copy metric key" [ref=e701]:
+                    - button [ref=e702] [cursor=pointer]:
+                      - img [ref=e703]
+                  - generic "Use in chat" [ref=e705]:
+                    - button [ref=e706] [cursor=pointer]:
+                      - img [ref=e707]
+            - row "Kochava - Shell US & Canada - Android - custom_5 - Registration complete enabled DEFAULT 0 96 0 custom:kochava_shell_us_canada_android_custom_5_registration_complete Copy metric key Use in chat" [ref=e709]:
+              - cell "Kochava - Shell US & Canada - Android - custom_5 - Registration complete enabled" [ref=e710]:
+                - paragraph [ref=e711]: Kochava - Shell US & Canada - Android - custom_5 - Registration complete
+                - text: enabled
+              - cell "DEFAULT" [ref=e712]
+              - cell "0" [ref=e713]
+              - cell "96" [ref=e714]
+              - cell "0" [ref=e715]
+              - cell "custom:kochava_shell_us_canada_android_custom_5_registration_complete Copy metric key Use in chat" [ref=e716]:
+                - generic [ref=e717]:
+                  - generic [ref=e718]: custom:kochava_shell_us_canada_android_custom_5_registration_complete
+                  - generic "Copy metric key" [ref=e719]:
+                    - button [ref=e720] [cursor=pointer]:
+                      - img [ref=e721]
+                  - generic "Use in chat" [ref=e723]:
+                    - button [ref=e724] [cursor=pointer]:
+                      - img [ref=e725]
+            - row "MOB_Shell_GLO_Lead_Station Locator-Search_Unique_2023-12 enabled DEFAULT 0 88 0 custom:mob_shell_glo_lead_station_locator_search_unique_2023_12 Copy metric key Use in chat" [ref=e727]:
+              - cell "MOB_Shell_GLO_Lead_Station Locator-Search_Unique_2023-12 enabled" [ref=e728]:
+                - paragraph [ref=e729]: MOB_Shell_GLO_Lead_Station Locator-Search_Unique_2023-12
+                - text: enabled
+              - cell "DEFAULT" [ref=e730]
+              - cell "0" [ref=e731]
+              - cell "88" [ref=e732]
+              - cell "0" [ref=e733]
+              - cell "custom:mob_shell_glo_lead_station_locator_search_unique_2023_12 Copy metric key Use in chat" [ref=e734]:
+                - generic [ref=e735]:
+                  - generic [ref=e736]: custom:mob_shell_glo_lead_station_locator_search_unique_2023_12
+                  - generic "Copy metric key" [ref=e737]:
+                    - button [ref=e738] [cursor=pointer]:
+                      - img [ref=e739]
+                  - generic "Use in chat" [ref=e741]:
+                    - button [ref=e742] [cursor=pointer]:
+                      - img [ref=e743]
+            - row "Kochava - Shell US & Canada - Android - custom_2 - loyalty_account_link enabled DEFAULT 0 59 0 custom:kochava_shell_us_canada_android_custom_2_loyalty_account_link Copy metric key Use in chat" [ref=e745]:
+              - cell "Kochava - Shell US & Canada - Android - custom_2 - loyalty_account_link enabled" [ref=e746]:
+                - paragraph [ref=e747]: Kochava - Shell US & Canada - Android - custom_2 - loyalty_account_link
+                - text: enabled
+              - cell "DEFAULT" [ref=e748]
+              - cell "0" [ref=e749]
+              - cell "59" [ref=e750]
+              - cell "0" [ref=e751]
+              - cell "custom:kochava_shell_us_canada_android_custom_2_loyalty_account_link Copy metric key Use in chat" [ref=e752]:
+                - generic [ref=e753]:
+                  - generic [ref=e754]: custom:kochava_shell_us_canada_android_custom_2_loyalty_account_link
+                  - generic "Copy metric key" [ref=e755]:
+                    - button [ref=e756] [cursor=pointer]:
+                      - img [ref=e757]
+                  - generic "Use in chat" [ref=e759]:
+                    - button [ref=e760] [cursor=pointer]:
+                      - img [ref=e761]
+            - row "Shell US & Canada (Android) Pay In Store 9.12 enabled DEFAULT 0 25 29.509118059 custom:shell_us_canada_android_pay_in_store_9_12 Copy metric key Use in chat" [ref=e763]:
+              - cell "Shell US & Canada (Android) Pay In Store 9.12 enabled" [ref=e764]:
+                - paragraph [ref=e765]: Shell US & Canada (Android) Pay In Store 9.12
+                - text: enabled
+              - cell "DEFAULT" [ref=e766]
+              - cell "0" [ref=e767]
+              - cell "25" [ref=e768]
+              - cell "29.509118059" [ref=e769]
+              - cell "custom:shell_us_canada_android_pay_in_store_9_12 Copy metric key Use in chat" [ref=e770]:
+                - generic [ref=e771]:
+                  - generic [ref=e772]: custom:shell_us_canada_android_pay_in_store_9_12
+                  - generic "Copy metric key" [ref=e773]:
+                    - button [ref=e774] [cursor=pointer]:
+                      - img [ref=e775]
+                  - generic "Use in chat" [ref=e777]:
+                    - button [ref=e778] [cursor=pointer]:
+                      - img [ref=e779]
+            - row "MOB_Shell_GLO_Lead_Station Locator-Plan Route_Unique_2023-12 enabled DEFAULT 0 13 0 custom:mob_shell_glo_lead_station_locator_plan_route_unique_2023_12 Copy metric key Use in chat" [ref=e781]:
+              - cell "MOB_Shell_GLO_Lead_Station Locator-Plan Route_Unique_2023-12 enabled" [ref=e782]:
+                - paragraph [ref=e783]: MOB_Shell_GLO_Lead_Station Locator-Plan Route_Unique_2023-12
+                - text: enabled
+              - cell "DEFAULT" [ref=e784]
+              - cell "0" [ref=e785]
+              - cell "13" [ref=e786]
+              - cell "0" [ref=e787]
+              - cell "custom:mob_shell_glo_lead_station_locator_plan_route_unique_2023_12 Copy metric key Use in chat" [ref=e788]:
+                - generic [ref=e789]:
+                  - generic [ref=e790]: custom:mob_shell_glo_lead_station_locator_plan_route_unique_2023_12
+                  - generic "Copy metric key" [ref=e791]:
+                    - button [ref=e792] [cursor=pointer]:
+                      - img [ref=e793]
+                  - generic "Use in chat" [ref=e795]:
+                    - button [ref=e796] [cursor=pointer]:
+                      - img [ref=e797]
+            - row "ENG_Shell Mobility_OnClick_iOS Download_Unique_2025-04-16 enabled DEFAULT 0 13 0 custom:eng_shell_mobility_onclick_ios_download_unique_2025_04_16 Copy metric key Use in chat" [ref=e799]:
+              - cell "ENG_Shell Mobility_OnClick_iOS Download_Unique_2025-04-16 enabled" [ref=e800]:
+                - paragraph [ref=e801]: ENG_Shell Mobility_OnClick_iOS Download_Unique_2025-04-16
+                - text: enabled
+              - cell "DEFAULT" [ref=e802]
+              - cell "0" [ref=e803]
+              - cell "13" [ref=e804]
+              - cell "0" [ref=e805]
+              - cell "custom:eng_shell_mobility_onclick_ios_download_unique_2025_04_16 Copy metric key Use in chat" [ref=e806]:
+                - generic [ref=e807]:
+                  - generic [ref=e808]: custom:eng_shell_mobility_onclick_ios_download_unique_2025_04_16
+                  - generic "Copy metric key" [ref=e809]:
+                    - button [ref=e810] [cursor=pointer]:
+                      - img [ref=e811]
+                  - generic "Use in chat" [ref=e813]:
+                    - button [ref=e814] [cursor=pointer]:
+                      - img [ref=e815]
+            - row "Google Analytics - form_start - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT 0 9 0 custom:google_analytics_form_start_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e817]:
+              - cell "Google Analytics - form_start - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e818]:
+                - paragraph [ref=e819]: Google Analytics - form_start - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e820]
+              - cell "0" [ref=e821]
+              - cell "9" [ref=e822]
+              - cell "0" [ref=e823]
+              - cell "custom:google_analytics_form_start_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e824]:
+                - generic [ref=e825]:
+                  - generic [ref=e826]: custom:google_analytics_form_start_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e827]:
+                    - button [ref=e828] [cursor=pointer]:
+                      - img [ref=e829]
+                  - generic "Use in chat" [ref=e831]:
+                    - button [ref=e832] [cursor=pointer]:
+                      - img [ref=e833]
+            - row "Google Analytics - file_downloaded - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT 0 9 0 custom:google_analytics_file_downloaded_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e835]:
+              - cell "Google Analytics - file_downloaded - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e836]:
+                - paragraph [ref=e837]: Google Analytics - file_downloaded - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e838]
+              - cell "0" [ref=e839]
+              - cell "9" [ref=e840]
+              - cell "0" [ref=e841]
+              - cell "custom:google_analytics_file_downloaded_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e842]:
+                - generic [ref=e843]:
+                  - generic [ref=e844]: custom:google_analytics_file_downloaded_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e845]:
+                    - button [ref=e846] [cursor=pointer]:
+                      - img [ref=e847]
+                  - generic "Use in chat" [ref=e849]:
+                    - button [ref=e850] [cursor=pointer]:
+                      - img [ref=e851]
+            - row "Google Analytics - form_completed - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT 0 8 0 custom:google_analytics_form_completed_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e853]:
+              - cell "Google Analytics - form_completed - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e854]:
+                - paragraph [ref=e855]: Google Analytics - form_completed - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e856]
+              - cell "0" [ref=e857]
+              - cell "8" [ref=e858]
+              - cell "0" [ref=e859]
+              - cell "custom:google_analytics_form_completed_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e860]:
+                - generic [ref=e861]:
+                  - generic [ref=e862]: custom:google_analytics_form_completed_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e863]:
+                    - button [ref=e864] [cursor=pointer]:
+                      - img [ref=e865]
+                  - generic "Use in chat" [ref=e867]:
+                    - button [ref=e868] [cursor=pointer]:
+                      - img [ref=e869]
+            - row "Kochava - Shell US & Canada - iOS - ecommerce_purchase enabled PURCHASE 0 7 0 custom:kochava_shell_us_canada_ios_ecommerce_purchase Copy metric key Use in chat" [ref=e871]:
+              - cell "Kochava - Shell US & Canada - iOS - ecommerce_purchase enabled" [ref=e872]:
+                - paragraph [ref=e873]: Kochava - Shell US & Canada - iOS - ecommerce_purchase
+                - text: enabled
+              - cell "PURCHASE" [ref=e874]
+              - cell "0" [ref=e875]
+              - cell "7" [ref=e876]
+              - cell "0" [ref=e877]
+              - cell "custom:kochava_shell_us_canada_ios_ecommerce_purchase Copy metric key Use in chat" [ref=e878]:
+                - generic [ref=e879]:
+                  - generic [ref=e880]: custom:kochava_shell_us_canada_ios_ecommerce_purchase
+                  - generic "Copy metric key" [ref=e881]:
+                    - button [ref=e882] [cursor=pointer]:
+                      - img [ref=e883]
+                  - generic "Use in chat" [ref=e885]:
+                    - button [ref=e886] [cursor=pointer]:
+                      - img [ref=e887]
+            - row "Kochava - Shell US & Canada - iOS - custom_1 - locate_station enabled DEFAULT 0 4 0 custom:kochava_shell_us_canada_ios_custom_1_locate_station Copy metric key Use in chat" [ref=e889]:
+              - cell "Kochava - Shell US & Canada - iOS - custom_1 - locate_station enabled" [ref=e890]:
+                - paragraph [ref=e891]: Kochava - Shell US & Canada - iOS - custom_1 - locate_station
+                - text: enabled
+              - cell "DEFAULT" [ref=e892]
+              - cell "0" [ref=e893]
+              - cell "4" [ref=e894]
+              - cell "0" [ref=e895]
+              - cell "custom:kochava_shell_us_canada_ios_custom_1_locate_station Copy metric key Use in chat" [ref=e896]:
+                - generic [ref=e897]:
+                  - generic [ref=e898]: custom:kochava_shell_us_canada_ios_custom_1_locate_station
+                  - generic "Copy metric key" [ref=e899]:
+                    - button [ref=e900] [cursor=pointer]:
+                      - img [ref=e901]
+                  - generic "Use in chat" [ref=e903]:
+                    - button [ref=e904] [cursor=pointer]:
+                      - img [ref=e905]
+            - row "Shell (Android) session_start enabled DEFAULT 0 4 4.7236704 custom:shell_android_session_start Copy metric key Use in chat" [ref=e907]:
+              - cell "Shell (Android) session_start enabled" [ref=e908]:
+                - paragraph [ref=e909]: Shell (Android) session_start
+                - text: enabled
+              - cell "DEFAULT" [ref=e910]
+              - cell "0" [ref=e911]
+              - cell "4" [ref=e912]
+              - cell "4.7236704" [ref=e913]
+              - cell "custom:shell_android_session_start Copy metric key Use in chat" [ref=e914]:
+                - generic [ref=e915]:
+                  - generic [ref=e916]: custom:shell_android_session_start
+                  - generic "Copy metric key" [ref=e917]:
+                    - button [ref=e918] [cursor=pointer]:
+                      - img [ref=e919]
+                  - generic "Use in chat" [ref=e921]:
+                    - button [ref=e922] [cursor=pointer]:
+                      - img [ref=e923]
+            - row "Local actions - Orders enabled BEGIN_CHECKOUT 0 3 3.514993742 custom:local_actions_orders Copy metric key Use in chat" [ref=e925]:
+              - cell "Local actions - Orders enabled" [ref=e926]:
+                - paragraph [ref=e927]: Local actions - Orders
+                - text: enabled
+              - cell "BEGIN_CHECKOUT" [ref=e928]
+              - cell "0" [ref=e929]
+              - cell "3" [ref=e930]
+              - cell "3.514993742" [ref=e931]
+              - cell "custom:local_actions_orders Copy metric key Use in chat" [ref=e932]:
+                - generic [ref=e933]:
+                  - generic [ref=e934]: custom:local_actions_orders
+                  - generic "Copy metric key" [ref=e935]:
+                    - button [ref=e936] [cursor=pointer]:
+                      - img [ref=e937]
+                  - generic "Use in chat" [ref=e939]:
+                    - button [ref=e940] [cursor=pointer]:
+                      - img [ref=e941]
+            - row "Google Analytics - download_the_app_widget - (378718380) GA4 - shell.ca - Shell (Canada) enabled DEFAULT 0 3 0 custom:google_analytics_download_the_app_widget_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e943]:
+              - cell "Google Analytics - download_the_app_widget - (378718380) GA4 - shell.ca - Shell (Canada) enabled" [ref=e944]:
+                - paragraph [ref=e945]: Google Analytics - download_the_app_widget - (378718380) GA4 - shell.ca - Shell (Canada)
+                - text: enabled
+              - cell "DEFAULT" [ref=e946]
+              - cell "0" [ref=e947]
+              - cell "3" [ref=e948]
+              - cell "0" [ref=e949]
+              - cell "custom:google_analytics_download_the_app_widget_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e950]:
+                - generic [ref=e951]:
+                  - generic [ref=e952]: custom:google_analytics_download_the_app_widget_378718380_ga4_shell_ca_shell_canada
+                  - generic "Copy metric key" [ref=e953]:
+                    - button [ref=e954] [cursor=pointer]:
+                      - img [ref=e955]
+                  - generic "Use in chat" [ref=e957]:
+                    - button [ref=e958] [cursor=pointer]:
+                      - img [ref=e959]
+            - row "YouTube channel subscriptions enabled ENGAGEMENT 0 1 1.185433144 custom:youtube_channel_subscriptions Copy metric key Use in chat" [ref=e961]:
+              - cell "YouTube channel subscriptions enabled" [ref=e962]:
+                - paragraph [ref=e963]: YouTube channel subscriptions
+                - text: enabled
+              - cell "ENGAGEMENT" [ref=e964]
+              - cell "0" [ref=e965]
+              - cell "1" [ref=e966]
+              - cell "1.185433144" [ref=e967]
+              - cell "custom:youtube_channel_subscriptions Copy metric key Use in chat" [ref=e968]:
+                - generic [ref=e969]:
+                  - generic [ref=e970]: custom:youtube_channel_subscriptions
+                  - generic "Copy metric key" [ref=e971]:
+                    - button [ref=e972] [cursor=pointer]:
+                      - img [ref=e973]
+                  - generic "Use in chat" [ref=e975]:
+                    - button [ref=e976] [cursor=pointer]:
+                      - img [ref=e977]
+            - row "LUB_Shell_GLO_Visits_Lub Match tool-Results_Unique_2023-12 enabled DEFAULT 0 1 0 custom:lub_shell_glo_visits_lub_match_tool_results_unique_2023_12 Copy metric key Use in chat" [ref=e979]:
+              - cell "LUB_Shell_GLO_Visits_Lub Match tool-Results_Unique_2023-12 enabled" [ref=e980]:
+                - paragraph [ref=e981]: LUB_Shell_GLO_Visits_Lub Match tool-Results_Unique_2023-12
+                - text: enabled
+              - cell "DEFAULT" [ref=e982]
+              - cell "0" [ref=e983]
+              - cell "1" [ref=e984]
+              - cell "0" [ref=e985]
+              - cell "custom:lub_shell_glo_visits_lub_match_tool_results_unique_2023_12 Copy metric key Use in chat" [ref=e986]:
+                - generic [ref=e987]:
+                  - generic [ref=e988]: custom:lub_shell_glo_visits_lub_match_tool_results_unique_2023_12
+                  - generic "Copy metric key" [ref=e989]:
+                    - button [ref=e990] [cursor=pointer]:
+                      - img [ref=e991]
+                  - generic "Use in chat" [ref=e993]:
+                    - button [ref=e994] [cursor=pointer]:
+                      - img [ref=e995]
+            - row "Kochava - Shell US & Canada - iOS - custom_2 - loyalty_account_link enabled DEFAULT 0 1 0 custom:kochava_shell_us_canada_ios_custom_2_loyalty_account_link Copy metric key Use in chat" [ref=e997]:
+              - cell "Kochava - Shell US & Canada - iOS - custom_2 - loyalty_account_link enabled" [ref=e998]:
+                - paragraph [ref=e999]: Kochava - Shell US & Canada - iOS - custom_2 - loyalty_account_link
+                - text: enabled
+              - cell "DEFAULT" [ref=e1000]
+              - cell "0" [ref=e1001]
+              - cell "1" [ref=e1002]
+              - cell "0" [ref=e1003]
+              - cell "custom:kochava_shell_us_canada_ios_custom_2_loyalty_account_link Copy metric key Use in chat" [ref=e1004]:
+                - generic [ref=e1005]:
+                  - generic [ref=e1006]: custom:kochava_shell_us_canada_ios_custom_2_loyalty_account_link
+                  - generic "Copy metric key" [ref=e1007]:
+                    - button [ref=e1008] [cursor=pointer]:
+                      - img [ref=e1009]
+                  - generic "Use in chat" [ref=e1011]:
+                    - button [ref=e1012] [cursor=pointer]:
+                      - img [ref=e1013]
+            - row "Kochava - Shell US & Canada - iOS - custom_4 - sign_in enabled DEFAULT 0 1 0 custom:kochava_shell_us_canada_ios_custom_4_sign_in Copy metric key Use in chat" [ref=e1015]:
+              - cell "Kochava - Shell US & Canada - iOS - custom_4 - sign_in enabled" [ref=e1016]:
+                - paragraph [ref=e1017]: Kochava - Shell US & Canada - iOS - custom_4 - sign_in
+                - text: enabled
+              - cell "DEFAULT" [ref=e1018]
+              - cell "0" [ref=e1019]
+              - cell "1" [ref=e1020]
+              - cell "0" [ref=e1021]
+              - cell "custom:kochava_shell_us_canada_ios_custom_4_sign_in Copy metric key Use in chat" [ref=e1022]:
+                - generic [ref=e1023]:
+                  - generic [ref=e1024]: custom:kochava_shell_us_canada_ios_custom_4_sign_in
+                  - generic "Copy metric key" [ref=e1025]:
+                    - button [ref=e1026] [cursor=pointer]:
+                      - img [ref=e1027]
+                  - generic "Use in chat" [ref=e1029]:
+                    - button [ref=e1030] [cursor=pointer]:
+                      - img [ref=e1031]
+            - row "Kochava - Shell US & Canada - iOS - custom_5 - Registration complete enabled DEFAULT 0 1 0 custom:kochava_shell_us_canada_ios_custom_5_registration_complete Copy metric key Use in chat" [ref=e1033]:
+              - cell "Kochava - Shell US & Canada - iOS - custom_5 - Registration complete enabled" [ref=e1034]:
+                - paragraph [ref=e1035]: Kochava - Shell US & Canada - iOS - custom_5 - Registration complete
+                - text: enabled
+              - cell "DEFAULT" [ref=e1036]
+              - cell "0" [ref=e1037]
+              - cell "1" [ref=e1038]
+              - cell "0" [ref=e1039]
+              - cell "custom:kochava_shell_us_canada_ios_custom_5_registration_complete Copy metric key Use in chat" [ref=e1040]:
+                - generic [ref=e1041]:
+                  - generic [ref=e1042]: custom:kochava_shell_us_canada_ios_custom_5_registration_complete
+                  - generic "Copy metric key" [ref=e1043]:
+                    - button [ref=e1044] [cursor=pointer]:
+                      - img [ref=e1045]
+                  - generic "Use in chat" [ref=e1047]:
+                    - button [ref=e1048] [cursor=pointer]:
+                      - img [ref=e1049]
+            - row "Kochava - Shell US & Canada - iOS - custom_6 - payment_type_link enabled DEFAULT 0 1 0 custom:kochava_shell_us_canada_ios_custom_6_payment_type_link Copy metric key Use in chat" [ref=e1051]:
+              - cell "Kochava - Shell US & Canada - iOS - custom_6 - payment_type_link enabled" [ref=e1052]:
+                - paragraph [ref=e1053]: Kochava - Shell US & Canada - iOS - custom_6 - payment_type_link
+                - text: enabled
+              - cell "DEFAULT" [ref=e1054]
+              - cell "0" [ref=e1055]
+              - cell "1" [ref=e1056]
+              - cell "0" [ref=e1057]
+              - cell "custom:kochava_shell_us_canada_ios_custom_6_payment_type_link Copy metric key Use in chat" [ref=e1058]:
+                - generic [ref=e1059]:
+                  - generic [ref=e1060]: custom:kochava_shell_us_canada_ios_custom_6_payment_type_link
+                  - generic "Copy metric key" [ref=e1061]:
+                    - button [ref=e1062] [cursor=pointer]:
+                      - img [ref=e1063]
+                  - generic "Use in chat" [ref=e1065]:
+                    - button [ref=e1066] [cursor=pointer]:
+                      - img [ref=e1067]
+            - row "ENG_Shell_USA_Wholesale-Fuel-B2B-Landing-Page_Unique_2024-11-22 enabled DEFAULT 0 1 0 custom:eng_shell_usa_wholesale_fuel_b2b_landing_page_unique_2024_11_22 Copy metric key Use in chat" [ref=e1069]:
+              - cell "ENG_Shell_USA_Wholesale-Fuel-B2B-Landing-Page_Unique_2024-11-22 enabled" [ref=e1070]:
+                - paragraph [ref=e1071]: ENG_Shell_USA_Wholesale-Fuel-B2B-Landing-Page_Unique_2024-11-22
+                - text: enabled
+              - cell "DEFAULT" [ref=e1072]
+              - cell "0" [ref=e1073]
+              - cell "1" [ref=e1074]
+              - cell "0" [ref=e1075]
+              - cell "custom:eng_shell_usa_wholesale_fuel_b2b_landing_page_unique_2024_11_22 Copy metric key Use in chat" [ref=e1076]:
+                - generic [ref=e1077]:
+                  - generic [ref=e1078]: custom:eng_shell_usa_wholesale_fuel_b2b_landing_page_unique_2024_11_22
+                  - generic "Copy metric key" [ref=e1079]:
+                    - button [ref=e1080] [cursor=pointer]:
+                      - img [ref=e1081]
+                  - generic "Use in chat" [ref=e1083]:
+                    - button [ref=e1084] [cursor=pointer]:
+                      - img [ref=e1085]
+            - row "Google Analytics - form_abandoned - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT 0 1 0 custom:google_analytics_form_abandoned_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e1087]:
+              - cell "Google Analytics - form_abandoned - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e1088]:
+                - paragraph [ref=e1089]: Google Analytics - form_abandoned - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e1090]
+              - cell "0" [ref=e1091]
+              - cell "1" [ref=e1092]
+              - cell "0" [ref=e1093]
+              - cell "custom:google_analytics_form_abandoned_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e1094]:
+                - generic [ref=e1095]:
+                  - generic [ref=e1096]: custom:google_analytics_form_abandoned_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e1097]:
+                    - button [ref=e1098] [cursor=pointer]:
+                      - img [ref=e1099]
+                  - generic "Use in chat" [ref=e1101]:
+                    - button [ref=e1102] [cursor=pointer]:
+                      - img [ref=e1103]
+            - row "ds_store_visits_from_google_ads enabled STORE_VISIT custom:ds_store_visits_from_google_ads Copy metric key Use in chat" [ref=e1105]:
+              - cell "ds_store_visits_from_google_ads enabled" [ref=e1106]:
+                - paragraph [ref=e1107]: ds_store_visits_from_google_ads
+                - text: enabled
+              - cell "STORE_VISIT" [ref=e1108]
+              - cell [ref=e1109]
+              - cell [ref=e1110]
+              - cell [ref=e1111]
+              - cell "custom:ds_store_visits_from_google_ads Copy metric key Use in chat" [ref=e1112]:
+                - generic [ref=e1113]:
+                  - generic [ref=e1114]: custom:ds_store_visits_from_google_ads
+                  - generic "Copy metric key" [ref=e1115]:
+                    - button [ref=e1116] [cursor=pointer]:
+                      - img [ref=e1117]
+                  - generic "Use in chat" [ref=e1119]:
+                    - button [ref=e1120] [cursor=pointer]:
+                      - img [ref=e1121]
+            - row "ds_store_sales_from_google_ads enabled STORE_SALE custom:ds_store_sales_from_google_ads Copy metric key Use in chat" [ref=e1123]:
+              - cell "ds_store_sales_from_google_ads enabled" [ref=e1124]:
+                - paragraph [ref=e1125]: ds_store_sales_from_google_ads
+                - text: enabled
+              - cell "STORE_SALE" [ref=e1126]
+              - cell [ref=e1127]
+              - cell [ref=e1128]
+              - cell [ref=e1129]
+              - cell "custom:ds_store_sales_from_google_ads Copy metric key Use in chat" [ref=e1130]:
+                - generic [ref=e1131]:
+                  - generic [ref=e1132]: custom:ds_store_sales_from_google_ads
+                  - generic "Copy metric key" [ref=e1133]:
+                    - button [ref=e1134] [cursor=pointer]:
+                      - img [ref=e1135]
+                  - generic "Use in chat" [ref=e1137]:
+                    - button [ref=e1138] [cursor=pointer]:
+                      - img [ref=e1139]
+            - row "Store Visits V2 enabled STORE_VISIT custom:store_visits_v2 Copy metric key Use in chat" [ref=e1141]:
+              - cell "Store Visits V2 enabled" [ref=e1142]:
+                - paragraph [ref=e1143]: Store Visits V2
+                - text: enabled
+              - cell "STORE_VISIT" [ref=e1144]
+              - cell [ref=e1145]
+              - cell [ref=e1146]
+              - cell [ref=e1147]
+              - cell "custom:store_visits_v2 Copy metric key Use in chat" [ref=e1148]:
+                - generic [ref=e1149]:
+                  - generic [ref=e1150]: custom:store_visits_v2
+                  - generic "Copy metric key" [ref=e1151]:
+                    - button [ref=e1152] [cursor=pointer]:
+                      - img [ref=e1153]
+                  - generic "Use in chat" [ref=e1155]:
+                    - button [ref=e1156] [cursor=pointer]:
+                      - img [ref=e1157]
+            - row "EOF Sign-ups enabled SIGNUP custom:eof_sign_ups Copy metric key Use in chat" [ref=e1159]:
+              - cell "EOF Sign-ups enabled" [ref=e1160]:
+                - paragraph [ref=e1161]: EOF Sign-ups
+                - text: enabled
+              - cell "SIGNUP" [ref=e1162]
+              - cell [ref=e1163]
+              - cell [ref=e1164]
+              - cell [ref=e1165]
+              - cell "custom:eof_sign_ups Copy metric key Use in chat" [ref=e1166]:
+                - generic [ref=e1167]:
+                  - generic [ref=e1168]: custom:eof_sign_ups
+                  - generic "Copy metric key" [ref=e1169]:
+                    - button [ref=e1170] [cursor=pointer]:
+                      - img [ref=e1171]
+                  - generic "Use in chat" [ref=e1173]:
+                    - button [ref=e1174] [cursor=pointer]:
+                      - img [ref=e1175]
+            - row "trans - eoffrgrs - X - 1622615820916488938 enabled PURCHASE custom:trans_eoffrgrs_x_1622615820916488938 Copy metric key Use in chat" [ref=e1177]:
+              - cell "trans - eoffrgrs - X - 1622615820916488938 enabled" [ref=e1178]:
+                - paragraph [ref=e1179]: trans - eoffrgrs - X - 1622615820916488938
+                - text: enabled
+              - cell "PURCHASE" [ref=e1180]
+              - cell [ref=e1181]
+              - cell [ref=e1182]
+              - cell [ref=e1183]
+              - cell "custom:trans_eoffrgrs_x_1622615820916488938 Copy metric key Use in chat" [ref=e1184]:
+                - generic [ref=e1185]:
+                  - generic [ref=e1186]: custom:trans_eoffrgrs_x_1622615820916488938
+                  - generic "Copy metric key" [ref=e1187]:
+                    - button [ref=e1188] [cursor=pointer]:
+                      - img [ref=e1189]
+                  - generic "Use in chat" [ref=e1191]:
+                    - button [ref=e1192] [cursor=pointer]:
+                      - img [ref=e1193]
+            - row "trans - US_Re008 - X - 1622615820916499418 enabled PURCHASE custom:trans_us_re008_x_1622615820916499418 Copy metric key Use in chat" [ref=e1195]:
+              - cell "trans - US_Re008 - X - 1622615820916499418 enabled" [ref=e1196]:
+                - paragraph [ref=e1197]: trans - US_Re008 - X - 1622615820916499418
+                - text: enabled
+              - cell "PURCHASE" [ref=e1198]
+              - cell [ref=e1199]
+              - cell [ref=e1200]
+              - cell [ref=e1201]
+              - cell "custom:trans_us_re008_x_1622615820916499418 Copy metric key Use in chat" [ref=e1202]:
+                - generic [ref=e1203]:
+                  - generic [ref=e1204]: custom:trans_us_re008_x_1622615820916499418
+                  - generic "Copy metric key" [ref=e1205]:
+                    - button [ref=e1206] [cursor=pointer]:
+                      - img [ref=e1207]
+                  - generic "Use in chat" [ref=e1209]:
+                    - button [ref=e1210] [cursor=pointer]:
+                      - img [ref=e1211]
+            - row "trans - frsesupa - X - 1622615820916521908 enabled PURCHASE custom:trans_frsesupa_x_1622615820916521908 Copy metric key Use in chat" [ref=e1213]:
+              - cell "trans - frsesupa - X - 1622615820916521908 enabled" [ref=e1214]:
+                - paragraph [ref=e1215]: trans - frsesupa - X - 1622615820916521908
+                - text: enabled
+              - cell "PURCHASE" [ref=e1216]
+              - cell [ref=e1217]
+              - cell [ref=e1218]
+              - cell [ref=e1219]
+              - cell "custom:trans_frsesupa_x_1622615820916521908 Copy metric key Use in chat" [ref=e1220]:
+                - generic [ref=e1221]:
+                  - generic [ref=e1222]: custom:trans_frsesupa_x_1622615820916521908
+                  - generic "Copy metric key" [ref=e1223]:
+                    - button [ref=e1224] [cursor=pointer]:
+                      - img [ref=e1225]
+                  - generic "Use in chat" [ref=e1227]:
+                    - button [ref=e1228] [cursor=pointer]:
+                      - img [ref=e1229]
+            - row "action - frsescpb - X - 1622615820916556748 enabled DEFAULT custom:action_frsescpb_x_1622615820916556748 Copy metric key Use in chat" [ref=e1231]:
+              - cell "action - frsescpb - X - 1622615820916556748 enabled" [ref=e1232]:
+                - paragraph [ref=e1233]: action - frsescpb - X - 1622615820916556748
+                - text: enabled
+              - cell "DEFAULT" [ref=e1234]
+              - cell [ref=e1235]
+              - cell [ref=e1236]
+              - cell [ref=e1237]
+              - cell "custom:action_frsescpb_x_1622615820916556748 Copy metric key Use in chat" [ref=e1238]:
+                - generic [ref=e1239]:
+                  - generic [ref=e1240]: custom:action_frsescpb_x_1622615820916556748
+                  - generic "Copy metric key" [ref=e1241]:
+                    - button [ref=e1242] [cursor=pointer]:
+                      - img [ref=e1243]
+                  - generic "Use in chat" [ref=e1245]:
+                    - button [ref=e1246] [cursor=pointer]:
+                      - img [ref=e1247]
+            - row "action - eoffrgrs - X - 1622615820916426108 enabled DEFAULT custom:action_eoffrgrs_x_1622615820916426108 Copy metric key Use in chat" [ref=e1249]:
+              - cell "action - eoffrgrs - X - 1622615820916426108 enabled" [ref=e1250]:
+                - paragraph [ref=e1251]: action - eoffrgrs - X - 1622615820916426108
+                - text: enabled
+              - cell "DEFAULT" [ref=e1252]
+              - cell [ref=e1253]
+              - cell [ref=e1254]
+              - cell [ref=e1255]
+              - cell "custom:action_eoffrgrs_x_1622615820916426108 Copy metric key Use in chat" [ref=e1256]:
+                - generic [ref=e1257]:
+                  - generic [ref=e1258]: custom:action_eoffrgrs_x_1622615820916426108
+                  - generic "Copy metric key" [ref=e1259]:
+                    - button [ref=e1260] [cursor=pointer]:
+                      - img [ref=e1261]
+                  - generic "Use in chat" [ref=e1263]:
+                    - button [ref=e1264] [cursor=pointer]:
+                      - img [ref=e1265]
+            - row "action - US_Re008 - X - 1622615820916532008 enabled DEFAULT custom:action_us_re008_x_1622615820916532008 Copy metric key Use in chat" [ref=e1267]:
+              - cell "action - US_Re008 - X - 1622615820916532008 enabled" [ref=e1268]:
+                - paragraph [ref=e1269]: action - US_Re008 - X - 1622615820916532008
+                - text: enabled
+              - cell "DEFAULT" [ref=e1270]
+              - cell [ref=e1271]
+              - cell [ref=e1272]
+              - cell [ref=e1273]
+              - cell "custom:action_us_re008_x_1622615820916532008 Copy metric key Use in chat" [ref=e1274]:
+                - generic [ref=e1275]:
+                  - generic [ref=e1276]: custom:action_us_re008_x_1622615820916532008
+                  - generic "Copy metric key" [ref=e1277]:
+                    - button [ref=e1278] [cursor=pointer]:
+                      - img [ref=e1279]
+                  - generic "Use in chat" [ref=e1281]:
+                    - button [ref=e1282] [cursor=pointer]:
+                      - img [ref=e1283]
+            - row "action - frsesupa - X - 1622615820916468088 enabled DEFAULT custom:action_frsesupa_x_1622615820916468088 Copy metric key Use in chat" [ref=e1285]:
+              - cell "action - frsesupa - X - 1622615820916468088 enabled" [ref=e1286]:
+                - paragraph [ref=e1287]: action - frsesupa - X - 1622615820916468088
+                - text: enabled
+              - cell "DEFAULT" [ref=e1288]
+              - cell [ref=e1289]
+              - cell [ref=e1290]
+              - cell [ref=e1291]
+              - cell "custom:action_frsesupa_x_1622615820916468088 Copy metric key Use in chat" [ref=e1292]:
+                - generic [ref=e1293]:
+                  - generic [ref=e1294]: custom:action_frsesupa_x_1622615820916468088
+                  - generic "Copy metric key" [ref=e1295]:
+                    - button [ref=e1296] [cursor=pointer]:
+                      - img [ref=e1297]
+                  - generic "Use in chat" [ref=e1299]:
+                    - button [ref=e1300] [cursor=pointer]:
+                      - img [ref=e1301]
+            - row "trans - frsescpb - X - 1622615820916546058 enabled PURCHASE custom:trans_frsescpb_x_1622615820916546058 Copy metric key Use in chat" [ref=e1303]:
+              - cell "trans - frsescpb - X - 1622615820916546058 enabled" [ref=e1304]:
+                - paragraph [ref=e1305]: trans - frsescpb - X - 1622615820916546058
+                - text: enabled
+              - cell "PURCHASE" [ref=e1306]
+              - cell [ref=e1307]
+              - cell [ref=e1308]
+              - cell [ref=e1309]
+              - cell "custom:trans_frsescpb_x_1622615820916546058 Copy metric key Use in chat" [ref=e1310]:
+                - generic [ref=e1311]:
+                  - generic [ref=e1312]: custom:trans_frsescpb_x_1622615820916546058
+                  - generic "Copy metric key" [ref=e1313]:
+                    - button [ref=e1314] [cursor=pointer]:
+                      - img [ref=e1315]
+                  - generic "Use in chat" [ref=e1317]:
+                    - button [ref=e1318] [cursor=pointer]:
+                      - img [ref=e1319]
+            - row "Android installs (all other apps) enabled DOWNLOAD custom:android_installs_all_other_apps Copy metric key Use in chat" [ref=e1321]:
+              - cell "Android installs (all other apps) enabled" [ref=e1322]:
+                - paragraph [ref=e1323]: Android installs (all other apps)
+                - text: enabled
+              - cell "DOWNLOAD" [ref=e1324]
+              - cell [ref=e1325]
+              - cell [ref=e1326]
+              - cell [ref=e1327]
+              - cell "custom:android_installs_all_other_apps Copy metric key Use in chat" [ref=e1328]:
+                - generic [ref=e1329]:
+                  - generic [ref=e1330]: custom:android_installs_all_other_apps
+                  - generic "Copy metric key" [ref=e1331]:
+                    - button [ref=e1332] [cursor=pointer]:
+                      - img [ref=e1333]
+                  - generic "Use in chat" [ref=e1335]:
+                    - button [ref=e1336] [cursor=pointer]:
+                      - img [ref=e1337]
+            - row "Calls from ads enabled PHONE_CALL_LEAD custom:calls_from_ads Copy metric key Use in chat" [ref=e1339]:
+              - cell "Calls from ads enabled" [ref=e1340]:
+                - paragraph [ref=e1341]: Calls from ads
+                - text: enabled
+              - cell "PHONE_CALL_LEAD" [ref=e1342]
+              - cell [ref=e1343]
+              - cell [ref=e1344]
+              - cell [ref=e1345]
+              - cell "custom:calls_from_ads Copy metric key Use in chat" [ref=e1346]:
+                - generic [ref=e1347]:
+                  - generic [ref=e1348]: custom:calls_from_ads
+                  - generic "Copy metric key" [ref=e1349]:
+                    - button [ref=e1350] [cursor=pointer]:
+                      - img [ref=e1351]
+                  - generic "Use in chat" [ref=e1353]:
+                    - button [ref=e1354] [cursor=pointer]:
+                      - img [ref=e1355]
+            - row "Shell Global - Subscription Loyalty Programs enabled SUBSCRIBE_PAID custom:shell_global_subscription_loyalty_programs Copy metric key Use in chat" [ref=e1357]:
+              - cell "Shell Global - Subscription Loyalty Programs enabled" [ref=e1358]:
+                - paragraph [ref=e1359]: Shell Global - Subscription Loyalty Programs
+                - text: enabled
+              - cell "SUBSCRIBE_PAID" [ref=e1360]
+              - cell [ref=e1361]
+              - cell [ref=e1362]
+              - cell [ref=e1363]
+              - cell "custom:shell_global_subscription_loyalty_programs Copy metric key Use in chat" [ref=e1364]:
+                - generic [ref=e1365]:
+                  - generic [ref=e1366]: custom:shell_global_subscription_loyalty_programs
+                  - generic "Copy metric key" [ref=e1367]:
+                    - button [ref=e1368] [cursor=pointer]:
+                      - img [ref=e1369]
+                  - generic "Use in chat" [ref=e1371]:
+                    - button [ref=e1372] [cursor=pointer]:
+                      - img [ref=e1373]
+            - row "Shell Global - Checkout enabled BEGIN_CHECKOUT custom:shell_global_checkout Copy metric key Use in chat" [ref=e1375]:
+              - cell "Shell Global - Checkout enabled" [ref=e1376]:
+                - paragraph [ref=e1377]: Shell Global - Checkout
+                - text: enabled
+              - cell "BEGIN_CHECKOUT" [ref=e1378]
+              - cell [ref=e1379]
+              - cell [ref=e1380]
+              - cell [ref=e1381]
+              - cell "custom:shell_global_checkout Copy metric key Use in chat" [ref=e1382]:
+                - generic [ref=e1383]:
+                  - generic [ref=e1384]: custom:shell_global_checkout
+                  - generic "Copy metric key" [ref=e1385]:
+                    - button [ref=e1386] [cursor=pointer]:
+                      - img [ref=e1387]
+                  - generic "Use in chat" [ref=e1389]:
+                    - button [ref=e1390] [cursor=pointer]:
+                      - img [ref=e1391]
+            - row "Shell Global - Oil Selector Results enabled PAGE_VIEW custom:shell_global_oil_selector_results Copy metric key Use in chat" [ref=e1393]:
+              - cell "Shell Global - Oil Selector Results enabled" [ref=e1394]:
+                - paragraph [ref=e1395]: Shell Global - Oil Selector Results
+                - text: enabled
+              - cell "PAGE_VIEW" [ref=e1396]
+              - cell [ref=e1397]
+              - cell [ref=e1398]
+              - cell [ref=e1399]
+              - cell "custom:shell_global_oil_selector_results Copy metric key Use in chat" [ref=e1400]:
+                - generic [ref=e1401]:
+                  - generic [ref=e1402]: custom:shell_global_oil_selector_results
+                  - generic "Copy metric key" [ref=e1403]:
+                    - button [ref=e1404] [cursor=pointer]:
+                      - img [ref=e1405]
+                  - generic "Use in chat" [ref=e1407]:
+                    - button [ref=e1408] [cursor=pointer]:
+                      - img [ref=e1409]
+            - row "Lubricant US - Page View enabled PAGE_VIEW custom:lubricant_us_page_view Copy metric key Use in chat" [ref=e1411]:
+              - cell "Lubricant US - Page View enabled" [ref=e1412]:
+                - paragraph [ref=e1413]: Lubricant US - Page View
+                - text: enabled
+              - cell "PAGE_VIEW" [ref=e1414]
+              - cell [ref=e1415]
+              - cell [ref=e1416]
+              - cell [ref=e1417]
+              - cell "custom:lubricant_us_page_view Copy metric key Use in chat" [ref=e1418]:
+                - generic [ref=e1419]:
+                  - generic [ref=e1420]: custom:lubricant_us_page_view
+                  - generic "Copy metric key" [ref=e1421]:
+                    - button [ref=e1422] [cursor=pointer]:
+                      - img [ref=e1423]
+                  - generic "Use in chat" [ref=e1425]:
+                    - button [ref=e1426] [cursor=pointer]:
+                      - img [ref=e1427]
+            - row "Lubricant US - Subscription Newsletter enabled SUBSCRIBE_PAID custom:lubricant_us_subscription_newsletter Copy metric key Use in chat" [ref=e1429]:
+              - cell "Lubricant US - Subscription Newsletter enabled" [ref=e1430]:
+                - paragraph [ref=e1431]: Lubricant US - Subscription Newsletter
+                - text: enabled
+              - cell "SUBSCRIBE_PAID" [ref=e1432]
+              - cell [ref=e1433]
+              - cell [ref=e1434]
+              - cell [ref=e1435]
+              - cell "custom:lubricant_us_subscription_newsletter Copy metric key Use in chat" [ref=e1436]:
+                - generic [ref=e1437]:
+                  - generic [ref=e1438]: custom:lubricant_us_subscription_newsletter
+                  - generic "Copy metric key" [ref=e1439]:
+                    - button [ref=e1440] [cursor=pointer]:
+                      - img [ref=e1441]
+                  - generic "Use in chat" [ref=e1443]:
+                    - button [ref=e1444] [cursor=pointer]:
+                      - img [ref=e1445]
+            - row "Lubricant US - Coupon Download enabled DEFAULT custom:lubricant_us_coupon_download Copy metric key Use in chat" [ref=e1447]:
+              - cell "Lubricant US - Coupon Download enabled" [ref=e1448]:
+                - paragraph [ref=e1449]: Lubricant US - Coupon Download
+                - text: enabled
+              - cell "DEFAULT" [ref=e1450]
+              - cell [ref=e1451]
+              - cell [ref=e1452]
+              - cell [ref=e1453]
+              - cell "custom:lubricant_us_coupon_download Copy metric key Use in chat" [ref=e1454]:
+                - generic [ref=e1455]:
+                  - generic [ref=e1456]: custom:lubricant_us_coupon_download
+                  - generic "Copy metric key" [ref=e1457]:
+                    - button [ref=e1458] [cursor=pointer]:
+                      - img [ref=e1459]
+                  - generic "Use in chat" [ref=e1461]:
+                    - button [ref=e1462] [cursor=pointer]:
+                      - img [ref=e1463]
+            - row "Lubricant US - Buy Now enabled BEGIN_CHECKOUT custom:lubricant_us_buy_now Copy metric key Use in chat" [ref=e1465]:
+              - cell "Lubricant US - Buy Now enabled" [ref=e1466]:
+                - paragraph [ref=e1467]: Lubricant US - Buy Now
+                - text: enabled
+              - cell "BEGIN_CHECKOUT" [ref=e1468]
+              - cell [ref=e1469]
+              - cell [ref=e1470]
+              - cell [ref=e1471]
+              - cell "custom:lubricant_us_buy_now Copy metric key Use in chat" [ref=e1472]:
+                - generic [ref=e1473]:
+                  - generic [ref=e1474]: custom:lubricant_us_buy_now
+                  - generic "Copy metric key" [ref=e1475]:
+                    - button [ref=e1476] [cursor=pointer]:
+                      - img [ref=e1477]
+                  - generic "Use in chat" [ref=e1479]:
+                    - button [ref=e1480] [cursor=pointer]:
+                      - img [ref=e1481]
+            - row "Lubricant US - Retailer Details enabled GET_DIRECTIONS custom:lubricant_us_retailer_details Copy metric key Use in chat" [ref=e1483]:
+              - cell "Lubricant US - Retailer Details enabled" [ref=e1484]:
+                - paragraph [ref=e1485]: Lubricant US - Retailer Details
+                - text: enabled
+              - cell "GET_DIRECTIONS" [ref=e1486]
+              - cell [ref=e1487]
+              - cell [ref=e1488]
+              - cell [ref=e1489]
+              - cell "custom:lubricant_us_retailer_details Copy metric key Use in chat" [ref=e1490]:
+                - generic [ref=e1491]:
+                  - generic [ref=e1492]: custom:lubricant_us_retailer_details
+                  - generic "Copy metric key" [ref=e1493]:
+                    - button [ref=e1494] [cursor=pointer]:
+                      - img [ref=e1495]
+                  - generic "Use in chat" [ref=e1497]:
+                    - button [ref=e1498] [cursor=pointer]:
+                      - img [ref=e1499]
+            - row "Lubricant US - Oil Selector Results enabled PAGE_VIEW custom:lubricant_us_oil_selector_results Copy metric key Use in chat" [ref=e1501]:
+              - cell "Lubricant US - Oil Selector Results enabled" [ref=e1502]:
+                - paragraph [ref=e1503]: Lubricant US - Oil Selector Results
+                - text: enabled
+              - cell "PAGE_VIEW" [ref=e1504]
+              - cell [ref=e1505]
+              - cell [ref=e1506]
+              - cell [ref=e1507]
+              - cell "custom:lubricant_us_oil_selector_results Copy metric key Use in chat" [ref=e1508]:
+                - generic [ref=e1509]:
+                  - generic [ref=e1510]: custom:lubricant_us_oil_selector_results
+                  - generic "Copy metric key" [ref=e1511]:
+                    - button [ref=e1512] [cursor=pointer]:
+                      - img [ref=e1513]
+                  - generic "Use in chat" [ref=e1515]:
+                    - button [ref=e1516] [cursor=pointer]:
+                      - img [ref=e1517]
+            - row "Lubricant US - Filter Selector Results enabled PAGE_VIEW custom:lubricant_us_filter_selector_results Copy metric key Use in chat" [ref=e1519]:
+              - cell "Lubricant US - Filter Selector Results enabled" [ref=e1520]:
+                - paragraph [ref=e1521]: Lubricant US - Filter Selector Results
+                - text: enabled
+              - cell "PAGE_VIEW" [ref=e1522]
+              - cell [ref=e1523]
+              - cell [ref=e1524]
+              - cell [ref=e1525]
+              - cell "custom:lubricant_us_filter_selector_results Copy metric key Use in chat" [ref=e1526]:
+                - generic [ref=e1527]:
+                  - generic [ref=e1528]: custom:lubricant_us_filter_selector_results
+                  - generic "Copy metric key" [ref=e1529]:
+                    - button [ref=e1530] [cursor=pointer]:
+                      - img [ref=e1531]
+                  - generic "Use in chat" [ref=e1533]:
+                    - button [ref=e1534] [cursor=pointer]:
+                      - img [ref=e1535]
+            - row "LUB_Shell_GLO_Lead_Lub Match tool-Where To Buy_Standard_2023-12 enabled DEFAULT custom:lub_shell_glo_lead_lub_match_tool_where_to_buy_standard_2023_12 Copy metric key Use in chat" [ref=e1537]:
+              - cell "LUB_Shell_GLO_Lead_Lub Match tool-Where To Buy_Standard_2023-12 enabled" [ref=e1538]:
+                - paragraph [ref=e1539]: LUB_Shell_GLO_Lead_Lub Match tool-Where To Buy_Standard_2023-12
+                - text: enabled
+              - cell "DEFAULT" [ref=e1540]
+              - cell [ref=e1541]
+              - cell [ref=e1542]
+              - cell [ref=e1543]
+              - cell "custom:lub_shell_glo_lead_lub_match_tool_where_to_buy_standard_2023_12 Copy metric key Use in chat" [ref=e1544]:
+                - generic [ref=e1545]:
+                  - generic [ref=e1546]: custom:lub_shell_glo_lead_lub_match_tool_where_to_buy_standard_2023_12
+                  - generic "Copy metric key" [ref=e1547]:
+                    - button [ref=e1548] [cursor=pointer]:
+                      - img [ref=e1549]
+                  - generic "Use in chat" [ref=e1551]:
+                    - button [ref=e1552] [cursor=pointer]:
+                      - img [ref=e1553]
+            - row "LUB_Shell_GLO_Visits_Lub Match tool-Search_Unique_2023-12 enabled DEFAULT custom:lub_shell_glo_visits_lub_match_tool_search_unique_2023_12 Copy metric key Use in chat" [ref=e1555]:
+              - cell "LUB_Shell_GLO_Visits_Lub Match tool-Search_Unique_2023-12 enabled" [ref=e1556]:
+                - paragraph [ref=e1557]: LUB_Shell_GLO_Visits_Lub Match tool-Search_Unique_2023-12
+                - text: enabled
+              - cell "DEFAULT" [ref=e1558]
+              - cell [ref=e1559]
+              - cell [ref=e1560]
+              - cell [ref=e1561]
+              - cell "custom:lub_shell_glo_visits_lub_match_tool_search_unique_2023_12 Copy metric key Use in chat" [ref=e1562]:
+                - generic [ref=e1563]:
+                  - generic [ref=e1564]: custom:lub_shell_glo_visits_lub_match_tool_search_unique_2023_12
+                  - generic "Copy metric key" [ref=e1565]:
+                    - button [ref=e1566] [cursor=pointer]:
+                      - img [ref=e1567]
+                  - generic "Use in chat" [ref=e1569]:
+                    - button [ref=e1570] [cursor=pointer]:
+                      - img [ref=e1571]
+            - row "ALL_Shell_DEU_Click_Tariff_Unique_2023-12-05 enabled DEFAULT custom:all_shell_deu_click_tariff_unique_2023_12_05 Copy metric key Use in chat" [ref=e1573]:
+              - cell "ALL_Shell_DEU_Click_Tariff_Unique_2023-12-05 enabled" [ref=e1574]:
+                - paragraph [ref=e1575]: ALL_Shell_DEU_Click_Tariff_Unique_2023-12-05
+                - text: enabled
+              - cell "DEFAULT" [ref=e1576]
+              - cell [ref=e1577]
+              - cell [ref=e1578]
+              - cell [ref=e1579]
+              - cell "custom:all_shell_deu_click_tariff_unique_2023_12_05 Copy metric key Use in chat" [ref=e1580]:
+                - generic [ref=e1581]:
+                  - generic [ref=e1582]: custom:all_shell_deu_click_tariff_unique_2023_12_05
+                  - generic "Copy metric key" [ref=e1583]:
+                    - button [ref=e1584] [cursor=pointer]:
+                      - img [ref=e1585]
+                  - generic "Use in chat" [ref=e1587]:
+                    - button [ref=e1588] [cursor=pointer]:
+                      - img [ref=e1589]
+            - row "ALL_Shell_DEU_Click_OrderConfirmation_Unique_2023-12-05 enabled DEFAULT custom:all_shell_deu_click_orderconfirmation_unique_2023_12_05 Copy metric key Use in chat" [ref=e1591]:
+              - cell "ALL_Shell_DEU_Click_OrderConfirmation_Unique_2023-12-05 enabled" [ref=e1592]:
+                - paragraph [ref=e1593]: ALL_Shell_DEU_Click_OrderConfirmation_Unique_2023-12-05
+                - text: enabled
+              - cell "DEFAULT" [ref=e1594]
+              - cell [ref=e1595]
+              - cell [ref=e1596]
+              - cell [ref=e1597]
+              - cell "custom:all_shell_deu_click_orderconfirmation_unique_2023_12_05 Copy metric key Use in chat" [ref=e1598]:
+                - generic [ref=e1599]:
+                  - generic [ref=e1600]: custom:all_shell_deu_click_orderconfirmation_unique_2023_12_05
+                  - generic "Copy metric key" [ref=e1601]:
+                    - button [ref=e1602] [cursor=pointer]:
+                      - img [ref=e1603]
+                  - generic "Use in chat" [ref=e1605]:
+                    - button [ref=e1606] [cursor=pointer]:
+                      - img [ref=e1607]
+            - row "ALL_Shell_DEU_Click_PaymentOption_Unique_2023-12-05 enabled DEFAULT custom:all_shell_deu_click_paymentoption_unique_2023_12_05 Copy metric key Use in chat" [ref=e1609]:
+              - cell "ALL_Shell_DEU_Click_PaymentOption_Unique_2023-12-05 enabled" [ref=e1610]:
+                - paragraph [ref=e1611]: ALL_Shell_DEU_Click_PaymentOption_Unique_2023-12-05
+                - text: enabled
+              - cell "DEFAULT" [ref=e1612]
+              - cell [ref=e1613]
+              - cell [ref=e1614]
+              - cell [ref=e1615]
+              - cell "custom:all_shell_deu_click_paymentoption_unique_2023_12_05 Copy metric key Use in chat" [ref=e1616]:
+                - generic [ref=e1617]:
+                  - generic [ref=e1618]: custom:all_shell_deu_click_paymentoption_unique_2023_12_05
+                  - generic "Copy metric key" [ref=e1619]:
+                    - button [ref=e1620] [cursor=pointer]:
+                      - img [ref=e1621]
+                  - generic "Use in chat" [ref=e1623]:
+                    - button [ref=e1624] [cursor=pointer]:
+                      - img [ref=e1625]
+            - row "ALL_Shell_DEU_Click_InvoiceAdress_Unique_2023-12-05 enabled DEFAULT custom:all_shell_deu_click_invoiceadress_unique_2023_12_05 Copy metric key Use in chat" [ref=e1627]:
+              - cell "ALL_Shell_DEU_Click_InvoiceAdress_Unique_2023-12-05 enabled" [ref=e1628]:
+                - paragraph [ref=e1629]: ALL_Shell_DEU_Click_InvoiceAdress_Unique_2023-12-05
+                - text: enabled
+              - cell "DEFAULT" [ref=e1630]
+              - cell [ref=e1631]
+              - cell [ref=e1632]
+              - cell [ref=e1633]
+              - cell "custom:all_shell_deu_click_invoiceadress_unique_2023_12_05 Copy metric key Use in chat" [ref=e1634]:
+                - generic [ref=e1635]:
+                  - generic [ref=e1636]: custom:all_shell_deu_click_invoiceadress_unique_2023_12_05
+                  - generic "Copy metric key" [ref=e1637]:
+                    - button [ref=e1638] [cursor=pointer]:
+                      - img [ref=e1639]
+                  - generic "Use in chat" [ref=e1641]:
+                    - button [ref=e1642] [cursor=pointer]:
+                      - img [ref=e1643]
+            - row "ALL_Shell_DEU_Click_OrderOverview_Unique_2023-12-05 enabled DEFAULT custom:all_shell_deu_click_orderoverview_unique_2023_12_05 Copy metric key Use in chat" [ref=e1645]:
+              - cell "ALL_Shell_DEU_Click_OrderOverview_Unique_2023-12-05 enabled" [ref=e1646]:
+                - paragraph [ref=e1647]: ALL_Shell_DEU_Click_OrderOverview_Unique_2023-12-05
+                - text: enabled
+              - cell "DEFAULT" [ref=e1648]
+              - cell [ref=e1649]
+              - cell [ref=e1650]
+              - cell [ref=e1651]
+              - cell "custom:all_shell_deu_click_orderoverview_unique_2023_12_05 Copy metric key Use in chat" [ref=e1652]:
+                - generic [ref=e1653]:
+                  - generic [ref=e1654]: custom:all_shell_deu_click_orderoverview_unique_2023_12_05
+                  - generic "Copy metric key" [ref=e1655]:
+                    - button [ref=e1656] [cursor=pointer]:
+                      - img [ref=e1657]
+                  - generic "Use in chat" [ref=e1659]:
+                    - button [ref=e1660] [cursor=pointer]:
+                      - img [ref=e1661]
+            - row "ALL_Shell_DEU_Click_BookingWebsite_Unique_2023-12-05 enabled DEFAULT custom:all_shell_deu_click_bookingwebsite_unique_2023_12_05 Copy metric key Use in chat" [ref=e1663]:
+              - cell "ALL_Shell_DEU_Click_BookingWebsite_Unique_2023-12-05 enabled" [ref=e1664]:
+                - paragraph [ref=e1665]: ALL_Shell_DEU_Click_BookingWebsite_Unique_2023-12-05
+                - text: enabled
+              - cell "DEFAULT" [ref=e1666]
+              - cell [ref=e1667]
+              - cell [ref=e1668]
+              - cell [ref=e1669]
+              - cell "custom:all_shell_deu_click_bookingwebsite_unique_2023_12_05 Copy metric key Use in chat" [ref=e1670]:
+                - generic [ref=e1671]:
+                  - generic [ref=e1672]: custom:all_shell_deu_click_bookingwebsite_unique_2023_12_05
+                  - generic "Copy metric key" [ref=e1673]:
+                    - button [ref=e1674] [cursor=pointer]:
+                      - img [ref=e1675]
+                  - generic "Use in chat" [ref=e1677]:
+                    - button [ref=e1678] [cursor=pointer]:
+                      - img [ref=e1679]
+            - row "MOB_Shell_GLO_Lead_Station Locator-Sent Direction to Phone_Unique_2023-12 enabled DEFAULT custom:mob_shell_glo_lead_station_locator_sent_direction_to_phone_unique_2023_12 Copy metric key Use in chat" [ref=e1681]:
+              - cell "MOB_Shell_GLO_Lead_Station Locator-Sent Direction to Phone_Unique_2023-12 enabled" [ref=e1682]:
+                - paragraph [ref=e1683]: MOB_Shell_GLO_Lead_Station Locator-Sent Direction to Phone_Unique_2023-12
+                - text: enabled
+              - cell "DEFAULT" [ref=e1684]
+              - cell [ref=e1685]
+              - cell [ref=e1686]
+              - cell [ref=e1687]
+              - cell "custom:mob_shell_glo_lead_station_locator_sent_direction_to_phone_unique_2023_12 Copy metric key Use in chat" [ref=e1688]:
+                - generic [ref=e1689]:
+                  - generic [ref=e1690]: custom:mob_shell_glo_lead_station_locator_sent_direction_to_phone_unique_2023_12
+                  - generic "Copy metric key" [ref=e1691]:
+                    - button [ref=e1692] [cursor=pointer]:
+                      - img [ref=e1693]
+                  - generic "Use in chat" [ref=e1695]:
+                    - button [ref=e1696] [cursor=pointer]:
+                      - img [ref=e1697]
+            - row "ALL_Shell_NDL_10secs_UNQ_2023-12-20 enabled DEFAULT custom:all_shell_ndl_10secs_unq_2023_12_20 Copy metric key Use in chat" [ref=e1699]:
+              - cell "ALL_Shell_NDL_10secs_UNQ_2023-12-20 enabled" [ref=e1700]:
+                - paragraph [ref=e1701]: ALL_Shell_NDL_10secs_UNQ_2023-12-20
+                - text: enabled
+              - cell "DEFAULT" [ref=e1702]
+              - cell [ref=e1703]
+              - cell [ref=e1704]
+              - cell [ref=e1705]
+              - cell "custom:all_shell_ndl_10secs_unq_2023_12_20 Copy metric key Use in chat" [ref=e1706]:
+                - generic [ref=e1707]:
+                  - generic [ref=e1708]: custom:all_shell_ndl_10secs_unq_2023_12_20
+                  - generic "Copy metric key" [ref=e1709]:
+                    - button [ref=e1710] [cursor=pointer]:
+                      - img [ref=e1711]
+                  - generic "Use in chat" [ref=e1713]:
+                    - button [ref=e1714] [cursor=pointer]:
+                      - img [ref=e1715]
+            - row "App_Analytics_DO_NOT_EDIT_Shell US & Canada - Android - enabled DEFAULT custom:app_analytics_do_not_edit_shell_us_canada_android Copy metric key Use in chat" [ref=e1717]:
+              - cell "App_Analytics_DO_NOT_EDIT_Shell US & Canada - Android - enabled" [ref=e1718]:
+                - paragraph [ref=e1719]: App_Analytics_DO_NOT_EDIT_Shell US & Canada - Android -
+                - text: enabled
+              - cell "DEFAULT" [ref=e1720]
+              - cell [ref=e1721]
+              - cell [ref=e1722]
+              - cell [ref=e1723]
+              - cell "custom:app_analytics_do_not_edit_shell_us_canada_android Copy metric key Use in chat" [ref=e1724]:
+                - generic [ref=e1725]:
+                  - generic [ref=e1726]: custom:app_analytics_do_not_edit_shell_us_canada_android
+                  - generic "Copy metric key" [ref=e1727]:
+                    - button [ref=e1728] [cursor=pointer]:
+                      - img [ref=e1729]
+                  - generic "Use in chat" [ref=e1731]:
+                    - button [ref=e1732] [cursor=pointer]:
+                      - img [ref=e1733]
+            - row "Kochava - Shell US & Canada - Android - session_start enabled DEFAULT custom:kochava_shell_us_canada_android_session_start Copy metric key Use in chat" [ref=e1735]:
+              - cell "Kochava - Shell US & Canada - Android - session_start enabled" [ref=e1736]:
+                - paragraph [ref=e1737]: Kochava - Shell US & Canada - Android - session_start
+                - text: enabled
+              - cell "DEFAULT" [ref=e1738]
+              - cell [ref=e1739]
+              - cell [ref=e1740]
+              - cell [ref=e1741]
+              - cell "custom:kochava_shell_us_canada_android_session_start Copy metric key Use in chat" [ref=e1742]:
+                - generic [ref=e1743]:
+                  - generic [ref=e1744]: custom:kochava_shell_us_canada_android_session_start
+                  - generic "Copy metric key" [ref=e1745]:
+                    - button [ref=e1746] [cursor=pointer]:
+                      - img [ref=e1747]
+                  - generic "Use in chat" [ref=e1749]:
+                    - button [ref=e1750] [cursor=pointer]:
+                      - img [ref=e1751]
+            - row "App_Analytics_DO_NOT_EDIT_Shell US & Canada - iOS - enabled DEFAULT custom:app_analytics_do_not_edit_shell_us_canada_ios Copy metric key Use in chat" [ref=e1753]:
+              - cell "App_Analytics_DO_NOT_EDIT_Shell US & Canada - iOS - enabled" [ref=e1754]:
+                - paragraph [ref=e1755]: App_Analytics_DO_NOT_EDIT_Shell US & Canada - iOS -
+                - text: enabled
+              - cell "DEFAULT" [ref=e1756]
+              - cell [ref=e1757]
+              - cell [ref=e1758]
+              - cell [ref=e1759]
+              - cell "custom:app_analytics_do_not_edit_shell_us_canada_ios Copy metric key Use in chat" [ref=e1760]:
+                - generic [ref=e1761]:
+                  - generic [ref=e1762]: custom:app_analytics_do_not_edit_shell_us_canada_ios
+                  - generic "Copy metric key" [ref=e1763]:
+                    - button [ref=e1764] [cursor=pointer]:
+                      - img [ref=e1765]
+                  - generic "Use in chat" [ref=e1767]:
+                    - button [ref=e1768] [cursor=pointer]:
+                      - img [ref=e1769]
+            - row "Kochava - Shell US & Canada - iOS - first_open enabled DEFAULT custom:kochava_shell_us_canada_ios_first_open Copy metric key Use in chat" [ref=e1771]:
+              - cell "Kochava - Shell US & Canada - iOS - first_open enabled" [ref=e1772]:
+                - paragraph [ref=e1773]: Kochava - Shell US & Canada - iOS - first_open
+                - text: enabled
+              - cell "DEFAULT" [ref=e1774]
+              - cell [ref=e1775]
+              - cell [ref=e1776]
+              - cell [ref=e1777]
+              - cell "custom:kochava_shell_us_canada_ios_first_open Copy metric key Use in chat" [ref=e1778]:
+                - generic [ref=e1779]:
+                  - generic [ref=e1780]: custom:kochava_shell_us_canada_ios_first_open
+                  - generic "Copy metric key" [ref=e1781]:
+                    - button [ref=e1782] [cursor=pointer]:
+                      - img [ref=e1783]
+                  - generic "Use in chat" [ref=e1785]:
+                    - button [ref=e1786] [cursor=pointer]:
+                      - img [ref=e1787]
+            - row "Kochava - Shell US & Canada - iOS - session_start enabled DEFAULT custom:kochava_shell_us_canada_ios_session_start Copy metric key Use in chat" [ref=e1789]:
+              - cell "Kochava - Shell US & Canada - iOS - session_start enabled" [ref=e1790]:
+                - paragraph [ref=e1791]: Kochava - Shell US & Canada - iOS - session_start
+                - text: enabled
+              - cell "DEFAULT" [ref=e1792]
+              - cell [ref=e1793]
+              - cell [ref=e1794]
+              - cell [ref=e1795]
+              - cell "custom:kochava_shell_us_canada_ios_session_start Copy metric key Use in chat" [ref=e1796]:
+                - generic [ref=e1797]:
+                  - generic [ref=e1798]: custom:kochava_shell_us_canada_ios_session_start
+                  - generic "Copy metric key" [ref=e1799]:
+                    - button [ref=e1800] [cursor=pointer]:
+                      - img [ref=e1801]
+                  - generic "Use in chat" [ref=e1803]:
+                    - button [ref=e1804] [cursor=pointer]:
+                      - img [ref=e1805]
+            - row "Kochava - Shell US & Canada - iOS - view_item enabled DEFAULT custom:kochava_shell_us_canada_ios_view_item Copy metric key Use in chat" [ref=e1807]:
+              - cell "Kochava - Shell US & Canada - iOS - view_item enabled" [ref=e1808]:
+                - paragraph [ref=e1809]: Kochava - Shell US & Canada - iOS - view_item
+                - text: enabled
+              - cell "DEFAULT" [ref=e1810]
+              - cell [ref=e1811]
+              - cell [ref=e1812]
+              - cell [ref=e1813]
+              - cell "custom:kochava_shell_us_canada_ios_view_item Copy metric key Use in chat" [ref=e1814]:
+                - generic [ref=e1815]:
+                  - generic [ref=e1816]: custom:kochava_shell_us_canada_ios_view_item
+                  - generic "Copy metric key" [ref=e1817]:
+                    - button [ref=e1818] [cursor=pointer]:
+                      - img [ref=e1819]
+                  - generic "Use in chat" [ref=e1821]:
+                    - button [ref=e1822] [cursor=pointer]:
+                      - img [ref=e1823]
+            - row "ALL_Shell_USA_Visits_AllPages_STD_2024-01-11 enabled DEFAULT custom:all_shell_usa_visits_allpages_std_2024_01_11 Copy metric key Use in chat" [ref=e1825]:
+              - cell "ALL_Shell_USA_Visits_AllPages_STD_2024-01-11 enabled" [ref=e1826]:
+                - paragraph [ref=e1827]: ALL_Shell_USA_Visits_AllPages_STD_2024-01-11
+                - text: enabled
+              - cell "DEFAULT" [ref=e1828]
+              - cell [ref=e1829]
+              - cell [ref=e1830]
+              - cell [ref=e1831]
+              - cell "custom:all_shell_usa_visits_allpages_std_2024_01_11 Copy metric key Use in chat" [ref=e1832]:
+                - generic [ref=e1833]:
+                  - generic [ref=e1834]: custom:all_shell_usa_visits_allpages_std_2024_01_11
+                  - generic "Copy metric key" [ref=e1835]:
+                    - button [ref=e1836] [cursor=pointer]:
+                      - img [ref=e1837]
+                  - generic "Use in chat" [ref=e1839]:
+                    - button [ref=e1840] [cursor=pointer]:
+                      - img [ref=e1841]
+            - row "Shell US & Canada (iOS) in_app_purchase enabled PURCHASE custom:shell_us_canada_ios_in_app_purchase Copy metric key Use in chat" [ref=e1843]:
+              - cell "Shell US & Canada (iOS) in_app_purchase enabled" [ref=e1844]:
+                - paragraph [ref=e1845]: Shell US & Canada (iOS) in_app_purchase
+                - text: enabled
+              - cell "PURCHASE" [ref=e1846]
+              - cell [ref=e1847]
+              - cell [ref=e1848]
+              - cell [ref=e1849]
+              - cell "custom:shell_us_canada_ios_in_app_purchase Copy metric key Use in chat" [ref=e1850]:
+                - generic [ref=e1851]:
+                  - generic [ref=e1852]: custom:shell_us_canada_ios_in_app_purchase
+                  - generic "Copy metric key" [ref=e1853]:
+                    - button [ref=e1854] [cursor=pointer]:
+                      - img [ref=e1855]
+                  - generic "Use in chat" [ref=e1857]:
+                    - button [ref=e1858] [cursor=pointer]:
+                      - img [ref=e1859]
+            - row "Shell US & Canada (Android) in_app_purchase enabled PURCHASE custom:shell_us_canada_android_in_app_purchase Copy metric key Use in chat" [ref=e1861]:
+              - cell "Shell US & Canada (Android) in_app_purchase enabled" [ref=e1862]:
+                - paragraph [ref=e1863]: Shell US & Canada (Android) in_app_purchase
+                - text: enabled
+              - cell "PURCHASE" [ref=e1864]
+              - cell [ref=e1865]
+              - cell [ref=e1866]
+              - cell [ref=e1867]
+              - cell "custom:shell_us_canada_android_in_app_purchase Copy metric key Use in chat" [ref=e1868]:
+                - generic [ref=e1869]:
+                  - generic [ref=e1870]: custom:shell_us_canada_android_in_app_purchase
+                  - generic "Copy metric key" [ref=e1871]:
+                    - button [ref=e1872] [cursor=pointer]:
+                      - img [ref=e1873]
+                  - generic "Use in chat" [ref=e1875]:
+                    - button [ref=e1876] [cursor=pointer]:
+                      - img [ref=e1877]
+            - row "Shell (Android) first_open enabled DOWNLOAD custom:shell_android_first_open Copy metric key Use in chat" [ref=e1879]:
+              - cell "Shell (Android) first_open enabled" [ref=e1880]:
+                - paragraph [ref=e1881]: Shell (Android) first_open
+                - text: enabled
+              - cell "DOWNLOAD" [ref=e1882]
+              - cell [ref=e1883]
+              - cell [ref=e1884]
+              - cell [ref=e1885]
+              - cell "custom:shell_android_first_open Copy metric key Use in chat" [ref=e1886]:
+                - generic [ref=e1887]:
+                  - generic [ref=e1888]: custom:shell_android_first_open
+                  - generic "Copy metric key" [ref=e1889]:
+                    - button [ref=e1890] [cursor=pointer]:
+                      - img [ref=e1891]
+                  - generic "Use in chat" [ref=e1893]:
+                    - button [ref=e1894] [cursor=pointer]:
+                      - img [ref=e1895]
+            - row "Shell (Android) registration_complete enabled DEFAULT custom:shell_android_registration_complete Copy metric key Use in chat" [ref=e1897]:
+              - cell "Shell (Android) registration_complete enabled" [ref=e1898]:
+                - paragraph [ref=e1899]: Shell (Android) registration_complete
+                - text: enabled
+              - cell "DEFAULT" [ref=e1900]
+              - cell [ref=e1901]
+              - cell [ref=e1902]
+              - cell [ref=e1903]
+              - cell "custom:shell_android_registration_complete Copy metric key Use in chat" [ref=e1904]:
+                - generic [ref=e1905]:
+                  - generic [ref=e1906]: custom:shell_android_registration_complete
+                  - generic "Copy metric key" [ref=e1907]:
+                    - button [ref=e1908] [cursor=pointer]:
+                      - img [ref=e1909]
+                  - generic "Use in chat" [ref=e1911]:
+                    - button [ref=e1912] [cursor=pointer]:
+                      - img [ref=e1913]
+            - row "Shell (Android) in_app_purchase enabled PURCHASE custom:shell_android_in_app_purchase Copy metric key Use in chat" [ref=e1915]:
+              - cell "Shell (Android) in_app_purchase enabled" [ref=e1916]:
+                - paragraph [ref=e1917]: Shell (Android) in_app_purchase
+                - text: enabled
+              - cell "PURCHASE" [ref=e1918]
+              - cell [ref=e1919]
+              - cell [ref=e1920]
+              - cell [ref=e1921]
+              - cell "custom:shell_android_in_app_purchase Copy metric key Use in chat" [ref=e1922]:
+                - generic [ref=e1923]:
+                  - generic [ref=e1924]: custom:shell_android_in_app_purchase
+                  - generic "Copy metric key" [ref=e1925]:
+                    - button [ref=e1926] [cursor=pointer]:
+                      - img [ref=e1927]
+                  - generic "Use in chat" [ref=e1929]:
+                    - button [ref=e1930] [cursor=pointer]:
+                      - img [ref=e1931]
+            - row "Shell (iOS) registration_complete enabled DEFAULT custom:shell_ios_registration_complete Copy metric key Use in chat" [ref=e1933]:
+              - cell "Shell (iOS) registration_complete enabled" [ref=e1934]:
+                - paragraph [ref=e1935]: Shell (iOS) registration_complete
+                - text: enabled
+              - cell "DEFAULT" [ref=e1936]
+              - cell [ref=e1937]
+              - cell [ref=e1938]
+              - cell [ref=e1939]
+              - cell "custom:shell_ios_registration_complete Copy metric key Use in chat" [ref=e1940]:
+                - generic [ref=e1941]:
+                  - generic [ref=e1942]: custom:shell_ios_registration_complete
+                  - generic "Copy metric key" [ref=e1943]:
+                    - button [ref=e1944] [cursor=pointer]:
+                      - img [ref=e1945]
+                  - generic "Use in chat" [ref=e1947]:
+                    - button [ref=e1948] [cursor=pointer]:
+                      - img [ref=e1949]
+            - row "Shell (iOS) in_app_purchase enabled PURCHASE custom:shell_ios_in_app_purchase Copy metric key Use in chat" [ref=e1951]:
+              - cell "Shell (iOS) in_app_purchase enabled" [ref=e1952]:
+                - paragraph [ref=e1953]: Shell (iOS) in_app_purchase
+                - text: enabled
+              - cell "PURCHASE" [ref=e1954]
+              - cell [ref=e1955]
+              - cell [ref=e1956]
+              - cell [ref=e1957]
+              - cell "custom:shell_ios_in_app_purchase Copy metric key Use in chat" [ref=e1958]:
+                - generic [ref=e1959]:
+                  - generic [ref=e1960]: custom:shell_ios_in_app_purchase
+                  - generic "Copy metric key" [ref=e1961]:
+                    - button [ref=e1962] [cursor=pointer]:
+                      - img [ref=e1963]
+                  - generic "Use in chat" [ref=e1965]:
+                    - button [ref=e1966] [cursor=pointer]:
+                      - img [ref=e1967]
+            - row "Shell US & Canada (Android) registration_complete enabled DEFAULT custom:shell_us_canada_android_registration_complete Copy metric key Use in chat" [ref=e1969]:
+              - cell "Shell US & Canada (Android) registration_complete enabled" [ref=e1970]:
+                - paragraph [ref=e1971]: Shell US & Canada (Android) registration_complete
+                - text: enabled
+              - cell "DEFAULT" [ref=e1972]
+              - cell [ref=e1973]
+              - cell [ref=e1974]
+              - cell [ref=e1975]
+              - cell "custom:shell_us_canada_android_registration_complete Copy metric key Use in chat" [ref=e1976]:
+                - generic [ref=e1977]:
+                  - generic [ref=e1978]: custom:shell_us_canada_android_registration_complete
+                  - generic "Copy metric key" [ref=e1979]:
+                    - button [ref=e1980] [cursor=pointer]:
+                      - img [ref=e1981]
+                  - generic "Use in chat" [ref=e1983]:
+                    - button [ref=e1984] [cursor=pointer]:
+                      - img [ref=e1985]
+            - row "Shell US & Canada (Android) session_start enabled DEFAULT custom:shell_us_canada_android_session_start Copy metric key Use in chat" [ref=e1987]:
+              - cell "Shell US & Canada (Android) session_start enabled" [ref=e1988]:
+                - paragraph [ref=e1989]: Shell US & Canada (Android) session_start
+                - text: enabled
+              - cell "DEFAULT" [ref=e1990]
+              - cell [ref=e1991]
+              - cell [ref=e1992]
+              - cell [ref=e1993]
+              - cell "custom:shell_us_canada_android_session_start Copy metric key Use in chat" [ref=e1994]:
+                - generic [ref=e1995]:
+                  - generic [ref=e1996]: custom:shell_us_canada_android_session_start
+                  - generic "Copy metric key" [ref=e1997]:
+                    - button [ref=e1998] [cursor=pointer]:
+                      - img [ref=e1999]
+                  - generic "Use in chat" [ref=e2001]:
+                    - button [ref=e2002] [cursor=pointer]:
+                      - img [ref=e2003]
+            - row "Shell (iOS) first_open enabled DOWNLOAD custom:shell_ios_first_open Copy metric key Use in chat" [ref=e2005]:
+              - cell "Shell (iOS) first_open enabled" [ref=e2006]:
+                - paragraph [ref=e2007]: Shell (iOS) first_open
+                - text: enabled
+              - cell "DOWNLOAD" [ref=e2008]
+              - cell [ref=e2009]
+              - cell [ref=e2010]
+              - cell [ref=e2011]
+              - cell "custom:shell_ios_first_open Copy metric key Use in chat" [ref=e2012]:
+                - generic [ref=e2013]:
+                  - generic [ref=e2014]: custom:shell_ios_first_open
+                  - generic "Copy metric key" [ref=e2015]:
+                    - button [ref=e2016] [cursor=pointer]:
+                      - img [ref=e2017]
+                  - generic "Use in chat" [ref=e2019]:
+                    - button [ref=e2020] [cursor=pointer]:
+                      - img [ref=e2021]
+            - row "ALL_Shell_EGY_Click_Purchase_UNQ_2024-01-29 enabled DEFAULT custom:all_shell_egy_click_purchase_unq_2024_01_29 Copy metric key Use in chat" [ref=e2023]:
+              - cell "ALL_Shell_EGY_Click_Purchase_UNQ_2024-01-29 enabled" [ref=e2024]:
+                - paragraph [ref=e2025]: ALL_Shell_EGY_Click_Purchase_UNQ_2024-01-29
+                - text: enabled
+              - cell "DEFAULT" [ref=e2026]
+              - cell [ref=e2027]
+              - cell [ref=e2028]
+              - cell [ref=e2029]
+              - cell "custom:all_shell_egy_click_purchase_unq_2024_01_29 Copy metric key Use in chat" [ref=e2030]:
+                - generic [ref=e2031]:
+                  - generic [ref=e2032]: custom:all_shell_egy_click_purchase_unq_2024_01_29
+                  - generic "Copy metric key" [ref=e2033]:
+                    - button [ref=e2034] [cursor=pointer]:
+                      - img [ref=e2035]
+                  - generic "Use in chat" [ref=e2037]:
+                    - button [ref=e2038] [cursor=pointer]:
+                      - img [ref=e2039]
+            - row "ALL_Shell_EGY_Click_Checkout_UNQ_2024-01-29 enabled DEFAULT custom:all_shell_egy_click_checkout_unq_2024_01_29 Copy metric key Use in chat" [ref=e2041]:
+              - cell "ALL_Shell_EGY_Click_Checkout_UNQ_2024-01-29 enabled" [ref=e2042]:
+                - paragraph [ref=e2043]: ALL_Shell_EGY_Click_Checkout_UNQ_2024-01-29
+                - text: enabled
+              - cell "DEFAULT" [ref=e2044]
+              - cell [ref=e2045]
+              - cell [ref=e2046]
+              - cell [ref=e2047]
+              - cell "custom:all_shell_egy_click_checkout_unq_2024_01_29 Copy metric key Use in chat" [ref=e2048]:
+                - generic [ref=e2049]:
+                  - generic [ref=e2050]: custom:all_shell_egy_click_checkout_unq_2024_01_29
+                  - generic "Copy metric key" [ref=e2051]:
+                    - button [ref=e2052] [cursor=pointer]:
+                      - img [ref=e2053]
+                  - generic "Use in chat" [ref=e2055]:
+                    - button [ref=e2056] [cursor=pointer]:
+                      - img [ref=e2057]
+            - row "ALL_Shell_EGY_Click_Addcart_UNQ_2024-01-29 enabled DEFAULT custom:all_shell_egy_click_addcart_unq_2024_01_29 Copy metric key Use in chat" [ref=e2059]:
+              - cell "ALL_Shell_EGY_Click_Addcart_UNQ_2024-01-29 enabled" [ref=e2060]:
+                - paragraph [ref=e2061]: ALL_Shell_EGY_Click_Addcart_UNQ_2024-01-29
+                - text: enabled
+              - cell "DEFAULT" [ref=e2062]
+              - cell [ref=e2063]
+              - cell [ref=e2064]
+              - cell [ref=e2065]
+              - cell "custom:all_shell_egy_click_addcart_unq_2024_01_29 Copy metric key Use in chat" [ref=e2066]:
+                - generic [ref=e2067]:
+                  - generic [ref=e2068]: custom:all_shell_egy_click_addcart_unq_2024_01_29
+                  - generic "Copy metric key" [ref=e2069]:
+                    - button [ref=e2070] [cursor=pointer]:
+                      - img [ref=e2071]
+                  - generic "Use in chat" [ref=e2073]:
+                    - button [ref=e2074] [cursor=pointer]:
+                      - img [ref=e2075]
+            - row "ALL_Shell_EGY_Click_Orderbutton_UNQ_2024-01-29 enabled DEFAULT custom:all_shell_egy_click_orderbutton_unq_2024_01_29 Copy metric key Use in chat" [ref=e2077]:
+              - cell "ALL_Shell_EGY_Click_Orderbutton_UNQ_2024-01-29 enabled" [ref=e2078]:
+                - paragraph [ref=e2079]: ALL_Shell_EGY_Click_Orderbutton_UNQ_2024-01-29
+                - text: enabled
+              - cell "DEFAULT" [ref=e2080]
+              - cell [ref=e2081]
+              - cell [ref=e2082]
+              - cell [ref=e2083]
+              - cell "custom:all_shell_egy_click_orderbutton_unq_2024_01_29 Copy metric key Use in chat" [ref=e2084]:
+                - generic [ref=e2085]:
+                  - generic [ref=e2086]: custom:all_shell_egy_click_orderbutton_unq_2024_01_29
+                  - generic "Copy metric key" [ref=e2087]:
+                    - button [ref=e2088] [cursor=pointer]:
+                      - img [ref=e2089]
+                  - generic "Use in chat" [ref=e2091]:
+                    - button [ref=e2092] [cursor=pointer]:
+                      - img [ref=e2093]
+            - row "ALL_Shell_EGY_Visits_Allpages_UNQ_2024-01-29 enabled DEFAULT custom:all_shell_egy_visits_allpages_unq_2024_01_29 Copy metric key Use in chat" [ref=e2095]:
+              - cell "ALL_Shell_EGY_Visits_Allpages_UNQ_2024-01-29 enabled" [ref=e2096]:
+                - paragraph [ref=e2097]: ALL_Shell_EGY_Visits_Allpages_UNQ_2024-01-29
+                - text: enabled
+              - cell "DEFAULT" [ref=e2098]
+              - cell [ref=e2099]
+              - cell [ref=e2100]
+              - cell [ref=e2101]
+              - cell "custom:all_shell_egy_visits_allpages_unq_2024_01_29 Copy metric key Use in chat" [ref=e2102]:
+                - generic [ref=e2103]:
+                  - generic [ref=e2104]: custom:all_shell_egy_visits_allpages_unq_2024_01_29
+                  - generic "Copy metric key" [ref=e2105]:
+                    - button [ref=e2106] [cursor=pointer]:
+                      - img [ref=e2107]
+                  - generic "Use in chat" [ref=e2109]:
+                    - button [ref=e2110] [cursor=pointer]:
+                      - img [ref=e2111]
+            - row "Google Analytics - purchase - (283737679) Shell Helix Egypt - GA4 enabled DEFAULT custom:google_analytics_purchase_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2113]:
+              - cell "Google Analytics - purchase - (283737679) Shell Helix Egypt - GA4 enabled" [ref=e2114]:
+                - paragraph [ref=e2115]: Google Analytics - purchase - (283737679) Shell Helix Egypt - GA4
+                - text: enabled
+              - cell "DEFAULT" [ref=e2116]
+              - cell [ref=e2117]
+              - cell [ref=e2118]
+              - cell [ref=e2119]
+              - cell "custom:google_analytics_purchase_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2120]:
+                - generic [ref=e2121]:
+                  - generic [ref=e2122]: custom:google_analytics_purchase_283737679_shell_helix_egypt_ga4
+                  - generic "Copy metric key" [ref=e2123]:
+                    - button [ref=e2124] [cursor=pointer]:
+                      - img [ref=e2125]
+                  - generic "Use in chat" [ref=e2127]:
+                    - button [ref=e2128] [cursor=pointer]:
+                      - img [ref=e2129]
+            - row "Google Analytics - Add_to_Cart - (283737679) Shell Helix Egypt - GA4 enabled DEFAULT custom:google_analytics_add_to_cart_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2131]:
+              - cell "Google Analytics - Add_to_Cart - (283737679) Shell Helix Egypt - GA4 enabled" [ref=e2132]:
+                - paragraph [ref=e2133]: Google Analytics - Add_to_Cart - (283737679) Shell Helix Egypt - GA4
+                - text: enabled
+              - cell "DEFAULT" [ref=e2134]
+              - cell [ref=e2135]
+              - cell [ref=e2136]
+              - cell [ref=e2137]
+              - cell "custom:google_analytics_add_to_cart_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2138]:
+                - generic [ref=e2139]:
+                  - generic [ref=e2140]: custom:google_analytics_add_to_cart_283737679_shell_helix_egypt_ga4
+                  - generic "Copy metric key" [ref=e2141]:
+                    - button [ref=e2142] [cursor=pointer]:
+                      - img [ref=e2143]
+                  - generic "Use in chat" [ref=e2145]:
+                    - button [ref=e2146] [cursor=pointer]:
+                      - img [ref=e2147]
+            - row "DO_NOT_EDIT Google Analytics property (283737679) Shell Helix Egypt - GA4 enabled DEFAULT custom:do_not_edit_google_analytics_property_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2149]:
+              - cell "DO_NOT_EDIT Google Analytics property (283737679) Shell Helix Egypt - GA4 enabled" [ref=e2150]:
+                - paragraph [ref=e2151]: DO_NOT_EDIT Google Analytics property (283737679) Shell Helix Egypt - GA4
+                - text: enabled
+              - cell "DEFAULT" [ref=e2152]
+              - cell [ref=e2153]
+              - cell [ref=e2154]
+              - cell [ref=e2155]
+              - cell "custom:do_not_edit_google_analytics_property_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2156]:
+                - generic [ref=e2157]:
+                  - generic [ref=e2158]: custom:do_not_edit_google_analytics_property_283737679_shell_helix_egypt_ga4
+                  - generic "Copy metric key" [ref=e2159]:
+                    - button [ref=e2160] [cursor=pointer]:
+                      - img [ref=e2161]
+                  - generic "Use in chat" [ref=e2163]:
+                    - button [ref=e2164] [cursor=pointer]:
+                      - img [ref=e2165]
+            - row "App_Analytics_DO_NOT_EDIT_Shell - iOS - enabled DEFAULT custom:app_analytics_do_not_edit_shell_ios Copy metric key Use in chat" [ref=e2167]:
+              - cell "App_Analytics_DO_NOT_EDIT_Shell - iOS - enabled" [ref=e2168]:
+                - paragraph [ref=e2169]: App_Analytics_DO_NOT_EDIT_Shell - iOS -
+                - text: enabled
+              - cell "DEFAULT" [ref=e2170]
+              - cell [ref=e2171]
+              - cell [ref=e2172]
+              - cell [ref=e2173]
+              - cell "custom:app_analytics_do_not_edit_shell_ios Copy metric key Use in chat" [ref=e2174]:
+                - generic [ref=e2175]:
+                  - generic [ref=e2176]: custom:app_analytics_do_not_edit_shell_ios
+                  - generic "Copy metric key" [ref=e2177]:
+                    - button [ref=e2178] [cursor=pointer]:
+                      - img [ref=e2179]
+                  - generic "Use in chat" [ref=e2181]:
+                    - button [ref=e2182] [cursor=pointer]:
+                      - img [ref=e2183]
+            - row "Kochava - Shell - iOS - first_open enabled DEFAULT custom:kochava_shell_ios_first_open Copy metric key Use in chat" [ref=e2185]:
+              - cell "Kochava - Shell - iOS - first_open enabled" [ref=e2186]:
+                - paragraph [ref=e2187]: Kochava - Shell - iOS - first_open
+                - text: enabled
+              - cell "DEFAULT" [ref=e2188]
+              - cell [ref=e2189]
+              - cell [ref=e2190]
+              - cell [ref=e2191]
+              - cell "custom:kochava_shell_ios_first_open Copy metric key Use in chat" [ref=e2192]:
+                - generic [ref=e2193]:
+                  - generic [ref=e2194]: custom:kochava_shell_ios_first_open
+                  - generic "Copy metric key" [ref=e2195]:
+                    - button [ref=e2196] [cursor=pointer]:
+                      - img [ref=e2197]
+                  - generic "Use in chat" [ref=e2199]:
+                    - button [ref=e2200] [cursor=pointer]:
+                      - img [ref=e2201]
+            - row "Kochava - Shell - iOS - ecommerce_purchase enabled PURCHASE custom:kochava_shell_ios_ecommerce_purchase Copy metric key Use in chat" [ref=e2203]:
+              - cell "Kochava - Shell - iOS - ecommerce_purchase enabled" [ref=e2204]:
+                - paragraph [ref=e2205]: Kochava - Shell - iOS - ecommerce_purchase
+                - text: enabled
+              - cell "PURCHASE" [ref=e2206]
+              - cell [ref=e2207]
+              - cell [ref=e2208]
+              - cell [ref=e2209]
+              - cell "custom:kochava_shell_ios_ecommerce_purchase Copy metric key Use in chat" [ref=e2210]:
+                - generic [ref=e2211]:
+                  - generic [ref=e2212]: custom:kochava_shell_ios_ecommerce_purchase
+                  - generic "Copy metric key" [ref=e2213]:
+                    - button [ref=e2214] [cursor=pointer]:
+                      - img [ref=e2215]
+                  - generic "Use in chat" [ref=e2217]:
+                    - button [ref=e2218] [cursor=pointer]:
+                      - img [ref=e2219]
+            - row "Kochava - Shell - iOS - custom - Registration complete enabled DEFAULT custom:kochava_shell_ios_custom_registration_complete Copy metric key Use in chat" [ref=e2221]:
+              - cell "Kochava - Shell - iOS - custom - Registration complete enabled" [ref=e2222]:
+                - paragraph [ref=e2223]: Kochava - Shell - iOS - custom - Registration complete
+                - text: enabled
+              - cell "DEFAULT" [ref=e2224]
+              - cell [ref=e2225]
+              - cell [ref=e2226]
+              - cell [ref=e2227]
+              - cell "custom:kochava_shell_ios_custom_registration_complete Copy metric key Use in chat" [ref=e2228]:
+                - generic [ref=e2229]:
+                  - generic [ref=e2230]: custom:kochava_shell_ios_custom_registration_complete
+                  - generic "Copy metric key" [ref=e2231]:
+                    - button [ref=e2232] [cursor=pointer]:
+                      - img [ref=e2233]
+                  - generic "Use in chat" [ref=e2235]:
+                    - button [ref=e2236] [cursor=pointer]:
+                      - img [ref=e2237]
+            - row "Kochava - Shell - iOS - custom_1 - SmartPay Registration Completed enabled DEFAULT custom:kochava_shell_ios_custom_1_smartpay_registration_completed Copy metric key Use in chat" [ref=e2239]:
+              - cell "Kochava - Shell - iOS - custom_1 - SmartPay Registration Completed enabled" [ref=e2240]:
+                - paragraph [ref=e2241]: Kochava - Shell - iOS - custom_1 - SmartPay Registration Completed
+                - text: enabled
+              - cell "DEFAULT" [ref=e2242]
+              - cell [ref=e2243]
+              - cell [ref=e2244]
+              - cell [ref=e2245]
+              - cell "custom:kochava_shell_ios_custom_1_smartpay_registration_completed Copy metric key Use in chat" [ref=e2246]:
+                - generic [ref=e2247]:
+                  - generic [ref=e2248]: custom:kochava_shell_ios_custom_1_smartpay_registration_completed
+                  - generic "Copy metric key" [ref=e2249]:
+                    - button [ref=e2250] [cursor=pointer]:
+                      - img [ref=e2251]
+                  - generic "Use in chat" [ref=e2253]:
+                    - button [ref=e2254] [cursor=pointer]:
+                      - img [ref=e2255]
+            - row "App_Analytics_DO_NOT_EDIT_Shell - Android - enabled DEFAULT custom:app_analytics_do_not_edit_shell_android Copy metric key Use in chat" [ref=e2257]:
+              - cell "App_Analytics_DO_NOT_EDIT_Shell - Android - enabled" [ref=e2258]:
+                - paragraph [ref=e2259]: App_Analytics_DO_NOT_EDIT_Shell - Android -
+                - text: enabled
+              - cell "DEFAULT" [ref=e2260]
+              - cell [ref=e2261]
+              - cell [ref=e2262]
+              - cell [ref=e2263]
+              - cell "custom:app_analytics_do_not_edit_shell_android Copy metric key Use in chat" [ref=e2264]:
+                - generic [ref=e2265]:
+                  - generic [ref=e2266]: custom:app_analytics_do_not_edit_shell_android
+                  - generic "Copy metric key" [ref=e2267]:
+                    - button [ref=e2268] [cursor=pointer]:
+                      - img [ref=e2269]
+                  - generic "Use in chat" [ref=e2271]:
+                    - button [ref=e2272] [cursor=pointer]:
+                      - img [ref=e2273]
+            - row "Kochava - Shell - Android - first_open enabled DEFAULT custom:kochava_shell_android_first_open Copy metric key Use in chat" [ref=e2275]:
+              - cell "Kochava - Shell - Android - first_open enabled" [ref=e2276]:
+                - paragraph [ref=e2277]: Kochava - Shell - Android - first_open
+                - text: enabled
+              - cell "DEFAULT" [ref=e2278]
+              - cell [ref=e2279]
+              - cell [ref=e2280]
+              - cell [ref=e2281]
+              - cell "custom:kochava_shell_android_first_open Copy metric key Use in chat" [ref=e2282]:
+                - generic [ref=e2283]:
+                  - generic [ref=e2284]: custom:kochava_shell_android_first_open
+                  - generic "Copy metric key" [ref=e2285]:
+                    - button [ref=e2286] [cursor=pointer]:
+                      - img [ref=e2287]
+                  - generic "Use in chat" [ref=e2289]:
+                    - button [ref=e2290] [cursor=pointer]:
+                      - img [ref=e2291]
+            - row "Kochava - Shell - Android - ecommerce_purchase enabled PURCHASE custom:kochava_shell_android_ecommerce_purchase Copy metric key Use in chat" [ref=e2293]:
+              - cell "Kochava - Shell - Android - ecommerce_purchase enabled" [ref=e2294]:
+                - paragraph [ref=e2295]: Kochava - Shell - Android - ecommerce_purchase
+                - text: enabled
+              - cell "PURCHASE" [ref=e2296]
+              - cell [ref=e2297]
+              - cell [ref=e2298]
+              - cell [ref=e2299]
+              - cell "custom:kochava_shell_android_ecommerce_purchase Copy metric key Use in chat" [ref=e2300]:
+                - generic [ref=e2301]:
+                  - generic [ref=e2302]: custom:kochava_shell_android_ecommerce_purchase
+                  - generic "Copy metric key" [ref=e2303]:
+                    - button [ref=e2304] [cursor=pointer]:
+                      - img [ref=e2305]
+                  - generic "Use in chat" [ref=e2307]:
+                    - button [ref=e2308] [cursor=pointer]:
+                      - img [ref=e2309]
+            - row "Kochava - Shell - Android - custom - Registration complete enabled DEFAULT custom:kochava_shell_android_custom_registration_complete Copy metric key Use in chat" [ref=e2311]:
+              - cell "Kochava - Shell - Android - custom - Registration complete enabled" [ref=e2312]:
+                - paragraph [ref=e2313]: Kochava - Shell - Android - custom - Registration complete
+                - text: enabled
+              - cell "DEFAULT" [ref=e2314]
+              - cell [ref=e2315]
+              - cell [ref=e2316]
+              - cell [ref=e2317]
+              - cell "custom:kochava_shell_android_custom_registration_complete Copy metric key Use in chat" [ref=e2318]:
+                - generic [ref=e2319]:
+                  - generic [ref=e2320]: custom:kochava_shell_android_custom_registration_complete
+                  - generic "Copy metric key" [ref=e2321]:
+                    - button [ref=e2322] [cursor=pointer]:
+                      - img [ref=e2323]
+                  - generic "Use in chat" [ref=e2325]:
+                    - button [ref=e2326] [cursor=pointer]:
+                      - img [ref=e2327]
+            - row "Kochava - Shell - Android - custom_1 - SmartPay Registration Completed enabled DEFAULT custom:kochava_shell_android_custom_1_smartpay_registration_completed Copy metric key Use in chat" [ref=e2329]:
+              - cell "Kochava - Shell - Android - custom_1 - SmartPay Registration Completed enabled" [ref=e2330]:
+                - paragraph [ref=e2331]: Kochava - Shell - Android - custom_1 - SmartPay Registration Completed
+                - text: enabled
+              - cell "DEFAULT" [ref=e2332]
+              - cell [ref=e2333]
+              - cell [ref=e2334]
+              - cell [ref=e2335]
+              - cell "custom:kochava_shell_android_custom_1_smartpay_registration_completed Copy metric key Use in chat" [ref=e2336]:
+                - generic [ref=e2337]:
+                  - generic [ref=e2338]: custom:kochava_shell_android_custom_1_smartpay_registration_completed
+                  - generic "Copy metric key" [ref=e2339]:
+                    - button [ref=e2340] [cursor=pointer]:
+                      - img [ref=e2341]
+                  - generic "Use in chat" [ref=e2343]:
+                    - button [ref=e2344] [cursor=pointer]:
+                      - img [ref=e2345]
+            - row "ALL_Shell_DEU_Click_NeinDanke_Unique_2024-03-06 enabled DEFAULT custom:all_shell_deu_click_neindanke_unique_2024_03_06 Copy metric key Use in chat" [ref=e2347]:
+              - cell "ALL_Shell_DEU_Click_NeinDanke_Unique_2024-03-06 enabled" [ref=e2348]:
+                - paragraph [ref=e2349]: ALL_Shell_DEU_Click_NeinDanke_Unique_2024-03-06
+                - text: enabled
+              - cell "DEFAULT" [ref=e2350]
+              - cell [ref=e2351]
+              - cell [ref=e2352]
+              - cell [ref=e2353]
+              - cell "custom:all_shell_deu_click_neindanke_unique_2024_03_06 Copy metric key Use in chat" [ref=e2354]:
+                - generic [ref=e2355]:
+                  - generic [ref=e2356]: custom:all_shell_deu_click_neindanke_unique_2024_03_06
+                  - generic "Copy metric key" [ref=e2357]:
+                    - button [ref=e2358] [cursor=pointer]:
+                      - img [ref=e2359]
+                  - generic "Use in chat" [ref=e2361]:
+                    - button [ref=e2362] [cursor=pointer]:
+                      - img [ref=e2363]
+            - row "ALL_Shell_DEU_Page_EmailSent_Unique_2024-03-06 enabled DEFAULT custom:all_shell_deu_page_emailsent_unique_2024_03_06 Copy metric key Use in chat" [ref=e2365]:
+              - cell "ALL_Shell_DEU_Page_EmailSent_Unique_2024-03-06 enabled" [ref=e2366]:
+                - paragraph [ref=e2367]: ALL_Shell_DEU_Page_EmailSent_Unique_2024-03-06
+                - text: enabled
+              - cell "DEFAULT" [ref=e2368]
+              - cell [ref=e2369]
+              - cell [ref=e2370]
+              - cell [ref=e2371]
+              - cell "custom:all_shell_deu_page_emailsent_unique_2024_03_06 Copy metric key Use in chat" [ref=e2372]:
+                - generic [ref=e2373]:
+                  - generic [ref=e2374]: custom:all_shell_deu_page_emailsent_unique_2024_03_06
+                  - generic "Copy metric key" [ref=e2375]:
+                    - button [ref=e2376] [cursor=pointer]:
+                      - img [ref=e2377]
+                  - generic "Use in chat" [ref=e2379]:
+                    - button [ref=e2380] [cursor=pointer]:
+                      - img [ref=e2381]
+            - row "ALL_Shell_DEU_Click_Registrieren_Unique_2024-03-06 enabled DEFAULT custom:all_shell_deu_click_registrieren_unique_2024_03_06 Copy metric key Use in chat" [ref=e2383]:
+              - cell "ALL_Shell_DEU_Click_Registrieren_Unique_2024-03-06 enabled" [ref=e2384]:
+                - paragraph [ref=e2385]: ALL_Shell_DEU_Click_Registrieren_Unique_2024-03-06
+                - text: enabled
+              - cell "DEFAULT" [ref=e2386]
+              - cell [ref=e2387]
+              - cell [ref=e2388]
+              - cell [ref=e2389]
+              - cell "custom:all_shell_deu_click_registrieren_unique_2024_03_06 Copy metric key Use in chat" [ref=e2390]:
+                - generic [ref=e2391]:
+                  - generic [ref=e2392]: custom:all_shell_deu_click_registrieren_unique_2024_03_06
+                  - generic "Copy metric key" [ref=e2393]:
+                    - button [ref=e2394] [cursor=pointer]:
+                      - img [ref=e2395]
+                  - generic "Use in chat" [ref=e2397]:
+                    - button [ref=e2398] [cursor=pointer]:
+                      - img [ref=e2399]
+            - row "ALL_Shell_DEU_Click_Weiter_Unique_2024-03-06 enabled DEFAULT custom:all_shell_deu_click_weiter_unique_2024_03_06 Copy metric key Use in chat" [ref=e2401]:
+              - cell "ALL_Shell_DEU_Click_Weiter_Unique_2024-03-06 enabled" [ref=e2402]:
+                - paragraph [ref=e2403]: ALL_Shell_DEU_Click_Weiter_Unique_2024-03-06
+                - text: enabled
+              - cell "DEFAULT" [ref=e2404]
+              - cell [ref=e2405]
+              - cell [ref=e2406]
+              - cell [ref=e2407]
+              - cell "custom:all_shell_deu_click_weiter_unique_2024_03_06 Copy metric key Use in chat" [ref=e2408]:
+                - generic [ref=e2409]:
+                  - generic [ref=e2410]: custom:all_shell_deu_click_weiter_unique_2024_03_06
+                  - generic "Copy metric key" [ref=e2411]:
+                    - button [ref=e2412] [cursor=pointer]:
+                      - img [ref=e2413]
+                  - generic "Use in chat" [ref=e2415]:
+                    - button [ref=e2416] [cursor=pointer]:
+                      - img [ref=e2417]
+            - row "ALL_Shell_DEU_Click_JaBitte_Unique_2024-03-06 enabled DEFAULT custom:all_shell_deu_click_jabitte_unique_2024_03_06 Copy metric key Use in chat" [ref=e2419]:
+              - cell "ALL_Shell_DEU_Click_JaBitte_Unique_2024-03-06 enabled" [ref=e2420]:
+                - paragraph [ref=e2421]: ALL_Shell_DEU_Click_JaBitte_Unique_2024-03-06
+                - text: enabled
+              - cell "DEFAULT" [ref=e2422]
+              - cell [ref=e2423]
+              - cell [ref=e2424]
+              - cell [ref=e2425]
+              - cell "custom:all_shell_deu_click_jabitte_unique_2024_03_06 Copy metric key Use in chat" [ref=e2426]:
+                - generic [ref=e2427]:
+                  - generic [ref=e2428]: custom:all_shell_deu_click_jabitte_unique_2024_03_06
+                  - generic "Copy metric key" [ref=e2429]:
+                    - button [ref=e2430] [cursor=pointer]:
+                      - img [ref=e2431]
+                  - generic "Use in chat" [ref=e2433]:
+                    - button [ref=e2434] [cursor=pointer]:
+                      - img [ref=e2435]
+            - row "ALL_Shell_DEU_Page_Confirmation_Unique_2024-03-06 enabled DEFAULT custom:all_shell_deu_page_confirmation_unique_2024_03_06 Copy metric key Use in chat" [ref=e2437]:
+              - cell "ALL_Shell_DEU_Page_Confirmation_Unique_2024-03-06 enabled" [ref=e2438]:
+                - paragraph [ref=e2439]: ALL_Shell_DEU_Page_Confirmation_Unique_2024-03-06
+                - text: enabled
+              - cell "DEFAULT" [ref=e2440]
+              - cell [ref=e2441]
+              - cell [ref=e2442]
+              - cell [ref=e2443]
+              - cell "custom:all_shell_deu_page_confirmation_unique_2024_03_06 Copy metric key Use in chat" [ref=e2444]:
+                - generic [ref=e2445]:
+                  - generic [ref=e2446]: custom:all_shell_deu_page_confirmation_unique_2024_03_06
+                  - generic "Copy metric key" [ref=e2447]:
+                    - button [ref=e2448] [cursor=pointer]:
+                      - img [ref=e2449]
+                  - generic "Use in chat" [ref=e2451]:
+                    - button [ref=e2452] [cursor=pointer]:
+                      - img [ref=e2453]
+            - row "Shell (Android) Shell SmartPay Registration Completed enabled DEFAULT custom:shell_android_shell_smartpay_registration_completed Copy metric key Use in chat" [ref=e2455]:
+              - cell "Shell (Android) Shell SmartPay Registration Completed enabled" [ref=e2456]:
+                - paragraph [ref=e2457]: Shell (Android) Shell SmartPay Registration Completed
+                - text: enabled
+              - cell "DEFAULT" [ref=e2458]
+              - cell [ref=e2459]
+              - cell [ref=e2460]
+              - cell [ref=e2461]
+              - cell "custom:shell_android_shell_smartpay_registration_completed Copy metric key Use in chat" [ref=e2462]:
+                - generic [ref=e2463]:
+                  - generic [ref=e2464]: custom:shell_android_shell_smartpay_registration_completed
+                  - generic "Copy metric key" [ref=e2465]:
+                    - button [ref=e2466] [cursor=pointer]:
+                      - img [ref=e2467]
+                  - generic "Use in chat" [ref=e2469]:
+                    - button [ref=e2470] [cursor=pointer]:
+                      - img [ref=e2471]
+            - row "Shell (iOS) Shell SmartPay Registration Completed enabled DEFAULT custom:shell_ios_shell_smartpay_registration_completed Copy metric key Use in chat" [ref=e2473]:
+              - cell "Shell (iOS) Shell SmartPay Registration Completed enabled" [ref=e2474]:
+                - paragraph [ref=e2475]: Shell (iOS) Shell SmartPay Registration Completed
+                - text: enabled
+              - cell "DEFAULT" [ref=e2476]
+              - cell [ref=e2477]
+              - cell [ref=e2478]
+              - cell [ref=e2479]
+              - cell "custom:shell_ios_shell_smartpay_registration_completed Copy metric key Use in chat" [ref=e2480]:
+                - generic [ref=e2481]:
+                  - generic [ref=e2482]: custom:shell_ios_shell_smartpay_registration_completed
+                  - generic "Copy metric key" [ref=e2483]:
+                    - button [ref=e2484] [cursor=pointer]:
+                      - img [ref=e2485]
+                  - generic "Use in chat" [ref=e2487]:
+                    - button [ref=e2488] [cursor=pointer]:
+                      - img [ref=e2489]
+            - row "ENG_Shell_USA_Page-level_Provider Signup Step 4_Unique_2024/04/18 enabled DEFAULT custom:eng_shell_usa_page_level_provider_signup_step_4_unique_2024_04_18 Copy metric key Use in chat" [ref=e2491]:
+              - cell "ENG_Shell_USA_Page-level_Provider Signup Step 4_Unique_2024/04/18 enabled" [ref=e2492]:
+                - paragraph [ref=e2493]: ENG_Shell_USA_Page-level_Provider Signup Step 4_Unique_2024/04/18
+                - text: enabled
+              - cell "DEFAULT" [ref=e2494]
+              - cell [ref=e2495]
+              - cell [ref=e2496]
+              - cell [ref=e2497]
+              - cell "custom:eng_shell_usa_page_level_provider_signup_step_4_unique_2024_04_18 Copy metric key Use in chat" [ref=e2498]:
+                - generic [ref=e2499]:
+                  - generic [ref=e2500]: custom:eng_shell_usa_page_level_provider_signup_step_4_unique_2024_04_18
+                  - generic "Copy metric key" [ref=e2501]:
+                    - button [ref=e2502] [cursor=pointer]:
+                      - img [ref=e2503]
+                  - generic "Use in chat" [ref=e2505]:
+                    - button [ref=e2506] [cursor=pointer]:
+                      - img [ref=e2507]
+            - row "ENG_Shell_USA_Page-level_Provider Signup Step 3_Unique_2024/04/18 enabled DEFAULT custom:eng_shell_usa_page_level_provider_signup_step_3_unique_2024_04_18 Copy metric key Use in chat" [ref=e2509]:
+              - cell "ENG_Shell_USA_Page-level_Provider Signup Step 3_Unique_2024/04/18 enabled" [ref=e2510]:
+                - paragraph [ref=e2511]: ENG_Shell_USA_Page-level_Provider Signup Step 3_Unique_2024/04/18
+                - text: enabled
+              - cell "DEFAULT" [ref=e2512]
+              - cell [ref=e2513]
+              - cell [ref=e2514]
+              - cell [ref=e2515]
+              - cell "custom:eng_shell_usa_page_level_provider_signup_step_3_unique_2024_04_18 Copy metric key Use in chat" [ref=e2516]:
+                - generic [ref=e2517]:
+                  - generic [ref=e2518]: custom:eng_shell_usa_page_level_provider_signup_step_3_unique_2024_04_18
+                  - generic "Copy metric key" [ref=e2519]:
+                    - button [ref=e2520] [cursor=pointer]:
+                      - img [ref=e2521]
+                  - generic "Use in chat" [ref=e2523]:
+                    - button [ref=e2524] [cursor=pointer]:
+                      - img [ref=e2525]
+            - row "ENG_Shell_USA_Page-level_Provider Signup Step 1_Unique_2024/04/18 enabled DEFAULT custom:eng_shell_usa_page_level_provider_signup_step_1_unique_2024_04_18 Copy metric key Use in chat" [ref=e2527]:
+              - cell "ENG_Shell_USA_Page-level_Provider Signup Step 1_Unique_2024/04/18 enabled" [ref=e2528]:
+                - paragraph [ref=e2529]: ENG_Shell_USA_Page-level_Provider Signup Step 1_Unique_2024/04/18
+                - text: enabled
+              - cell "DEFAULT" [ref=e2530]
+              - cell [ref=e2531]
+              - cell [ref=e2532]
+              - cell [ref=e2533]
+              - cell "custom:eng_shell_usa_page_level_provider_signup_step_1_unique_2024_04_18 Copy metric key Use in chat" [ref=e2534]:
+                - generic [ref=e2535]:
+                  - generic [ref=e2536]: custom:eng_shell_usa_page_level_provider_signup_step_1_unique_2024_04_18
+                  - generic "Copy metric key" [ref=e2537]:
+                    - button [ref=e2538] [cursor=pointer]:
+                      - img [ref=e2539]
+                  - generic "Use in chat" [ref=e2541]:
+                    - button [ref=e2542] [cursor=pointer]:
+                      - img [ref=e2543]
+            - row "ENG_Shell_USA_Page-level_Provider Signup Step 2_Unique_2024/04/18 enabled DEFAULT custom:eng_shell_usa_page_level_provider_signup_step_2_unique_2024_04_18 Copy metric key Use in chat" [ref=e2545]:
+              - cell "ENG_Shell_USA_Page-level_Provider Signup Step 2_Unique_2024/04/18 enabled" [ref=e2546]:
+                - paragraph [ref=e2547]: ENG_Shell_USA_Page-level_Provider Signup Step 2_Unique_2024/04/18
+                - text: enabled
+              - cell "DEFAULT" [ref=e2548]
+              - cell [ref=e2549]
+              - cell [ref=e2550]
+              - cell [ref=e2551]
+              - cell "custom:eng_shell_usa_page_level_provider_signup_step_2_unique_2024_04_18 Copy metric key Use in chat" [ref=e2552]:
+                - generic [ref=e2553]:
+                  - generic [ref=e2554]: custom:eng_shell_usa_page_level_provider_signup_step_2_unique_2024_04_18
+                  - generic "Copy metric key" [ref=e2555]:
+                    - button [ref=e2556] [cursor=pointer]:
+                      - img [ref=e2557]
+                  - generic "Use in chat" [ref=e2559]:
+                    - button [ref=e2560] [cursor=pointer]:
+                      - img [ref=e2561]
+            - row "ALL_Shell_DEU_Click_Weiter2_Unique_2024-03-06 enabled DEFAULT custom:all_shell_deu_click_weiter2_unique_2024_03_06 Copy metric key Use in chat" [ref=e2563]:
+              - cell "ALL_Shell_DEU_Click_Weiter2_Unique_2024-03-06 enabled" [ref=e2564]:
+                - paragraph [ref=e2565]: ALL_Shell_DEU_Click_Weiter2_Unique_2024-03-06
+                - text: enabled
+              - cell "DEFAULT" [ref=e2566]
+              - cell [ref=e2567]
+              - cell [ref=e2568]
+              - cell [ref=e2569]
+              - cell "custom:all_shell_deu_click_weiter2_unique_2024_03_06 Copy metric key Use in chat" [ref=e2570]:
+                - generic [ref=e2571]:
+                  - generic [ref=e2572]: custom:all_shell_deu_click_weiter2_unique_2024_03_06
+                  - generic "Copy metric key" [ref=e2573]:
+                    - button [ref=e2574] [cursor=pointer]:
+                      - img [ref=e2575]
+                  - generic "Use in chat" [ref=e2577]:
+                    - button [ref=e2578] [cursor=pointer]:
+                      - img [ref=e2579]
+            - row "ALL_Shell_CAN_Click_AppDownload_Unique_2024-05-09 enabled DEFAULT custom:all_shell_can_click_appdownload_unique_2024_05_09 Copy metric key Use in chat" [ref=e2581]:
+              - cell "ALL_Shell_CAN_Click_AppDownload_Unique_2024-05-09 enabled" [ref=e2582]:
+                - paragraph [ref=e2583]: ALL_Shell_CAN_Click_AppDownload_Unique_2024-05-09
+                - text: enabled
+              - cell "DEFAULT" [ref=e2584]
+              - cell [ref=e2585]
+              - cell [ref=e2586]
+              - cell [ref=e2587]
+              - cell "custom:all_shell_can_click_appdownload_unique_2024_05_09 Copy metric key Use in chat" [ref=e2588]:
+                - generic [ref=e2589]:
+                  - generic [ref=e2590]: custom:all_shell_can_click_appdownload_unique_2024_05_09
+                  - generic "Copy metric key" [ref=e2591]:
+                    - button [ref=e2592] [cursor=pointer]:
+                      - img [ref=e2593]
+                  - generic "Use in chat" [ref=e2595]:
+                    - button [ref=e2596] [cursor=pointer]:
+                      - img [ref=e2597]
+            - row "ALL_Shell_CAN_Click_Rewarded_Unique_2024-05-09 enabled DEFAULT custom:all_shell_can_click_rewarded_unique_2024_05_09 Copy metric key Use in chat" [ref=e2599]:
+              - cell "ALL_Shell_CAN_Click_Rewarded_Unique_2024-05-09 enabled" [ref=e2600]:
+                - paragraph [ref=e2601]: ALL_Shell_CAN_Click_Rewarded_Unique_2024-05-09
+                - text: enabled
+              - cell "DEFAULT" [ref=e2602]
+              - cell [ref=e2603]
+              - cell [ref=e2604]
+              - cell [ref=e2605]
+              - cell "custom:all_shell_can_click_rewarded_unique_2024_05_09 Copy metric key Use in chat" [ref=e2606]:
+                - generic [ref=e2607]:
+                  - generic [ref=e2608]: custom:all_shell_can_click_rewarded_unique_2024_05_09
+                  - generic "Copy metric key" [ref=e2609]:
+                    - button [ref=e2610] [cursor=pointer]:
+                      - img [ref=e2611]
+                  - generic "Use in chat" [ref=e2613]:
+                    - button [ref=e2614] [cursor=pointer]:
+                      - img [ref=e2615]
+            - row "ALL_Shell_CAN_Click_FindNearestStation_Unique_2024-05-09 enabled DEFAULT custom:all_shell_can_click_findneareststation_unique_2024_05_09 Copy metric key Use in chat" [ref=e2617]:
+              - cell "ALL_Shell_CAN_Click_FindNearestStation_Unique_2024-05-09 enabled" [ref=e2618]:
+                - paragraph [ref=e2619]: ALL_Shell_CAN_Click_FindNearestStation_Unique_2024-05-09
+                - text: enabled
+              - cell "DEFAULT" [ref=e2620]
+              - cell [ref=e2621]
+              - cell [ref=e2622]
+              - cell [ref=e2623]
+              - cell "custom:all_shell_can_click_findneareststation_unique_2024_05_09 Copy metric key Use in chat" [ref=e2624]:
+                - generic [ref=e2625]:
+                  - generic [ref=e2626]: custom:all_shell_can_click_findneareststation_unique_2024_05_09
+                  - generic "Copy metric key" [ref=e2627]:
+                    - button [ref=e2628] [cursor=pointer]:
+                      - img [ref=e2629]
+                  - generic "Use in chat" [ref=e2631]:
+                    - button [ref=e2632] [cursor=pointer]:
+                      - img [ref=e2633]
+            - row "Adsquare_Offline_Conversions enabled DEFAULT custom:adsquare_offline_conversions Copy metric key Use in chat" [ref=e2635]:
+              - cell "Adsquare_Offline_Conversions enabled" [ref=e2636]:
+                - paragraph [ref=e2637]: Adsquare_Offline_Conversions
+                - text: enabled
+              - cell "DEFAULT" [ref=e2638]
+              - cell [ref=e2639]
+              - cell [ref=e2640]
+              - cell [ref=e2641]
+              - cell "custom:adsquare_offline_conversions Copy metric key Use in chat" [ref=e2642]:
+                - generic [ref=e2643]:
+                  - generic [ref=e2644]: custom:adsquare_offline_conversions
+                  - generic "Copy metric key" [ref=e2645]:
+                    - button [ref=e2646] [cursor=pointer]:
+                      - img [ref=e2647]
+                  - generic "Use in chat" [ref=e2649]:
+                    - button [ref=e2650] [cursor=pointer]:
+                      - img [ref=e2651]
+            - row "All_Shell_THA_Click_Service-Station-Operator_Standard_2024-06-25 enabled DEFAULT custom:all_shell_tha_click_service_station_operator_standard_2024_06_25 Copy metric key Use in chat" [ref=e2653]:
+              - cell "All_Shell_THA_Click_Service-Station-Operator_Standard_2024-06-25 enabled" [ref=e2654]:
+                - paragraph [ref=e2655]: All_Shell_THA_Click_Service-Station-Operator_Standard_2024-06-25
+                - text: enabled
+              - cell "DEFAULT" [ref=e2656]
+              - cell [ref=e2657]
+              - cell [ref=e2658]
+              - cell [ref=e2659]
+              - cell "custom:all_shell_tha_click_service_station_operator_standard_2024_06_25 Copy metric key Use in chat" [ref=e2660]:
+                - generic [ref=e2661]:
+                  - generic [ref=e2662]: custom:all_shell_tha_click_service_station_operator_standard_2024_06_25
+                  - generic "Copy metric key" [ref=e2663]:
+                    - button [ref=e2664] [cursor=pointer]:
+                      - img [ref=e2665]
+                  - generic "Use in chat" [ref=e2667]:
+                    - button [ref=e2668] [cursor=pointer]:
+                      - img [ref=e2669]
+            - row "ADSQUARE_Shell_GBR_Offline_Conversions_Standard_2024-08 enabled DEFAULT custom:adsquare_shell_gbr_offline_conversions_standard_2024_08 Copy metric key Use in chat" [ref=e2671]:
+              - cell "ADSQUARE_Shell_GBR_Offline_Conversions_Standard_2024-08 enabled" [ref=e2672]:
+                - paragraph [ref=e2673]: ADSQUARE_Shell_GBR_Offline_Conversions_Standard_2024-08
+                - text: enabled
+              - cell "DEFAULT" [ref=e2674]
+              - cell [ref=e2675]
+              - cell [ref=e2676]
+              - cell [ref=e2677]
+              - cell "custom:adsquare_shell_gbr_offline_conversions_standard_2024_08 Copy metric key Use in chat" [ref=e2678]:
+                - generic [ref=e2679]:
+                  - generic [ref=e2680]: custom:adsquare_shell_gbr_offline_conversions_standard_2024_08
+                  - generic "Copy metric key" [ref=e2681]:
+                    - button [ref=e2682] [cursor=pointer]:
+                      - img [ref=e2683]
+                  - generic "Use in chat" [ref=e2685]:
+                    - button [ref=e2686] [cursor=pointer]:
+                      - img [ref=e2687]
+            - row "ALL_Shell_NDL_10secs_STD_2024-09-13 enabled DEFAULT custom:all_shell_ndl_10secs_std_2024_09_13 Copy metric key Use in chat" [ref=e2689]:
+              - cell "ALL_Shell_NDL_10secs_STD_2024-09-13 enabled" [ref=e2690]:
+                - paragraph [ref=e2691]: ALL_Shell_NDL_10secs_STD_2024-09-13
+                - text: enabled
+              - cell "DEFAULT" [ref=e2692]
+              - cell [ref=e2693]
+              - cell [ref=e2694]
+              - cell [ref=e2695]
+              - cell "custom:all_shell_ndl_10secs_std_2024_09_13 Copy metric key Use in chat" [ref=e2696]:
+                - generic [ref=e2697]:
+                  - generic [ref=e2698]: custom:all_shell_ndl_10secs_std_2024_09_13
+                  - generic "Copy metric key" [ref=e2699]:
+                    - button [ref=e2700] [cursor=pointer]:
+                      - img [ref=e2701]
+                  - generic "Use in chat" [ref=e2703]:
+                    - button [ref=e2704] [cursor=pointer]:
+                      - img [ref=e2705]
+            - row "ALL_Shell_DEU_Dwell-10secs_UNQ_2024-09-13 enabled DEFAULT custom:all_shell_deu_dwell_10secs_unq_2024_09_13 Copy metric key Use in chat" [ref=e2707]:
+              - cell "ALL_Shell_DEU_Dwell-10secs_UNQ_2024-09-13 enabled" [ref=e2708]:
+                - paragraph [ref=e2709]: ALL_Shell_DEU_Dwell-10secs_UNQ_2024-09-13
+                - text: enabled
+              - cell "DEFAULT" [ref=e2710]
+              - cell [ref=e2711]
+              - cell [ref=e2712]
+              - cell [ref=e2713]
+              - cell "custom:all_shell_deu_dwell_10secs_unq_2024_09_13 Copy metric key Use in chat" [ref=e2714]:
+                - generic [ref=e2715]:
+                  - generic [ref=e2716]: custom:all_shell_deu_dwell_10secs_unq_2024_09_13
+                  - generic "Copy metric key" [ref=e2717]:
+                    - button [ref=e2718] [cursor=pointer]:
+                      - img [ref=e2719]
+                  - generic "Use in chat" [ref=e2721]:
+                    - button [ref=e2722] [cursor=pointer]:
+                      - img [ref=e2723]
+            - row "ENG_Shell_USA_Wholesale-Fuel-B2B-Form-Submit_Standard_2024-11-07 enabled DEFAULT custom:eng_shell_usa_wholesale_fuel_b2b_form_submit_standard_2024_11_07 Copy metric key Use in chat" [ref=e2725]:
+              - cell "ENG_Shell_USA_Wholesale-Fuel-B2B-Form-Submit_Standard_2024-11-07 enabled" [ref=e2726]:
+                - paragraph [ref=e2727]: ENG_Shell_USA_Wholesale-Fuel-B2B-Form-Submit_Standard_2024-11-07
+                - text: enabled
+              - cell "DEFAULT" [ref=e2728]
+              - cell [ref=e2729]
+              - cell [ref=e2730]
+              - cell [ref=e2731]
+              - cell "custom:eng_shell_usa_wholesale_fuel_b2b_form_submit_standard_2024_11_07 Copy metric key Use in chat" [ref=e2732]:
+                - generic [ref=e2733]:
+                  - generic [ref=e2734]: custom:eng_shell_usa_wholesale_fuel_b2b_form_submit_standard_2024_11_07
+                  - generic "Copy metric key" [ref=e2735]:
+                    - button [ref=e2736] [cursor=pointer]:
+                      - img [ref=e2737]
+                  - generic "Use in chat" [ref=e2739]:
+                    - button [ref=e2740] [cursor=pointer]:
+                      - img [ref=e2741]
+            - row "Google Analytics - begin_checkout - (283737679) Shell Helix Egypt - GA4 enabled DEFAULT custom:google_analytics_begin_checkout_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2743]:
+              - cell "Google Analytics - begin_checkout - (283737679) Shell Helix Egypt - GA4 enabled" [ref=e2744]:
+                - paragraph [ref=e2745]: Google Analytics - begin_checkout - (283737679) Shell Helix Egypt - GA4
+                - text: enabled
+              - cell "DEFAULT" [ref=e2746]
+              - cell [ref=e2747]
+              - cell [ref=e2748]
+              - cell [ref=e2749]
+              - cell "custom:google_analytics_begin_checkout_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2750]:
+                - generic [ref=e2751]:
+                  - generic [ref=e2752]: custom:google_analytics_begin_checkout_283737679_shell_helix_egypt_ga4
+                  - generic "Copy metric key" [ref=e2753]:
+                    - button [ref=e2754] [cursor=pointer]:
+                      - img [ref=e2755]
+                  - generic "Use in chat" [ref=e2757]:
+                    - button [ref=e2758] [cursor=pointer]:
+                      - img [ref=e2759]
+            - row "Google Analytics - Added Product - (283737679) Shell Helix Egypt - GA4 enabled DEFAULT custom:google_analytics_added_product_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2761]:
+              - cell "Google Analytics - Added Product - (283737679) Shell Helix Egypt - GA4 enabled" [ref=e2762]:
+                - paragraph [ref=e2763]: Google Analytics - Added Product - (283737679) Shell Helix Egypt - GA4
+                - text: enabled
+              - cell "DEFAULT" [ref=e2764]
+              - cell [ref=e2765]
+              - cell [ref=e2766]
+              - cell [ref=e2767]
+              - cell "custom:google_analytics_added_product_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2768]:
+                - generic [ref=e2769]:
+                  - generic [ref=e2770]: custom:google_analytics_added_product_283737679_shell_helix_egypt_ga4
+                  - generic "Copy metric key" [ref=e2771]:
+                    - button [ref=e2772] [cursor=pointer]:
+                      - img [ref=e2773]
+                  - generic "Use in chat" [ref=e2775]:
+                    - button [ref=e2776] [cursor=pointer]:
+                      - img [ref=e2777]
+            - row "Google Analytics - Viewed Checkout - Processing Page - (283737679) Shell Helix Egypt - GA4 enabled DEFAULT custom:google_analytics_viewed_checkout_processing_page_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2779]:
+              - cell "Google Analytics - Viewed Checkout - Processing Page - (283737679) Shell Helix Egypt - GA4 enabled" [ref=e2780]:
+                - paragraph [ref=e2781]: Google Analytics - Viewed Checkout - Processing Page - (283737679) Shell Helix Egypt - GA4
+                - text: enabled
+              - cell "DEFAULT" [ref=e2782]
+              - cell [ref=e2783]
+              - cell [ref=e2784]
+              - cell [ref=e2785]
+              - cell "custom:google_analytics_viewed_checkout_processing_page_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2786]:
+                - generic [ref=e2787]:
+                  - generic [ref=e2788]: custom:google_analytics_viewed_checkout_processing_page_283737679_shell_helix_egypt_ga4
+                  - generic "Copy metric key" [ref=e2789]:
+                    - button [ref=e2790] [cursor=pointer]:
+                      - img [ref=e2791]
+                  - generic "Use in chat" [ref=e2793]:
+                    - button [ref=e2794] [cursor=pointer]:
+                      - img [ref=e2795]
+            - row "Google Analytics - Viewed Checkout - Receipt Page - (283737679) Shell Helix Egypt - GA4 enabled DEFAULT custom:google_analytics_viewed_checkout_receipt_page_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2797]:
+              - cell "Google Analytics - Viewed Checkout - Receipt Page - (283737679) Shell Helix Egypt - GA4 enabled" [ref=e2798]:
+                - paragraph [ref=e2799]: Google Analytics - Viewed Checkout - Receipt Page - (283737679) Shell Helix Egypt - GA4
+                - text: enabled
+              - cell "DEFAULT" [ref=e2800]
+              - cell [ref=e2801]
+              - cell [ref=e2802]
+              - cell [ref=e2803]
+              - cell "custom:google_analytics_viewed_checkout_receipt_page_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2804]:
+                - generic [ref=e2805]:
+                  - generic [ref=e2806]: custom:google_analytics_viewed_checkout_receipt_page_283737679_shell_helix_egypt_ga4
+                  - generic "Copy metric key" [ref=e2807]:
+                    - button [ref=e2808] [cursor=pointer]:
+                      - img [ref=e2809]
+                  - generic "Use in chat" [ref=e2811]:
+                    - button [ref=e2812] [cursor=pointer]:
+                      - img [ref=e2813]
+            - row "Google Analytics - Viewed Orders - Thank You Page - (283737679) Shell Helix Egypt - GA4 enabled DEFAULT custom:google_analytics_viewed_orders_thank_you_page_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2815]:
+              - cell "Google Analytics - Viewed Orders - Thank You Page - (283737679) Shell Helix Egypt - GA4 enabled" [ref=e2816]:
+                - paragraph [ref=e2817]: Google Analytics - Viewed Orders - Thank You Page - (283737679) Shell Helix Egypt - GA4
+                - text: enabled
+              - cell "DEFAULT" [ref=e2818]
+              - cell [ref=e2819]
+              - cell [ref=e2820]
+              - cell [ref=e2821]
+              - cell "custom:google_analytics_viewed_orders_thank_you_page_283737679_shell_helix_egypt_ga4 Copy metric key Use in chat" [ref=e2822]:
+                - generic [ref=e2823]:
+                  - generic [ref=e2824]: custom:google_analytics_viewed_orders_thank_you_page_283737679_shell_helix_egypt_ga4
+                  - generic "Copy metric key" [ref=e2825]:
+                    - button [ref=e2826] [cursor=pointer]:
+                      - img [ref=e2827]
+                  - generic "Use in chat" [ref=e2829]:
+                    - button [ref=e2830] [cursor=pointer]:
+                      - img [ref=e2831]
+            - row "MOB_Shell_GLO_Lead_Registration-Form-Completed_Unique_2025-02 enabled DEFAULT custom:mob_shell_glo_lead_registration_form_completed_unique_2025_02 Copy metric key Use in chat" [ref=e2833]:
+              - cell "MOB_Shell_GLO_Lead_Registration-Form-Completed_Unique_2025-02 enabled" [ref=e2834]:
+                - paragraph [ref=e2835]: MOB_Shell_GLO_Lead_Registration-Form-Completed_Unique_2025-02
+                - text: enabled
+              - cell "DEFAULT" [ref=e2836]
+              - cell [ref=e2837]
+              - cell [ref=e2838]
+              - cell [ref=e2839]
+              - cell "custom:mob_shell_glo_lead_registration_form_completed_unique_2025_02 Copy metric key Use in chat" [ref=e2840]:
+                - generic [ref=e2841]:
+                  - generic [ref=e2842]: custom:mob_shell_glo_lead_registration_form_completed_unique_2025_02
+                  - generic "Copy metric key" [ref=e2843]:
+                    - button [ref=e2844] [cursor=pointer]:
+                      - img [ref=e2845]
+                  - generic "Use in chat" [ref=e2847]:
+                    - button [ref=e2848] [cursor=pointer]:
+                      - img [ref=e2849]
+            - row "Shell Recharge enabled DOWNLOAD custom:shell_recharge Copy metric key Use in chat" [ref=e2851]:
+              - cell "Shell Recharge enabled" [ref=e2852]:
+                - paragraph [ref=e2853]: Shell Recharge
+                - text: enabled
+              - cell "DOWNLOAD" [ref=e2854]
+              - cell [ref=e2855]
+              - cell [ref=e2856]
+              - cell [ref=e2857]
+              - cell "custom:shell_recharge Copy metric key Use in chat" [ref=e2858]:
+                - generic [ref=e2859]:
+                  - generic [ref=e2860]: custom:shell_recharge
+                  - generic "Copy metric key" [ref=e2861]:
+                    - button [ref=e2862] [cursor=pointer]:
+                      - img [ref=e2863]
+                  - generic "Use in chat" [ref=e2865]:
+                    - button [ref=e2866] [cursor=pointer]:
+                      - img [ref=e2867]
+            - row "Lead form - Submit enabled SUBMIT_LEAD_FORM custom:lead_form_submit Copy metric key Use in chat" [ref=e2869]:
+              - cell "Lead form - Submit enabled" [ref=e2870]:
+                - paragraph [ref=e2871]: Lead form - Submit
+                - text: enabled
+              - cell "SUBMIT_LEAD_FORM" [ref=e2872]
+              - cell [ref=e2873]
+              - cell [ref=e2874]
+              - cell [ref=e2875]
+              - cell "custom:lead_form_submit Copy metric key Use in chat" [ref=e2876]:
+                - generic [ref=e2877]:
+                  - generic [ref=e2878]: custom:lead_form_submit
+                  - generic "Copy metric key" [ref=e2879]:
+                    - button [ref=e2880] [cursor=pointer]:
+                      - img [ref=e2881]
+                  - generic "Use in chat" [ref=e2883]:
+                    - button [ref=e2884] [cursor=pointer]:
+                      - img [ref=e2885]
+            - row "Google Analytics - purchase - (379057783) GA4 - shell.com.au - Shell (Australia) enabled DEFAULT custom:google_analytics_purchase_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2887]:
+              - cell "Google Analytics - purchase - (379057783) GA4 - shell.com.au - Shell (Australia) enabled" [ref=e2888]:
+                - paragraph [ref=e2889]: Google Analytics - purchase - (379057783) GA4 - shell.com.au - Shell (Australia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e2890]
+              - cell [ref=e2891]
+              - cell [ref=e2892]
+              - cell [ref=e2893]
+              - cell "custom:google_analytics_purchase_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2894]:
+                - generic [ref=e2895]:
+                  - generic [ref=e2896]: custom:google_analytics_purchase_379057783_ga4_shell_com_au_shell_australia
+                  - generic "Copy metric key" [ref=e2897]:
+                    - button [ref=e2898] [cursor=pointer]:
+                      - img [ref=e2899]
+                  - generic "Use in chat" [ref=e2901]:
+                    - button [ref=e2902] [cursor=pointer]:
+                      - img [ref=e2903]
+            - row "Google Analytics - form_completed - (379057783) GA4 - shell.com.au - Shell (Australia) enabled DEFAULT custom:google_analytics_form_completed_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2905]:
+              - cell "Google Analytics - form_completed - (379057783) GA4 - shell.com.au - Shell (Australia) enabled" [ref=e2906]:
+                - paragraph [ref=e2907]: Google Analytics - form_completed - (379057783) GA4 - shell.com.au - Shell (Australia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e2908]
+              - cell [ref=e2909]
+              - cell [ref=e2910]
+              - cell [ref=e2911]
+              - cell "custom:google_analytics_form_completed_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2912]:
+                - generic [ref=e2913]:
+                  - generic [ref=e2914]: custom:google_analytics_form_completed_379057783_ga4_shell_com_au_shell_australia
+                  - generic "Copy metric key" [ref=e2915]:
+                    - button [ref=e2916] [cursor=pointer]:
+                      - img [ref=e2917]
+                  - generic "Use in chat" [ref=e2919]:
+                    - button [ref=e2920] [cursor=pointer]:
+                      - img [ref=e2921]
+            - row "Google Analytics - form_abandoned - (379057783) GA4 - shell.com.au - Shell (Australia) enabled DEFAULT custom:google_analytics_form_abandoned_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2923]:
+              - cell "Google Analytics - form_abandoned - (379057783) GA4 - shell.com.au - Shell (Australia) enabled" [ref=e2924]:
+                - paragraph [ref=e2925]: Google Analytics - form_abandoned - (379057783) GA4 - shell.com.au - Shell (Australia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e2926]
+              - cell [ref=e2927]
+              - cell [ref=e2928]
+              - cell [ref=e2929]
+              - cell "custom:google_analytics_form_abandoned_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2930]:
+                - generic [ref=e2931]:
+                  - generic [ref=e2932]: custom:google_analytics_form_abandoned_379057783_ga4_shell_com_au_shell_australia
+                  - generic "Copy metric key" [ref=e2933]:
+                    - button [ref=e2934] [cursor=pointer]:
+                      - img [ref=e2935]
+                  - generic "Use in chat" [ref=e2937]:
+                    - button [ref=e2938] [cursor=pointer]:
+                      - img [ref=e2939]
+            - row "Google Analytics - file_downloaded - (379057783) GA4 - shell.com.au - Shell (Australia) enabled DEFAULT custom:google_analytics_file_downloaded_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2941]:
+              - cell "Google Analytics - file_downloaded - (379057783) GA4 - shell.com.au - Shell (Australia) enabled" [ref=e2942]:
+                - paragraph [ref=e2943]: Google Analytics - file_downloaded - (379057783) GA4 - shell.com.au - Shell (Australia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e2944]
+              - cell [ref=e2945]
+              - cell [ref=e2946]
+              - cell [ref=e2947]
+              - cell "custom:google_analytics_file_downloaded_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2948]:
+                - generic [ref=e2949]:
+                  - generic [ref=e2950]: custom:google_analytics_file_downloaded_379057783_ga4_shell_com_au_shell_australia
+                  - generic "Copy metric key" [ref=e2951]:
+                    - button [ref=e2952] [cursor=pointer]:
+                      - img [ref=e2953]
+                  - generic "Use in chat" [ref=e2955]:
+                    - button [ref=e2956] [cursor=pointer]:
+                      - img [ref=e2957]
+            - row "Google Analytics - form_start - (379057783) GA4 - shell.com.au - Shell (Australia) enabled DEFAULT custom:google_analytics_form_start_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2959]:
+              - cell "Google Analytics - form_start - (379057783) GA4 - shell.com.au - Shell (Australia) enabled" [ref=e2960]:
+                - paragraph [ref=e2961]: Google Analytics - form_start - (379057783) GA4 - shell.com.au - Shell (Australia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e2962]
+              - cell [ref=e2963]
+              - cell [ref=e2964]
+              - cell [ref=e2965]
+              - cell "custom:google_analytics_form_start_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2966]:
+                - generic [ref=e2967]:
+                  - generic [ref=e2968]: custom:google_analytics_form_start_379057783_ga4_shell_com_au_shell_australia
+                  - generic "Copy metric key" [ref=e2969]:
+                    - button [ref=e2970] [cursor=pointer]:
+                      - img [ref=e2971]
+                  - generic "Use in chat" [ref=e2973]:
+                    - button [ref=e2974] [cursor=pointer]:
+                      - img [ref=e2975]
+            - row "Google Analytics - download_the_app_widget - (379057783) GA4 - shell.com.au - Shell (Australia) enabled DEFAULT custom:google_analytics_download_the_app_widget_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2977]:
+              - cell "Google Analytics - download_the_app_widget - (379057783) GA4 - shell.com.au - Shell (Australia) enabled" [ref=e2978]:
+                - paragraph [ref=e2979]: Google Analytics - download_the_app_widget - (379057783) GA4 - shell.com.au - Shell (Australia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e2980]
+              - cell [ref=e2981]
+              - cell [ref=e2982]
+              - cell [ref=e2983]
+              - cell "custom:google_analytics_download_the_app_widget_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2984]:
+                - generic [ref=e2985]:
+                  - generic [ref=e2986]: custom:google_analytics_download_the_app_widget_379057783_ga4_shell_com_au_shell_australia
+                  - generic "Copy metric key" [ref=e2987]:
+                    - button [ref=e2988] [cursor=pointer]:
+                      - img [ref=e2989]
+                  - generic "Use in chat" [ref=e2991]:
+                    - button [ref=e2992] [cursor=pointer]:
+                      - img [ref=e2993]
+            - row "DO_NOT_EDIT Google Analytics property (379057783) GA4 - shell.com.au - Shell (Australia) enabled DEFAULT custom:do_not_edit_google_analytics_property_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e2995]:
+              - cell "DO_NOT_EDIT Google Analytics property (379057783) GA4 - shell.com.au - Shell (Australia) enabled" [ref=e2996]:
+                - paragraph [ref=e2997]: DO_NOT_EDIT Google Analytics property (379057783) GA4 - shell.com.au - Shell (Australia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e2998]
+              - cell [ref=e2999]
+              - cell [ref=e3000]
+              - cell [ref=e3001]
+              - cell "custom:do_not_edit_google_analytics_property_379057783_ga4_shell_com_au_shell_australia Copy metric key Use in chat" [ref=e3002]:
+                - generic [ref=e3003]:
+                  - generic [ref=e3004]: custom:do_not_edit_google_analytics_property_379057783_ga4_shell_com_au_shell_australia
+                  - generic "Copy metric key" [ref=e3005]:
+                    - button [ref=e3006] [cursor=pointer]:
+                      - img [ref=e3007]
+                  - generic "Use in chat" [ref=e3009]:
+                    - button [ref=e3010] [cursor=pointer]:
+                      - img [ref=e3011]
+            - row "Google Analytics - purchase - (378716474) GA4 - shell.be - Shell (Belgium) enabled DEFAULT custom:google_analytics_purchase_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3013]:
+              - cell "Google Analytics - purchase - (378716474) GA4 - shell.be - Shell (Belgium) enabled" [ref=e3014]:
+                - paragraph [ref=e3015]: Google Analytics - purchase - (378716474) GA4 - shell.be - Shell (Belgium)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3016]
+              - cell [ref=e3017]
+              - cell [ref=e3018]
+              - cell [ref=e3019]
+              - cell "custom:google_analytics_purchase_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3020]:
+                - generic [ref=e3021]:
+                  - generic [ref=e3022]: custom:google_analytics_purchase_378716474_ga4_shell_be_shell_belgium
+                  - generic "Copy metric key" [ref=e3023]:
+                    - button [ref=e3024] [cursor=pointer]:
+                      - img [ref=e3025]
+                  - generic "Use in chat" [ref=e3027]:
+                    - button [ref=e3028] [cursor=pointer]:
+                      - img [ref=e3029]
+            - row "Google Analytics - form_abandoned - (378716474) GA4 - shell.be - Shell (Belgium) enabled DEFAULT custom:google_analytics_form_abandoned_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3031]:
+              - cell "Google Analytics - form_abandoned - (378716474) GA4 - shell.be - Shell (Belgium) enabled" [ref=e3032]:
+                - paragraph [ref=e3033]: Google Analytics - form_abandoned - (378716474) GA4 - shell.be - Shell (Belgium)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3034]
+              - cell [ref=e3035]
+              - cell [ref=e3036]
+              - cell [ref=e3037]
+              - cell "custom:google_analytics_form_abandoned_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3038]:
+                - generic [ref=e3039]:
+                  - generic [ref=e3040]: custom:google_analytics_form_abandoned_378716474_ga4_shell_be_shell_belgium
+                  - generic "Copy metric key" [ref=e3041]:
+                    - button [ref=e3042] [cursor=pointer]:
+                      - img [ref=e3043]
+                  - generic "Use in chat" [ref=e3045]:
+                    - button [ref=e3046] [cursor=pointer]:
+                      - img [ref=e3047]
+            - row "Google Analytics - phone_number_click - (378716474) GA4 - shell.be - Shell (Belgium) enabled DEFAULT custom:google_analytics_phone_number_click_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3049]:
+              - cell "Google Analytics - phone_number_click - (378716474) GA4 - shell.be - Shell (Belgium) enabled" [ref=e3050]:
+                - paragraph [ref=e3051]: Google Analytics - phone_number_click - (378716474) GA4 - shell.be - Shell (Belgium)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3052]
+              - cell [ref=e3053]
+              - cell [ref=e3054]
+              - cell [ref=e3055]
+              - cell "custom:google_analytics_phone_number_click_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3056]:
+                - generic [ref=e3057]:
+                  - generic [ref=e3058]: custom:google_analytics_phone_number_click_378716474_ga4_shell_be_shell_belgium
+                  - generic "Copy metric key" [ref=e3059]:
+                    - button [ref=e3060] [cursor=pointer]:
+                      - img [ref=e3061]
+                  - generic "Use in chat" [ref=e3063]:
+                    - button [ref=e3064] [cursor=pointer]:
+                      - img [ref=e3065]
+            - row "Google Analytics - file_downloaded - (378716474) GA4 - shell.be - Shell (Belgium) enabled DEFAULT custom:google_analytics_file_downloaded_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3067]:
+              - cell "Google Analytics - file_downloaded - (378716474) GA4 - shell.be - Shell (Belgium) enabled" [ref=e3068]:
+                - paragraph [ref=e3069]: Google Analytics - file_downloaded - (378716474) GA4 - shell.be - Shell (Belgium)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3070]
+              - cell [ref=e3071]
+              - cell [ref=e3072]
+              - cell [ref=e3073]
+              - cell "custom:google_analytics_file_downloaded_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3074]:
+                - generic [ref=e3075]:
+                  - generic [ref=e3076]: custom:google_analytics_file_downloaded_378716474_ga4_shell_be_shell_belgium
+                  - generic "Copy metric key" [ref=e3077]:
+                    - button [ref=e3078] [cursor=pointer]:
+                      - img [ref=e3079]
+                  - generic "Use in chat" [ref=e3081]:
+                    - button [ref=e3082] [cursor=pointer]:
+                      - img [ref=e3083]
+            - row "Google Analytics - form_completed - (378716474) GA4 - shell.be - Shell (Belgium) enabled DEFAULT custom:google_analytics_form_completed_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3085]:
+              - cell "Google Analytics - form_completed - (378716474) GA4 - shell.be - Shell (Belgium) enabled" [ref=e3086]:
+                - paragraph [ref=e3087]: Google Analytics - form_completed - (378716474) GA4 - shell.be - Shell (Belgium)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3088]
+              - cell [ref=e3089]
+              - cell [ref=e3090]
+              - cell [ref=e3091]
+              - cell "custom:google_analytics_form_completed_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3092]:
+                - generic [ref=e3093]:
+                  - generic [ref=e3094]: custom:google_analytics_form_completed_378716474_ga4_shell_be_shell_belgium
+                  - generic "Copy metric key" [ref=e3095]:
+                    - button [ref=e3096] [cursor=pointer]:
+                      - img [ref=e3097]
+                  - generic "Use in chat" [ref=e3099]:
+                    - button [ref=e3100] [cursor=pointer]:
+                      - img [ref=e3101]
+            - row "Google Analytics - form_start - (378716474) GA4 - shell.be - Shell (Belgium) enabled DEFAULT custom:google_analytics_form_start_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3103]:
+              - cell "Google Analytics - form_start - (378716474) GA4 - shell.be - Shell (Belgium) enabled" [ref=e3104]:
+                - paragraph [ref=e3105]: Google Analytics - form_start - (378716474) GA4 - shell.be - Shell (Belgium)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3106]
+              - cell [ref=e3107]
+              - cell [ref=e3108]
+              - cell [ref=e3109]
+              - cell "custom:google_analytics_form_start_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3110]:
+                - generic [ref=e3111]:
+                  - generic [ref=e3112]: custom:google_analytics_form_start_378716474_ga4_shell_be_shell_belgium
+                  - generic "Copy metric key" [ref=e3113]:
+                    - button [ref=e3114] [cursor=pointer]:
+                      - img [ref=e3115]
+                  - generic "Use in chat" [ref=e3117]:
+                    - button [ref=e3118] [cursor=pointer]:
+                      - img [ref=e3119]
+            - row "Google Analytics - download_the_app_widget - (378716474) GA4 - shell.be - Shell (Belgium) enabled DEFAULT custom:google_analytics_download_the_app_widget_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3121]:
+              - cell "Google Analytics - download_the_app_widget - (378716474) GA4 - shell.be - Shell (Belgium) enabled" [ref=e3122]:
+                - paragraph [ref=e3123]: Google Analytics - download_the_app_widget - (378716474) GA4 - shell.be - Shell (Belgium)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3124]
+              - cell [ref=e3125]
+              - cell [ref=e3126]
+              - cell [ref=e3127]
+              - cell "custom:google_analytics_download_the_app_widget_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3128]:
+                - generic [ref=e3129]:
+                  - generic [ref=e3130]: custom:google_analytics_download_the_app_widget_378716474_ga4_shell_be_shell_belgium
+                  - generic "Copy metric key" [ref=e3131]:
+                    - button [ref=e3132] [cursor=pointer]:
+                      - img [ref=e3133]
+                  - generic "Use in chat" [ref=e3135]:
+                    - button [ref=e3136] [cursor=pointer]:
+                      - img [ref=e3137]
+            - row "DO_NOT_EDIT Google Analytics property (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled DEFAULT custom:do_not_edit_google_analytics_property_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3139]:
+              - cell "DO_NOT_EDIT Google Analytics property (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled" [ref=e3140]:
+                - paragraph [ref=e3141]: DO_NOT_EDIT Google Analytics property (378663644) GA4 - shell.bg - Shell (Bulgaria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3142]
+              - cell [ref=e3143]
+              - cell [ref=e3144]
+              - cell [ref=e3145]
+              - cell "custom:do_not_edit_google_analytics_property_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3146]:
+                - generic [ref=e3147]:
+                  - generic [ref=e3148]: custom:do_not_edit_google_analytics_property_378663644_ga4_shell_bg_shell_bulgaria
+                  - generic "Copy metric key" [ref=e3149]:
+                    - button [ref=e3150] [cursor=pointer]:
+                      - img [ref=e3151]
+                  - generic "Use in chat" [ref=e3153]:
+                    - button [ref=e3154] [cursor=pointer]:
+                      - img [ref=e3155]
+            - row "Google Analytics - purchase - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled DEFAULT custom:google_analytics_purchase_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3157]:
+              - cell "Google Analytics - purchase - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled" [ref=e3158]:
+                - paragraph [ref=e3159]: Google Analytics - purchase - (378663644) GA4 - shell.bg - Shell (Bulgaria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3160]
+              - cell [ref=e3161]
+              - cell [ref=e3162]
+              - cell [ref=e3163]
+              - cell "custom:google_analytics_purchase_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3164]:
+                - generic [ref=e3165]:
+                  - generic [ref=e3166]: custom:google_analytics_purchase_378663644_ga4_shell_bg_shell_bulgaria
+                  - generic "Copy metric key" [ref=e3167]:
+                    - button [ref=e3168] [cursor=pointer]:
+                      - img [ref=e3169]
+                  - generic "Use in chat" [ref=e3171]:
+                    - button [ref=e3172] [cursor=pointer]:
+                      - img [ref=e3173]
+            - row "Google Analytics - phone_number_click - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled DEFAULT custom:google_analytics_phone_number_click_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3175]:
+              - cell "Google Analytics - phone_number_click - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled" [ref=e3176]:
+                - paragraph [ref=e3177]: Google Analytics - phone_number_click - (378663644) GA4 - shell.bg - Shell (Bulgaria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3178]
+              - cell [ref=e3179]
+              - cell [ref=e3180]
+              - cell [ref=e3181]
+              - cell "custom:google_analytics_phone_number_click_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3182]:
+                - generic [ref=e3183]:
+                  - generic [ref=e3184]: custom:google_analytics_phone_number_click_378663644_ga4_shell_bg_shell_bulgaria
+                  - generic "Copy metric key" [ref=e3185]:
+                    - button [ref=e3186] [cursor=pointer]:
+                      - img [ref=e3187]
+                  - generic "Use in chat" [ref=e3189]:
+                    - button [ref=e3190] [cursor=pointer]:
+                      - img [ref=e3191]
+            - row "Google Analytics - file_downloaded - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled DEFAULT custom:google_analytics_file_downloaded_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3193]:
+              - cell "Google Analytics - file_downloaded - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled" [ref=e3194]:
+                - paragraph [ref=e3195]: Google Analytics - file_downloaded - (378663644) GA4 - shell.bg - Shell (Bulgaria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3196]
+              - cell [ref=e3197]
+              - cell [ref=e3198]
+              - cell [ref=e3199]
+              - cell "custom:google_analytics_file_downloaded_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3200]:
+                - generic [ref=e3201]:
+                  - generic [ref=e3202]: custom:google_analytics_file_downloaded_378663644_ga4_shell_bg_shell_bulgaria
+                  - generic "Copy metric key" [ref=e3203]:
+                    - button [ref=e3204] [cursor=pointer]:
+                      - img [ref=e3205]
+                  - generic "Use in chat" [ref=e3207]:
+                    - button [ref=e3208] [cursor=pointer]:
+                      - img [ref=e3209]
+            - row "Google Analytics - form_completed - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled DEFAULT custom:google_analytics_form_completed_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3211]:
+              - cell "Google Analytics - form_completed - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled" [ref=e3212]:
+                - paragraph [ref=e3213]: Google Analytics - form_completed - (378663644) GA4 - shell.bg - Shell (Bulgaria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3214]
+              - cell [ref=e3215]
+              - cell [ref=e3216]
+              - cell [ref=e3217]
+              - cell "custom:google_analytics_form_completed_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3218]:
+                - generic [ref=e3219]:
+                  - generic [ref=e3220]: custom:google_analytics_form_completed_378663644_ga4_shell_bg_shell_bulgaria
+                  - generic "Copy metric key" [ref=e3221]:
+                    - button [ref=e3222] [cursor=pointer]:
+                      - img [ref=e3223]
+                  - generic "Use in chat" [ref=e3225]:
+                    - button [ref=e3226] [cursor=pointer]:
+                      - img [ref=e3227]
+            - row "Google Analytics - form_abandoned - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled DEFAULT custom:google_analytics_form_abandoned_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3229]:
+              - cell "Google Analytics - form_abandoned - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled" [ref=e3230]:
+                - paragraph [ref=e3231]: Google Analytics - form_abandoned - (378663644) GA4 - shell.bg - Shell (Bulgaria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3232]
+              - cell [ref=e3233]
+              - cell [ref=e3234]
+              - cell [ref=e3235]
+              - cell "custom:google_analytics_form_abandoned_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3236]:
+                - generic [ref=e3237]:
+                  - generic [ref=e3238]: custom:google_analytics_form_abandoned_378663644_ga4_shell_bg_shell_bulgaria
+                  - generic "Copy metric key" [ref=e3239]:
+                    - button [ref=e3240] [cursor=pointer]:
+                      - img [ref=e3241]
+                  - generic "Use in chat" [ref=e3243]:
+                    - button [ref=e3244] [cursor=pointer]:
+                      - img [ref=e3245]
+            - row "Google Analytics - form_start - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled DEFAULT custom:google_analytics_form_start_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3247]:
+              - cell "Google Analytics - form_start - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled" [ref=e3248]:
+                - paragraph [ref=e3249]: Google Analytics - form_start - (378663644) GA4 - shell.bg - Shell (Bulgaria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3250]
+              - cell [ref=e3251]
+              - cell [ref=e3252]
+              - cell [ref=e3253]
+              - cell "custom:google_analytics_form_start_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3254]:
+                - generic [ref=e3255]:
+                  - generic [ref=e3256]: custom:google_analytics_form_start_378663644_ga4_shell_bg_shell_bulgaria
+                  - generic "Copy metric key" [ref=e3257]:
+                    - button [ref=e3258] [cursor=pointer]:
+                      - img [ref=e3259]
+                  - generic "Use in chat" [ref=e3261]:
+                    - button [ref=e3262] [cursor=pointer]:
+                      - img [ref=e3263]
+            - row "Google Analytics - download_the_app_widget - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled DEFAULT custom:google_analytics_download_the_app_widget_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3265]:
+              - cell "Google Analytics - download_the_app_widget - (378663644) GA4 - shell.bg - Shell (Bulgaria) enabled" [ref=e3266]:
+                - paragraph [ref=e3267]: Google Analytics - download_the_app_widget - (378663644) GA4 - shell.bg - Shell (Bulgaria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3268]
+              - cell [ref=e3269]
+              - cell [ref=e3270]
+              - cell [ref=e3271]
+              - cell "custom:google_analytics_download_the_app_widget_378663644_ga4_shell_bg_shell_bulgaria Copy metric key Use in chat" [ref=e3272]:
+                - generic [ref=e3273]:
+                  - generic [ref=e3274]: custom:google_analytics_download_the_app_widget_378663644_ga4_shell_bg_shell_bulgaria
+                  - generic "Copy metric key" [ref=e3275]:
+                    - button [ref=e3276] [cursor=pointer]:
+                      - img [ref=e3277]
+                  - generic "Use in chat" [ref=e3279]:
+                    - button [ref=e3280] [cursor=pointer]:
+                      - img [ref=e3281]
+            - row "DO_NOT_EDIT Google Analytics property (378713743) GA4 - shell.at - Shell (Austria) enabled DEFAULT custom:do_not_edit_google_analytics_property_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3283]:
+              - cell "DO_NOT_EDIT Google Analytics property (378713743) GA4 - shell.at - Shell (Austria) enabled" [ref=e3284]:
+                - paragraph [ref=e3285]: DO_NOT_EDIT Google Analytics property (378713743) GA4 - shell.at - Shell (Austria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3286]
+              - cell [ref=e3287]
+              - cell [ref=e3288]
+              - cell [ref=e3289]
+              - cell "custom:do_not_edit_google_analytics_property_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3290]:
+                - generic [ref=e3291]:
+                  - generic [ref=e3292]: custom:do_not_edit_google_analytics_property_378713743_ga4_shell_at_shell_austria
+                  - generic "Copy metric key" [ref=e3293]:
+                    - button [ref=e3294] [cursor=pointer]:
+                      - img [ref=e3295]
+                  - generic "Use in chat" [ref=e3297]:
+                    - button [ref=e3298] [cursor=pointer]:
+                      - img [ref=e3299]
+            - row "DO_NOT_EDIT Google Analytics property (378716474) GA4 - shell.be - Shell (Belgium) enabled DEFAULT custom:do_not_edit_google_analytics_property_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3301]:
+              - cell "DO_NOT_EDIT Google Analytics property (378716474) GA4 - shell.be - Shell (Belgium) enabled" [ref=e3302]:
+                - paragraph [ref=e3303]: DO_NOT_EDIT Google Analytics property (378716474) GA4 - shell.be - Shell (Belgium)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3304]
+              - cell [ref=e3305]
+              - cell [ref=e3306]
+              - cell [ref=e3307]
+              - cell "custom:do_not_edit_google_analytics_property_378716474_ga4_shell_be_shell_belgium Copy metric key Use in chat" [ref=e3308]:
+                - generic [ref=e3309]:
+                  - generic [ref=e3310]: custom:do_not_edit_google_analytics_property_378716474_ga4_shell_be_shell_belgium
+                  - generic "Copy metric key" [ref=e3311]:
+                    - button [ref=e3312] [cursor=pointer]:
+                      - img [ref=e3313]
+                  - generic "Use in chat" [ref=e3315]:
+                    - button [ref=e3316] [cursor=pointer]:
+                      - img [ref=e3317]
+            - row "Google Analytics - purchase - (378713743) GA4 - shell.at - Shell (Austria) enabled DEFAULT custom:google_analytics_purchase_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3319]:
+              - cell "Google Analytics - purchase - (378713743) GA4 - shell.at - Shell (Austria) enabled" [ref=e3320]:
+                - paragraph [ref=e3321]: Google Analytics - purchase - (378713743) GA4 - shell.at - Shell (Austria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3322]
+              - cell [ref=e3323]
+              - cell [ref=e3324]
+              - cell [ref=e3325]
+              - cell "custom:google_analytics_purchase_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3326]:
+                - generic [ref=e3327]:
+                  - generic [ref=e3328]: custom:google_analytics_purchase_378713743_ga4_shell_at_shell_austria
+                  - generic "Copy metric key" [ref=e3329]:
+                    - button [ref=e3330] [cursor=pointer]:
+                      - img [ref=e3331]
+                  - generic "Use in chat" [ref=e3333]:
+                    - button [ref=e3334] [cursor=pointer]:
+                      - img [ref=e3335]
+            - row "Google Analytics - form_completed - (378713743) GA4 - shell.at - Shell (Austria) enabled DEFAULT custom:google_analytics_form_completed_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3337]:
+              - cell "Google Analytics - form_completed - (378713743) GA4 - shell.at - Shell (Austria) enabled" [ref=e3338]:
+                - paragraph [ref=e3339]: Google Analytics - form_completed - (378713743) GA4 - shell.at - Shell (Austria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3340]
+              - cell [ref=e3341]
+              - cell [ref=e3342]
+              - cell [ref=e3343]
+              - cell "custom:google_analytics_form_completed_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3344]:
+                - generic [ref=e3345]:
+                  - generic [ref=e3346]: custom:google_analytics_form_completed_378713743_ga4_shell_at_shell_austria
+                  - generic "Copy metric key" [ref=e3347]:
+                    - button [ref=e3348] [cursor=pointer]:
+                      - img [ref=e3349]
+                  - generic "Use in chat" [ref=e3351]:
+                    - button [ref=e3352] [cursor=pointer]:
+                      - img [ref=e3353]
+            - row "Google Analytics - phone_number_click - (378713743) GA4 - shell.at - Shell (Austria) enabled DEFAULT custom:google_analytics_phone_number_click_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3355]:
+              - cell "Google Analytics - phone_number_click - (378713743) GA4 - shell.at - Shell (Austria) enabled" [ref=e3356]:
+                - paragraph [ref=e3357]: Google Analytics - phone_number_click - (378713743) GA4 - shell.at - Shell (Austria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3358]
+              - cell [ref=e3359]
+              - cell [ref=e3360]
+              - cell [ref=e3361]
+              - cell "custom:google_analytics_phone_number_click_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3362]:
+                - generic [ref=e3363]:
+                  - generic [ref=e3364]: custom:google_analytics_phone_number_click_378713743_ga4_shell_at_shell_austria
+                  - generic "Copy metric key" [ref=e3365]:
+                    - button [ref=e3366] [cursor=pointer]:
+                      - img [ref=e3367]
+                  - generic "Use in chat" [ref=e3369]:
+                    - button [ref=e3370] [cursor=pointer]:
+                      - img [ref=e3371]
+            - row "Google Analytics - file_downloaded - (378713743) GA4 - shell.at - Shell (Austria) enabled DEFAULT custom:google_analytics_file_downloaded_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3373]:
+              - cell "Google Analytics - file_downloaded - (378713743) GA4 - shell.at - Shell (Austria) enabled" [ref=e3374]:
+                - paragraph [ref=e3375]: Google Analytics - file_downloaded - (378713743) GA4 - shell.at - Shell (Austria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3376]
+              - cell [ref=e3377]
+              - cell [ref=e3378]
+              - cell [ref=e3379]
+              - cell "custom:google_analytics_file_downloaded_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3380]:
+                - generic [ref=e3381]:
+                  - generic [ref=e3382]: custom:google_analytics_file_downloaded_378713743_ga4_shell_at_shell_austria
+                  - generic "Copy metric key" [ref=e3383]:
+                    - button [ref=e3384] [cursor=pointer]:
+                      - img [ref=e3385]
+                  - generic "Use in chat" [ref=e3387]:
+                    - button [ref=e3388] [cursor=pointer]:
+                      - img [ref=e3389]
+            - row "Google Analytics - form_start - (378713743) GA4 - shell.at - Shell (Austria) enabled DEFAULT custom:google_analytics_form_start_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3391]:
+              - cell "Google Analytics - form_start - (378713743) GA4 - shell.at - Shell (Austria) enabled" [ref=e3392]:
+                - paragraph [ref=e3393]: Google Analytics - form_start - (378713743) GA4 - shell.at - Shell (Austria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3394]
+              - cell [ref=e3395]
+              - cell [ref=e3396]
+              - cell [ref=e3397]
+              - cell "custom:google_analytics_form_start_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3398]:
+                - generic [ref=e3399]:
+                  - generic [ref=e3400]: custom:google_analytics_form_start_378713743_ga4_shell_at_shell_austria
+                  - generic "Copy metric key" [ref=e3401]:
+                    - button [ref=e3402] [cursor=pointer]:
+                      - img [ref=e3403]
+                  - generic "Use in chat" [ref=e3405]:
+                    - button [ref=e3406] [cursor=pointer]:
+                      - img [ref=e3407]
+            - row "Google Analytics - form_abandoned - (378713743) GA4 - shell.at - Shell (Austria) enabled DEFAULT custom:google_analytics_form_abandoned_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3409]:
+              - cell "Google Analytics - form_abandoned - (378713743) GA4 - shell.at - Shell (Austria) enabled" [ref=e3410]:
+                - paragraph [ref=e3411]: Google Analytics - form_abandoned - (378713743) GA4 - shell.at - Shell (Austria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3412]
+              - cell [ref=e3413]
+              - cell [ref=e3414]
+              - cell [ref=e3415]
+              - cell "custom:google_analytics_form_abandoned_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3416]:
+                - generic [ref=e3417]:
+                  - generic [ref=e3418]: custom:google_analytics_form_abandoned_378713743_ga4_shell_at_shell_austria
+                  - generic "Copy metric key" [ref=e3419]:
+                    - button [ref=e3420] [cursor=pointer]:
+                      - img [ref=e3421]
+                  - generic "Use in chat" [ref=e3423]:
+                    - button [ref=e3424] [cursor=pointer]:
+                      - img [ref=e3425]
+            - row "Google Analytics - download_the_app_widget - (378713743) GA4 - shell.at - Shell (Austria) enabled DEFAULT custom:google_analytics_download_the_app_widget_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3427]:
+              - cell "Google Analytics - download_the_app_widget - (378713743) GA4 - shell.at - Shell (Austria) enabled" [ref=e3428]:
+                - paragraph [ref=e3429]: Google Analytics - download_the_app_widget - (378713743) GA4 - shell.at - Shell (Austria)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3430]
+              - cell [ref=e3431]
+              - cell [ref=e3432]
+              - cell [ref=e3433]
+              - cell "custom:google_analytics_download_the_app_widget_378713743_ga4_shell_at_shell_austria Copy metric key Use in chat" [ref=e3434]:
+                - generic [ref=e3435]:
+                  - generic [ref=e3436]: custom:google_analytics_download_the_app_widget_378713743_ga4_shell_at_shell_austria
+                  - generic "Copy metric key" [ref=e3437]:
+                    - button [ref=e3438] [cursor=pointer]:
+                      - img [ref=e3439]
+                  - generic "Use in chat" [ref=e3441]:
+                    - button [ref=e3442] [cursor=pointer]:
+                      - img [ref=e3443]
+            - row "Google Analytics - purchase - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled DEFAULT custom:google_analytics_purchase_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3445]:
+              - cell "Google Analytics - purchase - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled" [ref=e3446]:
+                - paragraph [ref=e3447]: Google Analytics - purchase - (378719271) GA4 - shell.co.th - Shell (Thailand)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3448]
+              - cell [ref=e3449]
+              - cell [ref=e3450]
+              - cell [ref=e3451]
+              - cell "custom:google_analytics_purchase_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3452]:
+                - generic [ref=e3453]:
+                  - generic [ref=e3454]: custom:google_analytics_purchase_378719271_ga4_shell_co_th_shell_thailand
+                  - generic "Copy metric key" [ref=e3455]:
+                    - button [ref=e3456] [cursor=pointer]:
+                      - img [ref=e3457]
+                  - generic "Use in chat" [ref=e3459]:
+                    - button [ref=e3460] [cursor=pointer]:
+                      - img [ref=e3461]
+            - row "Google Analytics - form_abandoned - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled DEFAULT custom:google_analytics_form_abandoned_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3463]:
+              - cell "Google Analytics - form_abandoned - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled" [ref=e3464]:
+                - paragraph [ref=e3465]: Google Analytics - form_abandoned - (378719271) GA4 - shell.co.th - Shell (Thailand)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3466]
+              - cell [ref=e3467]
+              - cell [ref=e3468]
+              - cell [ref=e3469]
+              - cell "custom:google_analytics_form_abandoned_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3470]:
+                - generic [ref=e3471]:
+                  - generic [ref=e3472]: custom:google_analytics_form_abandoned_378719271_ga4_shell_co_th_shell_thailand
+                  - generic "Copy metric key" [ref=e3473]:
+                    - button [ref=e3474] [cursor=pointer]:
+                      - img [ref=e3475]
+                  - generic "Use in chat" [ref=e3477]:
+                    - button [ref=e3478] [cursor=pointer]:
+                      - img [ref=e3479]
+            - row "Google Analytics - form_completed - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled DEFAULT custom:google_analytics_form_completed_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3481]:
+              - cell "Google Analytics - form_completed - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled" [ref=e3482]:
+                - paragraph [ref=e3483]: Google Analytics - form_completed - (378719271) GA4 - shell.co.th - Shell (Thailand)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3484]
+              - cell [ref=e3485]
+              - cell [ref=e3486]
+              - cell [ref=e3487]
+              - cell "custom:google_analytics_form_completed_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3488]:
+                - generic [ref=e3489]:
+                  - generic [ref=e3490]: custom:google_analytics_form_completed_378719271_ga4_shell_co_th_shell_thailand
+                  - generic "Copy metric key" [ref=e3491]:
+                    - button [ref=e3492] [cursor=pointer]:
+                      - img [ref=e3493]
+                  - generic "Use in chat" [ref=e3495]:
+                    - button [ref=e3496] [cursor=pointer]:
+                      - img [ref=e3497]
+            - row "Google Analytics - form_start - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled DEFAULT custom:google_analytics_form_start_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3499]:
+              - cell "Google Analytics - form_start - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled" [ref=e3500]:
+                - paragraph [ref=e3501]: Google Analytics - form_start - (378719271) GA4 - shell.co.th - Shell (Thailand)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3502]
+              - cell [ref=e3503]
+              - cell [ref=e3504]
+              - cell [ref=e3505]
+              - cell "custom:google_analytics_form_start_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3506]:
+                - generic [ref=e3507]:
+                  - generic [ref=e3508]: custom:google_analytics_form_start_378719271_ga4_shell_co_th_shell_thailand
+                  - generic "Copy metric key" [ref=e3509]:
+                    - button [ref=e3510] [cursor=pointer]:
+                      - img [ref=e3511]
+                  - generic "Use in chat" [ref=e3513]:
+                    - button [ref=e3514] [cursor=pointer]:
+                      - img [ref=e3515]
+            - row "Google Analytics - file_downloaded - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled DEFAULT custom:google_analytics_file_downloaded_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3517]:
+              - cell "Google Analytics - file_downloaded - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled" [ref=e3518]:
+                - paragraph [ref=e3519]: Google Analytics - file_downloaded - (378719271) GA4 - shell.co.th - Shell (Thailand)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3520]
+              - cell [ref=e3521]
+              - cell [ref=e3522]
+              - cell [ref=e3523]
+              - cell "custom:google_analytics_file_downloaded_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3524]:
+                - generic [ref=e3525]:
+                  - generic [ref=e3526]: custom:google_analytics_file_downloaded_378719271_ga4_shell_co_th_shell_thailand
+                  - generic "Copy metric key" [ref=e3527]:
+                    - button [ref=e3528] [cursor=pointer]:
+                      - img [ref=e3529]
+                  - generic "Use in chat" [ref=e3531]:
+                    - button [ref=e3532] [cursor=pointer]:
+                      - img [ref=e3533]
+            - row "Google Analytics - phone_number_click - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled DEFAULT custom:google_analytics_phone_number_click_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3535]:
+              - cell "Google Analytics - phone_number_click - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled" [ref=e3536]:
+                - paragraph [ref=e3537]: Google Analytics - phone_number_click - (378719271) GA4 - shell.co.th - Shell (Thailand)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3538]
+              - cell [ref=e3539]
+              - cell [ref=e3540]
+              - cell [ref=e3541]
+              - cell "custom:google_analytics_phone_number_click_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3542]:
+                - generic [ref=e3543]:
+                  - generic [ref=e3544]: custom:google_analytics_phone_number_click_378719271_ga4_shell_co_th_shell_thailand
+                  - generic "Copy metric key" [ref=e3545]:
+                    - button [ref=e3546] [cursor=pointer]:
+                      - img [ref=e3547]
+                  - generic "Use in chat" [ref=e3549]:
+                    - button [ref=e3550] [cursor=pointer]:
+                      - img [ref=e3551]
+            - row "Google Analytics - download_the_app_widget - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled DEFAULT custom:google_analytics_download_the_app_widget_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3553]:
+              - cell "Google Analytics - download_the_app_widget - (378719271) GA4 - shell.co.th - Shell (Thailand) enabled" [ref=e3554]:
+                - paragraph [ref=e3555]: Google Analytics - download_the_app_widget - (378719271) GA4 - shell.co.th - Shell (Thailand)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3556]
+              - cell [ref=e3557]
+              - cell [ref=e3558]
+              - cell [ref=e3559]
+              - cell "custom:google_analytics_download_the_app_widget_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3560]:
+                - generic [ref=e3561]:
+                  - generic [ref=e3562]: custom:google_analytics_download_the_app_widget_378719271_ga4_shell_co_th_shell_thailand
+                  - generic "Copy metric key" [ref=e3563]:
+                    - button [ref=e3564] [cursor=pointer]:
+                      - img [ref=e3565]
+                  - generic "Use in chat" [ref=e3567]:
+                    - button [ref=e3568] [cursor=pointer]:
+                      - img [ref=e3569]
+            - row "DO_NOT_EDIT Google Analytics property (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:do_not_edit_google_analytics_property_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e3571]:
+              - cell "DO_NOT_EDIT Google Analytics property (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e3572]:
+                - paragraph [ref=e3573]: DO_NOT_EDIT Google Analytics property (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3574]
+              - cell [ref=e3575]
+              - cell [ref=e3576]
+              - cell [ref=e3577]
+              - cell "custom:do_not_edit_google_analytics_property_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e3578]:
+                - generic [ref=e3579]:
+                  - generic [ref=e3580]: custom:do_not_edit_google_analytics_property_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e3581]:
+                    - button [ref=e3582] [cursor=pointer]:
+                      - img [ref=e3583]
+                  - generic "Use in chat" [ref=e3585]:
+                    - button [ref=e3586] [cursor=pointer]:
+                      - img [ref=e3587]
+            - row "DO_NOT_EDIT Google Analytics property (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled DEFAULT custom:do_not_edit_google_analytics_property_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3589]:
+              - cell "DO_NOT_EDIT Google Analytics property (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled" [ref=e3590]:
+                - paragraph [ref=e3591]: DO_NOT_EDIT Google Analytics property (378395618) GA4 - shell.com.ph - Shell (Philippines)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3592]
+              - cell [ref=e3593]
+              - cell [ref=e3594]
+              - cell [ref=e3595]
+              - cell "custom:do_not_edit_google_analytics_property_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3596]:
+                - generic [ref=e3597]:
+                  - generic [ref=e3598]: custom:do_not_edit_google_analytics_property_378395618_ga4_shell_com_ph_shell_philippines
+                  - generic "Copy metric key" [ref=e3599]:
+                    - button [ref=e3600] [cursor=pointer]:
+                      - img [ref=e3601]
+                  - generic "Use in chat" [ref=e3603]:
+                    - button [ref=e3604] [cursor=pointer]:
+                      - img [ref=e3605]
+            - row "Google Analytics - purchase - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled DEFAULT custom:google_analytics_purchase_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3607]:
+              - cell "Google Analytics - purchase - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled" [ref=e3608]:
+                - paragraph [ref=e3609]: Google Analytics - purchase - (378395618) GA4 - shell.com.ph - Shell (Philippines)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3610]
+              - cell [ref=e3611]
+              - cell [ref=e3612]
+              - cell [ref=e3613]
+              - cell "custom:google_analytics_purchase_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3614]:
+                - generic [ref=e3615]:
+                  - generic [ref=e3616]: custom:google_analytics_purchase_378395618_ga4_shell_com_ph_shell_philippines
+                  - generic "Copy metric key" [ref=e3617]:
+                    - button [ref=e3618] [cursor=pointer]:
+                      - img [ref=e3619]
+                  - generic "Use in chat" [ref=e3621]:
+                    - button [ref=e3622] [cursor=pointer]:
+                      - img [ref=e3623]
+            - row "Google Analytics - form_start - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled DEFAULT custom:google_analytics_form_start_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3625]:
+              - cell "Google Analytics - form_start - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled" [ref=e3626]:
+                - paragraph [ref=e3627]: Google Analytics - form_start - (378395618) GA4 - shell.com.ph - Shell (Philippines)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3628]
+              - cell [ref=e3629]
+              - cell [ref=e3630]
+              - cell [ref=e3631]
+              - cell "custom:google_analytics_form_start_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3632]:
+                - generic [ref=e3633]:
+                  - generic [ref=e3634]: custom:google_analytics_form_start_378395618_ga4_shell_com_ph_shell_philippines
+                  - generic "Copy metric key" [ref=e3635]:
+                    - button [ref=e3636] [cursor=pointer]:
+                      - img [ref=e3637]
+                  - generic "Use in chat" [ref=e3639]:
+                    - button [ref=e3640] [cursor=pointer]:
+                      - img [ref=e3641]
+            - row "Google Analytics - form_abandoned - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled DEFAULT custom:google_analytics_form_abandoned_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3643]:
+              - cell "Google Analytics - form_abandoned - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled" [ref=e3644]:
+                - paragraph [ref=e3645]: Google Analytics - form_abandoned - (378395618) GA4 - shell.com.ph - Shell (Philippines)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3646]
+              - cell [ref=e3647]
+              - cell [ref=e3648]
+              - cell [ref=e3649]
+              - cell "custom:google_analytics_form_abandoned_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3650]:
+                - generic [ref=e3651]:
+                  - generic [ref=e3652]: custom:google_analytics_form_abandoned_378395618_ga4_shell_com_ph_shell_philippines
+                  - generic "Copy metric key" [ref=e3653]:
+                    - button [ref=e3654] [cursor=pointer]:
+                      - img [ref=e3655]
+                  - generic "Use in chat" [ref=e3657]:
+                    - button [ref=e3658] [cursor=pointer]:
+                      - img [ref=e3659]
+            - row "Google Analytics - form_completed - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled DEFAULT custom:google_analytics_form_completed_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3661]:
+              - cell "Google Analytics - form_completed - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled" [ref=e3662]:
+                - paragraph [ref=e3663]: Google Analytics - form_completed - (378395618) GA4 - shell.com.ph - Shell (Philippines)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3664]
+              - cell [ref=e3665]
+              - cell [ref=e3666]
+              - cell [ref=e3667]
+              - cell "custom:google_analytics_form_completed_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3668]:
+                - generic [ref=e3669]:
+                  - generic [ref=e3670]: custom:google_analytics_form_completed_378395618_ga4_shell_com_ph_shell_philippines
+                  - generic "Copy metric key" [ref=e3671]:
+                    - button [ref=e3672] [cursor=pointer]:
+                      - img [ref=e3673]
+                  - generic "Use in chat" [ref=e3675]:
+                    - button [ref=e3676] [cursor=pointer]:
+                      - img [ref=e3677]
+            - row "Google Analytics - file_downloaded - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled DEFAULT custom:google_analytics_file_downloaded_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3679]:
+              - cell "Google Analytics - file_downloaded - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled" [ref=e3680]:
+                - paragraph [ref=e3681]: Google Analytics - file_downloaded - (378395618) GA4 - shell.com.ph - Shell (Philippines)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3682]
+              - cell [ref=e3683]
+              - cell [ref=e3684]
+              - cell [ref=e3685]
+              - cell "custom:google_analytics_file_downloaded_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3686]:
+                - generic [ref=e3687]:
+                  - generic [ref=e3688]: custom:google_analytics_file_downloaded_378395618_ga4_shell_com_ph_shell_philippines
+                  - generic "Copy metric key" [ref=e3689]:
+                    - button [ref=e3690] [cursor=pointer]:
+                      - img [ref=e3691]
+                  - generic "Use in chat" [ref=e3693]:
+                    - button [ref=e3694] [cursor=pointer]:
+                      - img [ref=e3695]
+            - row "Google Analytics - phone_number_click - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled DEFAULT custom:google_analytics_phone_number_click_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3697]:
+              - cell "Google Analytics - phone_number_click - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled" [ref=e3698]:
+                - paragraph [ref=e3699]: Google Analytics - phone_number_click - (378395618) GA4 - shell.com.ph - Shell (Philippines)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3700]
+              - cell [ref=e3701]
+              - cell [ref=e3702]
+              - cell [ref=e3703]
+              - cell "custom:google_analytics_phone_number_click_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3704]:
+                - generic [ref=e3705]:
+                  - generic [ref=e3706]: custom:google_analytics_phone_number_click_378395618_ga4_shell_com_ph_shell_philippines
+                  - generic "Copy metric key" [ref=e3707]:
+                    - button [ref=e3708] [cursor=pointer]:
+                      - img [ref=e3709]
+                  - generic "Use in chat" [ref=e3711]:
+                    - button [ref=e3712] [cursor=pointer]:
+                      - img [ref=e3713]
+            - row "Google Analytics - download_the_app_widget - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled DEFAULT custom:google_analytics_download_the_app_widget_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3715]:
+              - cell "Google Analytics - download_the_app_widget - (378395618) GA4 - shell.com.ph - Shell (Philippines) enabled" [ref=e3716]:
+                - paragraph [ref=e3717]: Google Analytics - download_the_app_widget - (378395618) GA4 - shell.com.ph - Shell (Philippines)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3718]
+              - cell [ref=e3719]
+              - cell [ref=e3720]
+              - cell [ref=e3721]
+              - cell "custom:google_analytics_download_the_app_widget_378395618_ga4_shell_com_ph_shell_philippines Copy metric key Use in chat" [ref=e3722]:
+                - generic [ref=e3723]:
+                  - generic [ref=e3724]: custom:google_analytics_download_the_app_widget_378395618_ga4_shell_com_ph_shell_philippines
+                  - generic "Copy metric key" [ref=e3725]:
+                    - button [ref=e3726] [cursor=pointer]:
+                      - img [ref=e3727]
+                  - generic "Use in chat" [ref=e3729]:
+                    - button [ref=e3730] [cursor=pointer]:
+                      - img [ref=e3731]
+            - row "Google Analytics - purchase - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_purchase_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3733]:
+              - cell "Google Analytics - purchase - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3734]:
+                - paragraph [ref=e3735]: Google Analytics - purchase - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3736]
+              - cell [ref=e3737]
+              - cell [ref=e3738]
+              - cell [ref=e3739]
+              - cell "custom:google_analytics_purchase_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3740]:
+                - generic [ref=e3741]:
+                  - generic [ref=e3742]: custom:google_analytics_purchase_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3743]:
+                    - button [ref=e3744] [cursor=pointer]:
+                      - img [ref=e3745]
+                  - generic "Use in chat" [ref=e3747]:
+                    - button [ref=e3748] [cursor=pointer]:
+                      - img [ref=e3749]
+            - row "Google Analytics - form_completed - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_form_completed_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3751]:
+              - cell "Google Analytics - form_completed - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3752]:
+                - paragraph [ref=e3753]: Google Analytics - form_completed - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3754]
+              - cell [ref=e3755]
+              - cell [ref=e3756]
+              - cell [ref=e3757]
+              - cell "custom:google_analytics_form_completed_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3758]:
+                - generic [ref=e3759]:
+                  - generic [ref=e3760]: custom:google_analytics_form_completed_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3761]:
+                    - button [ref=e3762] [cursor=pointer]:
+                      - img [ref=e3763]
+                  - generic "Use in chat" [ref=e3765]:
+                    - button [ref=e3766] [cursor=pointer]:
+                      - img [ref=e3767]
+            - row "Google Analytics - form_abandoned - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_form_abandoned_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3769]:
+              - cell "Google Analytics - form_abandoned - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3770]:
+                - paragraph [ref=e3771]: Google Analytics - form_abandoned - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3772]
+              - cell [ref=e3773]
+              - cell [ref=e3774]
+              - cell [ref=e3775]
+              - cell "custom:google_analytics_form_abandoned_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3776]:
+                - generic [ref=e3777]:
+                  - generic [ref=e3778]: custom:google_analytics_form_abandoned_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3779]:
+                    - button [ref=e3780] [cursor=pointer]:
+                      - img [ref=e3781]
+                  - generic "Use in chat" [ref=e3783]:
+                    - button [ref=e3784] [cursor=pointer]:
+                      - img [ref=e3785]
+            - row "Google Analytics - Chat Rating Good - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_chat_rating_good_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3787]:
+              - cell "Google Analytics - Chat Rating Good - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3788]:
+                - paragraph [ref=e3789]: Google Analytics - Chat Rating Good - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3790]
+              - cell [ref=e3791]
+              - cell [ref=e3792]
+              - cell [ref=e3793]
+              - cell "custom:google_analytics_chat_rating_good_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3794]:
+                - generic [ref=e3795]:
+                  - generic [ref=e3796]: custom:google_analytics_chat_rating_good_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3797]:
+                    - button [ref=e3798] [cursor=pointer]:
+                      - img [ref=e3799]
+                  - generic "Use in chat" [ref=e3801]:
+                    - button [ref=e3802] [cursor=pointer]:
+                      - img [ref=e3803]
+            - row "Google Analytics - Help Center Search - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_help_center_search_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3805]:
+              - cell "Google Analytics - Help Center Search - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3806]:
+                - paragraph [ref=e3807]: Google Analytics - Help Center Search - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3808]
+              - cell [ref=e3809]
+              - cell [ref=e3810]
+              - cell [ref=e3811]
+              - cell "custom:google_analytics_help_center_search_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3812]:
+                - generic [ref=e3813]:
+                  - generic [ref=e3814]: custom:google_analytics_help_center_search_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3815]:
+                    - button [ref=e3816] [cursor=pointer]:
+                      - img [ref=e3817]
+                  - generic "Use in chat" [ref=e3819]:
+                    - button [ref=e3820] [cursor=pointer]:
+                      - img [ref=e3821]
+            - row "Google Analytics - form_validation_error - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_form_validation_error_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3823]:
+              - cell "Google Analytics - form_validation_error - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3824]:
+                - paragraph [ref=e3825]: Google Analytics - form_validation_error - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3826]
+              - cell [ref=e3827]
+              - cell [ref=e3828]
+              - cell [ref=e3829]
+              - cell "custom:google_analytics_form_validation_error_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3830]:
+                - generic [ref=e3831]:
+                  - generic [ref=e3832]: custom:google_analytics_form_validation_error_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3833]:
+                    - button [ref=e3834] [cursor=pointer]:
+                      - img [ref=e3835]
+                  - generic "Use in chat" [ref=e3837]:
+                    - button [ref=e3838] [cursor=pointer]:
+                      - img [ref=e3839]
+            - row "Google Analytics - Chat Rating Bad - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_chat_rating_bad_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3841]:
+              - cell "Google Analytics - Chat Rating Bad - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3842]:
+                - paragraph [ref=e3843]: Google Analytics - Chat Rating Bad - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3844]
+              - cell [ref=e3845]
+              - cell [ref=e3846]
+              - cell [ref=e3847]
+              - cell "custom:google_analytics_chat_rating_bad_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3848]:
+                - generic [ref=e3849]:
+                  - generic [ref=e3850]: custom:google_analytics_chat_rating_bad_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3851]:
+                    - button [ref=e3852] [cursor=pointer]:
+                      - img [ref=e3853]
+                  - generic "Use in chat" [ref=e3855]:
+                    - button [ref=e3856] [cursor=pointer]:
+                      - img [ref=e3857]
+            - row "Google Analytics - Chat Request Form Submitted - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_chat_request_form_submitted_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3859]:
+              - cell "Google Analytics - Chat Request Form Submitted - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3860]:
+                - paragraph [ref=e3861]: Google Analytics - Chat Request Form Submitted - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3862]
+              - cell [ref=e3863]
+              - cell [ref=e3864]
+              - cell [ref=e3865]
+              - cell "custom:google_analytics_chat_request_form_submitted_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3866]:
+                - generic [ref=e3867]:
+                  - generic [ref=e3868]: custom:google_analytics_chat_request_form_submitted_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3869]:
+                    - button [ref=e3870] [cursor=pointer]:
+                      - img [ref=e3871]
+                  - generic "Use in chat" [ref=e3873]:
+                    - button [ref=e3874] [cursor=pointer]:
+                      - img [ref=e3875]
+            - row "Google Analytics - phone_number_click - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_phone_number_click_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3877]:
+              - cell "Google Analytics - phone_number_click - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3878]:
+                - paragraph [ref=e3879]: Google Analytics - phone_number_click - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3880]
+              - cell [ref=e3881]
+              - cell [ref=e3882]
+              - cell [ref=e3883]
+              - cell "custom:google_analytics_phone_number_click_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3884]:
+                - generic [ref=e3885]:
+                  - generic [ref=e3886]: custom:google_analytics_phone_number_click_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3887]:
+                    - button [ref=e3888] [cursor=pointer]:
+                      - img [ref=e3889]
+                  - generic "Use in chat" [ref=e3891]:
+                    - button [ref=e3892] [cursor=pointer]:
+                      - img [ref=e3893]
+            - row "Google Analytics - file_downloaded - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_file_downloaded_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3895]:
+              - cell "Google Analytics - file_downloaded - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3896]:
+                - paragraph [ref=e3897]: Google Analytics - file_downloaded - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3898]
+              - cell [ref=e3899]
+              - cell [ref=e3900]
+              - cell [ref=e3901]
+              - cell "custom:google_analytics_file_downloaded_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3902]:
+                - generic [ref=e3903]:
+                  - generic [ref=e3904]: custom:google_analytics_file_downloaded_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3905]:
+                    - button [ref=e3906] [cursor=pointer]:
+                      - img [ref=e3907]
+                  - generic "Use in chat" [ref=e3909]:
+                    - button [ref=e3910] [cursor=pointer]:
+                      - img [ref=e3911]
+            - row "Google Analytics - form_start - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_form_start_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3913]:
+              - cell "Google Analytics - form_start - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3914]:
+                - paragraph [ref=e3915]: Google Analytics - form_start - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3916]
+              - cell [ref=e3917]
+              - cell [ref=e3918]
+              - cell [ref=e3919]
+              - cell "custom:google_analytics_form_start_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3920]:
+                - generic [ref=e3921]:
+                  - generic [ref=e3922]: custom:google_analytics_form_start_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3923]:
+                    - button [ref=e3924] [cursor=pointer]:
+                      - img [ref=e3925]
+                  - generic "Use in chat" [ref=e3927]:
+                    - button [ref=e3928] [cursor=pointer]:
+                      - img [ref=e3929]
+            - row "Google Analytics - download_the_app_widget - (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:google_analytics_download_the_app_widget_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3931]:
+              - cell "Google Analytics - download_the_app_widget - (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e3932]:
+                - paragraph [ref=e3933]: Google Analytics - download_the_app_widget - (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3934]
+              - cell [ref=e3935]
+              - cell [ref=e3936]
+              - cell [ref=e3937]
+              - cell "custom:google_analytics_download_the_app_widget_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e3938]:
+                - generic [ref=e3939]:
+                  - generic [ref=e3940]: custom:google_analytics_download_the_app_widget_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e3941]:
+                    - button [ref=e3942] [cursor=pointer]:
+                      - img [ref=e3943]
+                  - generic "Use in chat" [ref=e3945]:
+                    - button [ref=e3946] [cursor=pointer]:
+                      - img [ref=e3947]
+            - row "DO_NOT_EDIT Google Analytics property (378719271) GA4 - shell.co.th - Shell (Thailand) enabled DEFAULT custom:do_not_edit_google_analytics_property_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3949]:
+              - cell "DO_NOT_EDIT Google Analytics property (378719271) GA4 - shell.co.th - Shell (Thailand) enabled" [ref=e3950]:
+                - paragraph [ref=e3951]: DO_NOT_EDIT Google Analytics property (378719271) GA4 - shell.co.th - Shell (Thailand)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3952]
+              - cell [ref=e3953]
+              - cell [ref=e3954]
+              - cell [ref=e3955]
+              - cell "custom:do_not_edit_google_analytics_property_378719271_ga4_shell_co_th_shell_thailand Copy metric key Use in chat" [ref=e3956]:
+                - generic [ref=e3957]:
+                  - generic [ref=e3958]: custom:do_not_edit_google_analytics_property_378719271_ga4_shell_co_th_shell_thailand
+                  - generic "Copy metric key" [ref=e3959]:
+                    - button [ref=e3960] [cursor=pointer]:
+                      - img [ref=e3961]
+                  - generic "Use in chat" [ref=e3963]:
+                    - button [ref=e3964] [cursor=pointer]:
+                      - img [ref=e3965]
+            - row "DO_NOT_EDIT Google Analytics property (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled DEFAULT custom:do_not_edit_google_analytics_property_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e3967]:
+              - cell "DO_NOT_EDIT Google Analytics property (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled" [ref=e3968]:
+                - paragraph [ref=e3969]: DO_NOT_EDIT Google Analytics property (378713455) GA4 - shell.com.tr - Shell (Turkey)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3970]
+              - cell [ref=e3971]
+              - cell [ref=e3972]
+              - cell [ref=e3973]
+              - cell "custom:do_not_edit_google_analytics_property_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e3974]:
+                - generic [ref=e3975]:
+                  - generic [ref=e3976]: custom:do_not_edit_google_analytics_property_378713455_ga4_shell_com_tr_shell_turkey
+                  - generic "Copy metric key" [ref=e3977]:
+                    - button [ref=e3978] [cursor=pointer]:
+                      - img [ref=e3979]
+                  - generic "Use in chat" [ref=e3981]:
+                    - button [ref=e3982] [cursor=pointer]:
+                      - img [ref=e3983]
+            - row "Google Analytics - purchase - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled DEFAULT custom:google_analytics_purchase_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e3985]:
+              - cell "Google Analytics - purchase - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled" [ref=e3986]:
+                - paragraph [ref=e3987]: Google Analytics - purchase - (379074466) GA4 - shell.com.vn - Shell (Vietnam)
+                - text: enabled
+              - cell "DEFAULT" [ref=e3988]
+              - cell [ref=e3989]
+              - cell [ref=e3990]
+              - cell [ref=e3991]
+              - cell "custom:google_analytics_purchase_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e3992]:
+                - generic [ref=e3993]:
+                  - generic [ref=e3994]: custom:google_analytics_purchase_379074466_ga4_shell_com_vn_shell_vietnam
+                  - generic "Copy metric key" [ref=e3995]:
+                    - button [ref=e3996] [cursor=pointer]:
+                      - img [ref=e3997]
+                  - generic "Use in chat" [ref=e3999]:
+                    - button [ref=e4000] [cursor=pointer]:
+                      - img [ref=e4001]
+            - row "Google Analytics - form_completed - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled DEFAULT custom:google_analytics_form_completed_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4003]:
+              - cell "Google Analytics - form_completed - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled" [ref=e4004]:
+                - paragraph [ref=e4005]: Google Analytics - form_completed - (379074466) GA4 - shell.com.vn - Shell (Vietnam)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4006]
+              - cell [ref=e4007]
+              - cell [ref=e4008]
+              - cell [ref=e4009]
+              - cell "custom:google_analytics_form_completed_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4010]:
+                - generic [ref=e4011]:
+                  - generic [ref=e4012]: custom:google_analytics_form_completed_379074466_ga4_shell_com_vn_shell_vietnam
+                  - generic "Copy metric key" [ref=e4013]:
+                    - button [ref=e4014] [cursor=pointer]:
+                      - img [ref=e4015]
+                  - generic "Use in chat" [ref=e4017]:
+                    - button [ref=e4018] [cursor=pointer]:
+                      - img [ref=e4019]
+            - row "Google Analytics - form_abandoned - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled DEFAULT custom:google_analytics_form_abandoned_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4021]:
+              - cell "Google Analytics - form_abandoned - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled" [ref=e4022]:
+                - paragraph [ref=e4023]: Google Analytics - form_abandoned - (379074466) GA4 - shell.com.vn - Shell (Vietnam)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4024]
+              - cell [ref=e4025]
+              - cell [ref=e4026]
+              - cell [ref=e4027]
+              - cell "custom:google_analytics_form_abandoned_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4028]:
+                - generic [ref=e4029]:
+                  - generic [ref=e4030]: custom:google_analytics_form_abandoned_379074466_ga4_shell_com_vn_shell_vietnam
+                  - generic "Copy metric key" [ref=e4031]:
+                    - button [ref=e4032] [cursor=pointer]:
+                      - img [ref=e4033]
+                  - generic "Use in chat" [ref=e4035]:
+                    - button [ref=e4036] [cursor=pointer]:
+                      - img [ref=e4037]
+            - row "Google Analytics - form_start - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled DEFAULT custom:google_analytics_form_start_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4039]:
+              - cell "Google Analytics - form_start - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled" [ref=e4040]:
+                - paragraph [ref=e4041]: Google Analytics - form_start - (379074466) GA4 - shell.com.vn - Shell (Vietnam)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4042]
+              - cell [ref=e4043]
+              - cell [ref=e4044]
+              - cell [ref=e4045]
+              - cell "custom:google_analytics_form_start_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4046]:
+                - generic [ref=e4047]:
+                  - generic [ref=e4048]: custom:google_analytics_form_start_379074466_ga4_shell_com_vn_shell_vietnam
+                  - generic "Copy metric key" [ref=e4049]:
+                    - button [ref=e4050] [cursor=pointer]:
+                      - img [ref=e4051]
+                  - generic "Use in chat" [ref=e4053]:
+                    - button [ref=e4054] [cursor=pointer]:
+                      - img [ref=e4055]
+            - row "Google Analytics - file_downloaded - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled DEFAULT custom:google_analytics_file_downloaded_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4057]:
+              - cell "Google Analytics - file_downloaded - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled" [ref=e4058]:
+                - paragraph [ref=e4059]: Google Analytics - file_downloaded - (379074466) GA4 - shell.com.vn - Shell (Vietnam)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4060]
+              - cell [ref=e4061]
+              - cell [ref=e4062]
+              - cell [ref=e4063]
+              - cell "custom:google_analytics_file_downloaded_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4064]:
+                - generic [ref=e4065]:
+                  - generic [ref=e4066]: custom:google_analytics_file_downloaded_379074466_ga4_shell_com_vn_shell_vietnam
+                  - generic "Copy metric key" [ref=e4067]:
+                    - button [ref=e4068] [cursor=pointer]:
+                      - img [ref=e4069]
+                  - generic "Use in chat" [ref=e4071]:
+                    - button [ref=e4072] [cursor=pointer]:
+                      - img [ref=e4073]
+            - row "Google Analytics - download_the_app_widget - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled DEFAULT custom:google_analytics_download_the_app_widget_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4075]:
+              - cell "Google Analytics - download_the_app_widget - (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled" [ref=e4076]:
+                - paragraph [ref=e4077]: Google Analytics - download_the_app_widget - (379074466) GA4 - shell.com.vn - Shell (Vietnam)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4078]
+              - cell [ref=e4079]
+              - cell [ref=e4080]
+              - cell [ref=e4081]
+              - cell "custom:google_analytics_download_the_app_widget_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4082]:
+                - generic [ref=e4083]:
+                  - generic [ref=e4084]: custom:google_analytics_download_the_app_widget_379074466_ga4_shell_com_vn_shell_vietnam
+                  - generic "Copy metric key" [ref=e4085]:
+                    - button [ref=e4086] [cursor=pointer]:
+                      - img [ref=e4087]
+                  - generic "Use in chat" [ref=e4089]:
+                    - button [ref=e4090] [cursor=pointer]:
+                      - img [ref=e4091]
+            - row "DO_NOT_EDIT Google Analytics property (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:do_not_edit_google_analytics_property_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4093]:
+              - cell "DO_NOT_EDIT Google Analytics property (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4094]:
+                - paragraph [ref=e4095]: DO_NOT_EDIT Google Analytics property (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4096]
+              - cell [ref=e4097]
+              - cell [ref=e4098]
+              - cell [ref=e4099]
+              - cell "custom:do_not_edit_google_analytics_property_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4100]:
+                - generic [ref=e4101]:
+                  - generic [ref=e4102]: custom:do_not_edit_google_analytics_property_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4103]:
+                    - button [ref=e4104] [cursor=pointer]:
+                      - img [ref=e4105]
+                  - generic "Use in chat" [ref=e4107]:
+                    - button [ref=e4108] [cursor=pointer]:
+                      - img [ref=e4109]
+            - row "Google Analytics - purchase - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled DEFAULT custom:google_analytics_purchase_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4111]:
+              - cell "Google Analytics - purchase - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled" [ref=e4112]:
+                - paragraph [ref=e4113]: Google Analytics - purchase - (378731462) GA4 - shell.sk - Shell (Slovakia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4114]
+              - cell [ref=e4115]
+              - cell [ref=e4116]
+              - cell [ref=e4117]
+              - cell "custom:google_analytics_purchase_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4118]:
+                - generic [ref=e4119]:
+                  - generic [ref=e4120]: custom:google_analytics_purchase_378731462_ga4_shell_sk_shell_slovakia
+                  - generic "Copy metric key" [ref=e4121]:
+                    - button [ref=e4122] [cursor=pointer]:
+                      - img [ref=e4123]
+                  - generic "Use in chat" [ref=e4125]:
+                    - button [ref=e4126] [cursor=pointer]:
+                      - img [ref=e4127]
+            - row "Google Analytics - form_completed - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled DEFAULT custom:google_analytics_form_completed_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4129]:
+              - cell "Google Analytics - form_completed - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled" [ref=e4130]:
+                - paragraph [ref=e4131]: Google Analytics - form_completed - (378731462) GA4 - shell.sk - Shell (Slovakia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4132]
+              - cell [ref=e4133]
+              - cell [ref=e4134]
+              - cell [ref=e4135]
+              - cell "custom:google_analytics_form_completed_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4136]:
+                - generic [ref=e4137]:
+                  - generic [ref=e4138]: custom:google_analytics_form_completed_378731462_ga4_shell_sk_shell_slovakia
+                  - generic "Copy metric key" [ref=e4139]:
+                    - button [ref=e4140] [cursor=pointer]:
+                      - img [ref=e4141]
+                  - generic "Use in chat" [ref=e4143]:
+                    - button [ref=e4144] [cursor=pointer]:
+                      - img [ref=e4145]
+            - row "Google Analytics - phone_number_click - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled DEFAULT custom:google_analytics_phone_number_click_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4147]:
+              - cell "Google Analytics - phone_number_click - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled" [ref=e4148]:
+                - paragraph [ref=e4149]: Google Analytics - phone_number_click - (378731462) GA4 - shell.sk - Shell (Slovakia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4150]
+              - cell [ref=e4151]
+              - cell [ref=e4152]
+              - cell [ref=e4153]
+              - cell "custom:google_analytics_phone_number_click_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4154]:
+                - generic [ref=e4155]:
+                  - generic [ref=e4156]: custom:google_analytics_phone_number_click_378731462_ga4_shell_sk_shell_slovakia
+                  - generic "Copy metric key" [ref=e4157]:
+                    - button [ref=e4158] [cursor=pointer]:
+                      - img [ref=e4159]
+                  - generic "Use in chat" [ref=e4161]:
+                    - button [ref=e4162] [cursor=pointer]:
+                      - img [ref=e4163]
+            - row "Google Analytics - file_downloaded - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled DEFAULT custom:google_analytics_file_downloaded_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4165]:
+              - cell "Google Analytics - file_downloaded - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled" [ref=e4166]:
+                - paragraph [ref=e4167]: Google Analytics - file_downloaded - (378731462) GA4 - shell.sk - Shell (Slovakia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4168]
+              - cell [ref=e4169]
+              - cell [ref=e4170]
+              - cell [ref=e4171]
+              - cell "custom:google_analytics_file_downloaded_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4172]:
+                - generic [ref=e4173]:
+                  - generic [ref=e4174]: custom:google_analytics_file_downloaded_378731462_ga4_shell_sk_shell_slovakia
+                  - generic "Copy metric key" [ref=e4175]:
+                    - button [ref=e4176] [cursor=pointer]:
+                      - img [ref=e4177]
+                  - generic "Use in chat" [ref=e4179]:
+                    - button [ref=e4180] [cursor=pointer]:
+                      - img [ref=e4181]
+            - row "Google Analytics - form_start - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled DEFAULT custom:google_analytics_form_start_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4183]:
+              - cell "Google Analytics - form_start - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled" [ref=e4184]:
+                - paragraph [ref=e4185]: Google Analytics - form_start - (378731462) GA4 - shell.sk - Shell (Slovakia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4186]
+              - cell [ref=e4187]
+              - cell [ref=e4188]
+              - cell [ref=e4189]
+              - cell "custom:google_analytics_form_start_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4190]:
+                - generic [ref=e4191]:
+                  - generic [ref=e4192]: custom:google_analytics_form_start_378731462_ga4_shell_sk_shell_slovakia
+                  - generic "Copy metric key" [ref=e4193]:
+                    - button [ref=e4194] [cursor=pointer]:
+                      - img [ref=e4195]
+                  - generic "Use in chat" [ref=e4197]:
+                    - button [ref=e4198] [cursor=pointer]:
+                      - img [ref=e4199]
+            - row "Google Analytics - form_abandoned - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled DEFAULT custom:google_analytics_form_abandoned_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4201]:
+              - cell "Google Analytics - form_abandoned - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled" [ref=e4202]:
+                - paragraph [ref=e4203]: Google Analytics - form_abandoned - (378731462) GA4 - shell.sk - Shell (Slovakia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4204]
+              - cell [ref=e4205]
+              - cell [ref=e4206]
+              - cell [ref=e4207]
+              - cell "custom:google_analytics_form_abandoned_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4208]:
+                - generic [ref=e4209]:
+                  - generic [ref=e4210]: custom:google_analytics_form_abandoned_378731462_ga4_shell_sk_shell_slovakia
+                  - generic "Copy metric key" [ref=e4211]:
+                    - button [ref=e4212] [cursor=pointer]:
+                      - img [ref=e4213]
+                  - generic "Use in chat" [ref=e4215]:
+                    - button [ref=e4216] [cursor=pointer]:
+                      - img [ref=e4217]
+            - row "Google Analytics - download_the_app_widget - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled DEFAULT custom:google_analytics_download_the_app_widget_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4219]:
+              - cell "Google Analytics - download_the_app_widget - (378731462) GA4 - shell.sk - Shell (Slovakia) enabled" [ref=e4220]:
+                - paragraph [ref=e4221]: Google Analytics - download_the_app_widget - (378731462) GA4 - shell.sk - Shell (Slovakia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4222]
+              - cell [ref=e4223]
+              - cell [ref=e4224]
+              - cell [ref=e4225]
+              - cell "custom:google_analytics_download_the_app_widget_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e4226]:
+                - generic [ref=e4227]:
+                  - generic [ref=e4228]: custom:google_analytics_download_the_app_widget_378731462_ga4_shell_sk_shell_slovakia
+                  - generic "Copy metric key" [ref=e4229]:
+                    - button [ref=e4230] [cursor=pointer]:
+                      - img [ref=e4231]
+                  - generic "Use in chat" [ref=e4233]:
+                    - button [ref=e4234] [cursor=pointer]:
+                      - img [ref=e4235]
+            - row "DO_NOT_EDIT Google Analytics property (378729198) GA4 - shell.fr - Shell (France) enabled DEFAULT custom:do_not_edit_google_analytics_property_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4237]:
+              - cell "DO_NOT_EDIT Google Analytics property (378729198) GA4 - shell.fr - Shell (France) enabled" [ref=e4238]:
+                - paragraph [ref=e4239]: DO_NOT_EDIT Google Analytics property (378729198) GA4 - shell.fr - Shell (France)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4240]
+              - cell [ref=e4241]
+              - cell [ref=e4242]
+              - cell [ref=e4243]
+              - cell "custom:do_not_edit_google_analytics_property_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4244]:
+                - generic [ref=e4245]:
+                  - generic [ref=e4246]: custom:do_not_edit_google_analytics_property_378729198_ga4_shell_fr_shell_france
+                  - generic "Copy metric key" [ref=e4247]:
+                    - button [ref=e4248] [cursor=pointer]:
+                      - img [ref=e4249]
+                  - generic "Use in chat" [ref=e4251]:
+                    - button [ref=e4252] [cursor=pointer]:
+                      - img [ref=e4253]
+            - row "DO_NOT_EDIT Google Analytics property (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:do_not_edit_google_analytics_property_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e4255]:
+              - cell "DO_NOT_EDIT Google Analytics property (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e4256]:
+                - paragraph [ref=e4257]: DO_NOT_EDIT Google Analytics property (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4258]
+              - cell [ref=e4259]
+              - cell [ref=e4260]
+              - cell [ref=e4261]
+              - cell "custom:do_not_edit_google_analytics_property_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e4262]:
+                - generic [ref=e4263]:
+                  - generic [ref=e4264]: custom:do_not_edit_google_analytics_property_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e4265]:
+                    - button [ref=e4266] [cursor=pointer]:
+                      - img [ref=e4267]
+                  - generic "Use in chat" [ref=e4269]:
+                    - button [ref=e4270] [cursor=pointer]:
+                      - img [ref=e4271]
+            - row "Google Analytics - purchase - (378729198) GA4 - shell.fr - Shell (France) enabled DEFAULT custom:google_analytics_purchase_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4273]:
+              - cell "Google Analytics - purchase - (378729198) GA4 - shell.fr - Shell (France) enabled" [ref=e4274]:
+                - paragraph [ref=e4275]: Google Analytics - purchase - (378729198) GA4 - shell.fr - Shell (France)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4276]
+              - cell [ref=e4277]
+              - cell [ref=e4278]
+              - cell [ref=e4279]
+              - cell "custom:google_analytics_purchase_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4280]:
+                - generic [ref=e4281]:
+                  - generic [ref=e4282]: custom:google_analytics_purchase_378729198_ga4_shell_fr_shell_france
+                  - generic "Copy metric key" [ref=e4283]:
+                    - button [ref=e4284] [cursor=pointer]:
+                      - img [ref=e4285]
+                  - generic "Use in chat" [ref=e4287]:
+                    - button [ref=e4288] [cursor=pointer]:
+                      - img [ref=e4289]
+            - row "Google Analytics - phone_number_click - (378729198) GA4 - shell.fr - Shell (France) enabled DEFAULT custom:google_analytics_phone_number_click_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4291]:
+              - cell "Google Analytics - phone_number_click - (378729198) GA4 - shell.fr - Shell (France) enabled" [ref=e4292]:
+                - paragraph [ref=e4293]: Google Analytics - phone_number_click - (378729198) GA4 - shell.fr - Shell (France)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4294]
+              - cell [ref=e4295]
+              - cell [ref=e4296]
+              - cell [ref=e4297]
+              - cell "custom:google_analytics_phone_number_click_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4298]:
+                - generic [ref=e4299]:
+                  - generic [ref=e4300]: custom:google_analytics_phone_number_click_378729198_ga4_shell_fr_shell_france
+                  - generic "Copy metric key" [ref=e4301]:
+                    - button [ref=e4302] [cursor=pointer]:
+                      - img [ref=e4303]
+                  - generic "Use in chat" [ref=e4305]:
+                    - button [ref=e4306] [cursor=pointer]:
+                      - img [ref=e4307]
+            - row "Google Analytics - file_downloaded - (378729198) GA4 - shell.fr - Shell (France) enabled DEFAULT custom:google_analytics_file_downloaded_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4309]:
+              - cell "Google Analytics - file_downloaded - (378729198) GA4 - shell.fr - Shell (France) enabled" [ref=e4310]:
+                - paragraph [ref=e4311]: Google Analytics - file_downloaded - (378729198) GA4 - shell.fr - Shell (France)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4312]
+              - cell [ref=e4313]
+              - cell [ref=e4314]
+              - cell [ref=e4315]
+              - cell "custom:google_analytics_file_downloaded_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4316]:
+                - generic [ref=e4317]:
+                  - generic [ref=e4318]: custom:google_analytics_file_downloaded_378729198_ga4_shell_fr_shell_france
+                  - generic "Copy metric key" [ref=e4319]:
+                    - button [ref=e4320] [cursor=pointer]:
+                      - img [ref=e4321]
+                  - generic "Use in chat" [ref=e4323]:
+                    - button [ref=e4324] [cursor=pointer]:
+                      - img [ref=e4325]
+            - row "Google Analytics - form_start - (378729198) GA4 - shell.fr - Shell (France) enabled DEFAULT custom:google_analytics_form_start_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4327]:
+              - cell "Google Analytics - form_start - (378729198) GA4 - shell.fr - Shell (France) enabled" [ref=e4328]:
+                - paragraph [ref=e4329]: Google Analytics - form_start - (378729198) GA4 - shell.fr - Shell (France)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4330]
+              - cell [ref=e4331]
+              - cell [ref=e4332]
+              - cell [ref=e4333]
+              - cell "custom:google_analytics_form_start_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4334]:
+                - generic [ref=e4335]:
+                  - generic [ref=e4336]: custom:google_analytics_form_start_378729198_ga4_shell_fr_shell_france
+                  - generic "Copy metric key" [ref=e4337]:
+                    - button [ref=e4338] [cursor=pointer]:
+                      - img [ref=e4339]
+                  - generic "Use in chat" [ref=e4341]:
+                    - button [ref=e4342] [cursor=pointer]:
+                      - img [ref=e4343]
+            - row "Google Analytics - form_completed - (378729198) GA4 - shell.fr - Shell (France) enabled DEFAULT custom:google_analytics_form_completed_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4345]:
+              - cell "Google Analytics - form_completed - (378729198) GA4 - shell.fr - Shell (France) enabled" [ref=e4346]:
+                - paragraph [ref=e4347]: Google Analytics - form_completed - (378729198) GA4 - shell.fr - Shell (France)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4348]
+              - cell [ref=e4349]
+              - cell [ref=e4350]
+              - cell [ref=e4351]
+              - cell "custom:google_analytics_form_completed_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4352]:
+                - generic [ref=e4353]:
+                  - generic [ref=e4354]: custom:google_analytics_form_completed_378729198_ga4_shell_fr_shell_france
+                  - generic "Copy metric key" [ref=e4355]:
+                    - button [ref=e4356] [cursor=pointer]:
+                      - img [ref=e4357]
+                  - generic "Use in chat" [ref=e4359]:
+                    - button [ref=e4360] [cursor=pointer]:
+                      - img [ref=e4361]
+            - row "Google Analytics - form_abandoned - (378729198) GA4 - shell.fr - Shell (France) enabled DEFAULT custom:google_analytics_form_abandoned_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4363]:
+              - cell "Google Analytics - form_abandoned - (378729198) GA4 - shell.fr - Shell (France) enabled" [ref=e4364]:
+                - paragraph [ref=e4365]: Google Analytics - form_abandoned - (378729198) GA4 - shell.fr - Shell (France)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4366]
+              - cell [ref=e4367]
+              - cell [ref=e4368]
+              - cell [ref=e4369]
+              - cell "custom:google_analytics_form_abandoned_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4370]:
+                - generic [ref=e4371]:
+                  - generic [ref=e4372]: custom:google_analytics_form_abandoned_378729198_ga4_shell_fr_shell_france
+                  - generic "Copy metric key" [ref=e4373]:
+                    - button [ref=e4374] [cursor=pointer]:
+                      - img [ref=e4375]
+                  - generic "Use in chat" [ref=e4377]:
+                    - button [ref=e4378] [cursor=pointer]:
+                      - img [ref=e4379]
+            - row "Google Analytics - download_the_app_widget - (378729198) GA4 - shell.fr - Shell (France) enabled DEFAULT custom:google_analytics_download_the_app_widget_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4381]:
+              - cell "Google Analytics - download_the_app_widget - (378729198) GA4 - shell.fr - Shell (France) enabled" [ref=e4382]:
+                - paragraph [ref=e4383]: Google Analytics - download_the_app_widget - (378729198) GA4 - shell.fr - Shell (France)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4384]
+              - cell [ref=e4385]
+              - cell [ref=e4386]
+              - cell [ref=e4387]
+              - cell "custom:google_analytics_download_the_app_widget_378729198_ga4_shell_fr_shell_france Copy metric key Use in chat" [ref=e4388]:
+                - generic [ref=e4389]:
+                  - generic [ref=e4390]: custom:google_analytics_download_the_app_widget_378729198_ga4_shell_fr_shell_france
+                  - generic "Copy metric key" [ref=e4391]:
+                    - button [ref=e4392] [cursor=pointer]:
+                      - img [ref=e4393]
+                  - generic "Use in chat" [ref=e4395]:
+                    - button [ref=e4396] [cursor=pointer]:
+                      - img [ref=e4397]
+            - row "Google Analytics - purchase - (378718380) GA4 - shell.ca - Shell (Canada) enabled DEFAULT custom:google_analytics_purchase_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4399]:
+              - cell "Google Analytics - purchase - (378718380) GA4 - shell.ca - Shell (Canada) enabled" [ref=e4400]:
+                - paragraph [ref=e4401]: Google Analytics - purchase - (378718380) GA4 - shell.ca - Shell (Canada)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4402]
+              - cell [ref=e4403]
+              - cell [ref=e4404]
+              - cell [ref=e4405]
+              - cell "custom:google_analytics_purchase_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4406]:
+                - generic [ref=e4407]:
+                  - generic [ref=e4408]: custom:google_analytics_purchase_378718380_ga4_shell_ca_shell_canada
+                  - generic "Copy metric key" [ref=e4409]:
+                    - button [ref=e4410] [cursor=pointer]:
+                      - img [ref=e4411]
+                  - generic "Use in chat" [ref=e4413]:
+                    - button [ref=e4414] [cursor=pointer]:
+                      - img [ref=e4415]
+            - row "Google Analytics - form_start - (378718380) GA4 - shell.ca - Shell (Canada) enabled DEFAULT custom:google_analytics_form_start_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4417]:
+              - cell "Google Analytics - form_start - (378718380) GA4 - shell.ca - Shell (Canada) enabled" [ref=e4418]:
+                - paragraph [ref=e4419]: Google Analytics - form_start - (378718380) GA4 - shell.ca - Shell (Canada)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4420]
+              - cell [ref=e4421]
+              - cell [ref=e4422]
+              - cell [ref=e4423]
+              - cell "custom:google_analytics_form_start_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4424]:
+                - generic [ref=e4425]:
+                  - generic [ref=e4426]: custom:google_analytics_form_start_378718380_ga4_shell_ca_shell_canada
+                  - generic "Copy metric key" [ref=e4427]:
+                    - button [ref=e4428] [cursor=pointer]:
+                      - img [ref=e4429]
+                  - generic "Use in chat" [ref=e4431]:
+                    - button [ref=e4432] [cursor=pointer]:
+                      - img [ref=e4433]
+            - row "Google Analytics - file_downloaded - (378718380) GA4 - shell.ca - Shell (Canada) enabled DEFAULT custom:google_analytics_file_downloaded_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4435]:
+              - cell "Google Analytics - file_downloaded - (378718380) GA4 - shell.ca - Shell (Canada) enabled" [ref=e4436]:
+                - paragraph [ref=e4437]: Google Analytics - file_downloaded - (378718380) GA4 - shell.ca - Shell (Canada)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4438]
+              - cell [ref=e4439]
+              - cell [ref=e4440]
+              - cell [ref=e4441]
+              - cell "custom:google_analytics_file_downloaded_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4442]:
+                - generic [ref=e4443]:
+                  - generic [ref=e4444]: custom:google_analytics_file_downloaded_378718380_ga4_shell_ca_shell_canada
+                  - generic "Copy metric key" [ref=e4445]:
+                    - button [ref=e4446] [cursor=pointer]:
+                      - img [ref=e4447]
+                  - generic "Use in chat" [ref=e4449]:
+                    - button [ref=e4450] [cursor=pointer]:
+                      - img [ref=e4451]
+            - row "Google Analytics - form_abandoned - (378718380) GA4 - shell.ca - Shell (Canada) enabled DEFAULT custom:google_analytics_form_abandoned_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4453]:
+              - cell "Google Analytics - form_abandoned - (378718380) GA4 - shell.ca - Shell (Canada) enabled" [ref=e4454]:
+                - paragraph [ref=e4455]: Google Analytics - form_abandoned - (378718380) GA4 - shell.ca - Shell (Canada)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4456]
+              - cell [ref=e4457]
+              - cell [ref=e4458]
+              - cell [ref=e4459]
+              - cell "custom:google_analytics_form_abandoned_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4460]:
+                - generic [ref=e4461]:
+                  - generic [ref=e4462]: custom:google_analytics_form_abandoned_378718380_ga4_shell_ca_shell_canada
+                  - generic "Copy metric key" [ref=e4463]:
+                    - button [ref=e4464] [cursor=pointer]:
+                      - img [ref=e4465]
+                  - generic "Use in chat" [ref=e4467]:
+                    - button [ref=e4468] [cursor=pointer]:
+                      - img [ref=e4469]
+            - row "Google Analytics - form_completed - (378718380) GA4 - shell.ca - Shell (Canada) enabled DEFAULT custom:google_analytics_form_completed_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4471]:
+              - cell "Google Analytics - form_completed - (378718380) GA4 - shell.ca - Shell (Canada) enabled" [ref=e4472]:
+                - paragraph [ref=e4473]: Google Analytics - form_completed - (378718380) GA4 - shell.ca - Shell (Canada)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4474]
+              - cell [ref=e4475]
+              - cell [ref=e4476]
+              - cell [ref=e4477]
+              - cell "custom:google_analytics_form_completed_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4478]:
+                - generic [ref=e4479]:
+                  - generic [ref=e4480]: custom:google_analytics_form_completed_378718380_ga4_shell_ca_shell_canada
+                  - generic "Copy metric key" [ref=e4481]:
+                    - button [ref=e4482] [cursor=pointer]:
+                      - img [ref=e4483]
+                  - generic "Use in chat" [ref=e4485]:
+                    - button [ref=e4486] [cursor=pointer]:
+                      - img [ref=e4487]
+            - row "Google Analytics - phone_number_click - (378718380) GA4 - shell.ca - Shell (Canada) enabled DEFAULT custom:google_analytics_phone_number_click_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4489]:
+              - cell "Google Analytics - phone_number_click - (378718380) GA4 - shell.ca - Shell (Canada) enabled" [ref=e4490]:
+                - paragraph [ref=e4491]: Google Analytics - phone_number_click - (378718380) GA4 - shell.ca - Shell (Canada)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4492]
+              - cell [ref=e4493]
+              - cell [ref=e4494]
+              - cell [ref=e4495]
+              - cell "custom:google_analytics_phone_number_click_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e4496]:
+                - generic [ref=e4497]:
+                  - generic [ref=e4498]: custom:google_analytics_phone_number_click_378718380_ga4_shell_ca_shell_canada
+                  - generic "Copy metric key" [ref=e4499]:
+                    - button [ref=e4500] [cursor=pointer]:
+                      - img [ref=e4501]
+                  - generic "Use in chat" [ref=e4503]:
+                    - button [ref=e4504] [cursor=pointer]:
+                      - img [ref=e4505]
+            - row "Google Analytics - purchase - (378678895) GA4 - shell.hu - Shell (Hungary) enabled DEFAULT custom:google_analytics_purchase_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4507]:
+              - cell "Google Analytics - purchase - (378678895) GA4 - shell.hu - Shell (Hungary) enabled" [ref=e4508]:
+                - paragraph [ref=e4509]: Google Analytics - purchase - (378678895) GA4 - shell.hu - Shell (Hungary)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4510]
+              - cell [ref=e4511]
+              - cell [ref=e4512]
+              - cell [ref=e4513]
+              - cell "custom:google_analytics_purchase_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4514]:
+                - generic [ref=e4515]:
+                  - generic [ref=e4516]: custom:google_analytics_purchase_378678895_ga4_shell_hu_shell_hungary
+                  - generic "Copy metric key" [ref=e4517]:
+                    - button [ref=e4518] [cursor=pointer]:
+                      - img [ref=e4519]
+                  - generic "Use in chat" [ref=e4521]:
+                    - button [ref=e4522] [cursor=pointer]:
+                      - img [ref=e4523]
+            - row "Google Analytics - form_completed - (378678895) GA4 - shell.hu - Shell (Hungary) enabled DEFAULT custom:google_analytics_form_completed_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4525]:
+              - cell "Google Analytics - form_completed - (378678895) GA4 - shell.hu - Shell (Hungary) enabled" [ref=e4526]:
+                - paragraph [ref=e4527]: Google Analytics - form_completed - (378678895) GA4 - shell.hu - Shell (Hungary)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4528]
+              - cell [ref=e4529]
+              - cell [ref=e4530]
+              - cell [ref=e4531]
+              - cell "custom:google_analytics_form_completed_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4532]:
+                - generic [ref=e4533]:
+                  - generic [ref=e4534]: custom:google_analytics_form_completed_378678895_ga4_shell_hu_shell_hungary
+                  - generic "Copy metric key" [ref=e4535]:
+                    - button [ref=e4536] [cursor=pointer]:
+                      - img [ref=e4537]
+                  - generic "Use in chat" [ref=e4539]:
+                    - button [ref=e4540] [cursor=pointer]:
+                      - img [ref=e4541]
+            - row "Google Analytics - form_start - (378678895) GA4 - shell.hu - Shell (Hungary) enabled DEFAULT custom:google_analytics_form_start_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4543]:
+              - cell "Google Analytics - form_start - (378678895) GA4 - shell.hu - Shell (Hungary) enabled" [ref=e4544]:
+                - paragraph [ref=e4545]: Google Analytics - form_start - (378678895) GA4 - shell.hu - Shell (Hungary)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4546]
+              - cell [ref=e4547]
+              - cell [ref=e4548]
+              - cell [ref=e4549]
+              - cell "custom:google_analytics_form_start_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4550]:
+                - generic [ref=e4551]:
+                  - generic [ref=e4552]: custom:google_analytics_form_start_378678895_ga4_shell_hu_shell_hungary
+                  - generic "Copy metric key" [ref=e4553]:
+                    - button [ref=e4554] [cursor=pointer]:
+                      - img [ref=e4555]
+                  - generic "Use in chat" [ref=e4557]:
+                    - button [ref=e4558] [cursor=pointer]:
+                      - img [ref=e4559]
+            - row "Google Analytics - form_abandoned - (378678895) GA4 - shell.hu - Shell (Hungary) enabled DEFAULT custom:google_analytics_form_abandoned_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4561]:
+              - cell "Google Analytics - form_abandoned - (378678895) GA4 - shell.hu - Shell (Hungary) enabled" [ref=e4562]:
+                - paragraph [ref=e4563]: Google Analytics - form_abandoned - (378678895) GA4 - shell.hu - Shell (Hungary)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4564]
+              - cell [ref=e4565]
+              - cell [ref=e4566]
+              - cell [ref=e4567]
+              - cell "custom:google_analytics_form_abandoned_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4568]:
+                - generic [ref=e4569]:
+                  - generic [ref=e4570]: custom:google_analytics_form_abandoned_378678895_ga4_shell_hu_shell_hungary
+                  - generic "Copy metric key" [ref=e4571]:
+                    - button [ref=e4572] [cursor=pointer]:
+                      - img [ref=e4573]
+                  - generic "Use in chat" [ref=e4575]:
+                    - button [ref=e4576] [cursor=pointer]:
+                      - img [ref=e4577]
+            - row "Google Analytics - phone_number_click - (378678895) GA4 - shell.hu - Shell (Hungary) enabled DEFAULT custom:google_analytics_phone_number_click_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4579]:
+              - cell "Google Analytics - phone_number_click - (378678895) GA4 - shell.hu - Shell (Hungary) enabled" [ref=e4580]:
+                - paragraph [ref=e4581]: Google Analytics - phone_number_click - (378678895) GA4 - shell.hu - Shell (Hungary)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4582]
+              - cell [ref=e4583]
+              - cell [ref=e4584]
+              - cell [ref=e4585]
+              - cell "custom:google_analytics_phone_number_click_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4586]:
+                - generic [ref=e4587]:
+                  - generic [ref=e4588]: custom:google_analytics_phone_number_click_378678895_ga4_shell_hu_shell_hungary
+                  - generic "Copy metric key" [ref=e4589]:
+                    - button [ref=e4590] [cursor=pointer]:
+                      - img [ref=e4591]
+                  - generic "Use in chat" [ref=e4593]:
+                    - button [ref=e4594] [cursor=pointer]:
+                      - img [ref=e4595]
+            - row "Google Analytics - file_downloaded - (378678895) GA4 - shell.hu - Shell (Hungary) enabled DEFAULT custom:google_analytics_file_downloaded_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4597]:
+              - cell "Google Analytics - file_downloaded - (378678895) GA4 - shell.hu - Shell (Hungary) enabled" [ref=e4598]:
+                - paragraph [ref=e4599]: Google Analytics - file_downloaded - (378678895) GA4 - shell.hu - Shell (Hungary)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4600]
+              - cell [ref=e4601]
+              - cell [ref=e4602]
+              - cell [ref=e4603]
+              - cell "custom:google_analytics_file_downloaded_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4604]:
+                - generic [ref=e4605]:
+                  - generic [ref=e4606]: custom:google_analytics_file_downloaded_378678895_ga4_shell_hu_shell_hungary
+                  - generic "Copy metric key" [ref=e4607]:
+                    - button [ref=e4608] [cursor=pointer]:
+                      - img [ref=e4609]
+                  - generic "Use in chat" [ref=e4611]:
+                    - button [ref=e4612] [cursor=pointer]:
+                      - img [ref=e4613]
+            - row "Google Analytics - download_the_app_widget - (378678895) GA4 - shell.hu - Shell (Hungary) enabled DEFAULT custom:google_analytics_download_the_app_widget_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4615]:
+              - cell "Google Analytics - download_the_app_widget - (378678895) GA4 - shell.hu - Shell (Hungary) enabled" [ref=e4616]:
+                - paragraph [ref=e4617]: Google Analytics - download_the_app_widget - (378678895) GA4 - shell.hu - Shell (Hungary)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4618]
+              - cell [ref=e4619]
+              - cell [ref=e4620]
+              - cell [ref=e4621]
+              - cell "custom:google_analytics_download_the_app_widget_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e4622]:
+                - generic [ref=e4623]:
+                  - generic [ref=e4624]: custom:google_analytics_download_the_app_widget_378678895_ga4_shell_hu_shell_hungary
+                  - generic "Copy metric key" [ref=e4625]:
+                    - button [ref=e4626] [cursor=pointer]:
+                      - img [ref=e4627]
+                  - generic "Use in chat" [ref=e4629]:
+                    - button [ref=e4630] [cursor=pointer]:
+                      - img [ref=e4631]
+            - row "DO_NOT_EDIT Google Analytics property (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled DEFAULT custom:do_not_edit_google_analytics_property_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e4633]:
+              - cell "DO_NOT_EDIT Google Analytics property (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled" [ref=e4634]:
+                - paragraph [ref=e4635]: DO_NOT_EDIT Google Analytics property (379030167) GA4 - shell.co.id - Shell (Indonesia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4636]
+              - cell [ref=e4637]
+              - cell [ref=e4638]
+              - cell [ref=e4639]
+              - cell "custom:do_not_edit_google_analytics_property_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e4640]:
+                - generic [ref=e4641]:
+                  - generic [ref=e4642]: custom:do_not_edit_google_analytics_property_379030167_ga4_shell_co_id_shell_indonesia
+                  - generic "Copy metric key" [ref=e4643]:
+                    - button [ref=e4644] [cursor=pointer]:
+                      - img [ref=e4645]
+                  - generic "Use in chat" [ref=e4647]:
+                    - button [ref=e4648] [cursor=pointer]:
+                      - img [ref=e4649]
+            - row "DO_NOT_EDIT Google Analytics property (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled DEFAULT custom:do_not_edit_google_analytics_property_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4651]:
+              - cell "DO_NOT_EDIT Google Analytics property (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled" [ref=e4652]:
+                - paragraph [ref=e4653]: DO_NOT_EDIT Google Analytics property (379076669) GA4 - shell.com.hk - Shell (HongKong)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4654]
+              - cell [ref=e4655]
+              - cell [ref=e4656]
+              - cell [ref=e4657]
+              - cell "custom:do_not_edit_google_analytics_property_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4658]:
+                - generic [ref=e4659]:
+                  - generic [ref=e4660]: custom:do_not_edit_google_analytics_property_379076669_ga4_shell_com_hk_shell_hongkong
+                  - generic "Copy metric key" [ref=e4661]:
+                    - button [ref=e4662] [cursor=pointer]:
+                      - img [ref=e4663]
+                  - generic "Use in chat" [ref=e4665]:
+                    - button [ref=e4666] [cursor=pointer]:
+                      - img [ref=e4667]
+            - row "DO_NOT_EDIT Google Analytics property (379322841) GA4 - shell.pl - Shell (Poland) enabled DEFAULT custom:do_not_edit_google_analytics_property_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e4669]:
+              - cell "DO_NOT_EDIT Google Analytics property (379322841) GA4 - shell.pl - Shell (Poland) enabled" [ref=e4670]:
+                - paragraph [ref=e4671]: DO_NOT_EDIT Google Analytics property (379322841) GA4 - shell.pl - Shell (Poland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4672]
+              - cell [ref=e4673]
+              - cell [ref=e4674]
+              - cell [ref=e4675]
+              - cell "custom:do_not_edit_google_analytics_property_379322841_ga4_shell_pl_shell_poland Copy metric key Use in chat" [ref=e4676]:
+                - generic [ref=e4677]:
+                  - generic [ref=e4678]: custom:do_not_edit_google_analytics_property_379322841_ga4_shell_pl_shell_poland
+                  - generic "Copy metric key" [ref=e4679]:
+                    - button [ref=e4680] [cursor=pointer]:
+                      - img [ref=e4681]
+                  - generic "Use in chat" [ref=e4683]:
+                    - button [ref=e4684] [cursor=pointer]:
+                      - img [ref=e4685]
+            - row "DO_NOT_EDIT Google Analytics property (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT custom:do_not_edit_google_analytics_property_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e4687]:
+              - cell "DO_NOT_EDIT Google Analytics property (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e4688]:
+                - paragraph [ref=e4689]: DO_NOT_EDIT Google Analytics property (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4690]
+              - cell [ref=e4691]
+              - cell [ref=e4692]
+              - cell [ref=e4693]
+              - cell "custom:do_not_edit_google_analytics_property_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e4694]:
+                - generic [ref=e4695]:
+                  - generic [ref=e4696]: custom:do_not_edit_google_analytics_property_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e4697]:
+                    - button [ref=e4698] [cursor=pointer]:
+                      - img [ref=e4699]
+                  - generic "Use in chat" [ref=e4701]:
+                    - button [ref=e4702] [cursor=pointer]:
+                      - img [ref=e4703]
+            - row "Google Analytics - purchase - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:google_analytics_purchase_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4705]:
+              - cell "Google Analytics - purchase - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4706]:
+                - paragraph [ref=e4707]: Google Analytics - purchase - (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4708]
+              - cell [ref=e4709]
+              - cell [ref=e4710]
+              - cell [ref=e4711]
+              - cell "custom:google_analytics_purchase_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4712]:
+                - generic [ref=e4713]:
+                  - generic [ref=e4714]: custom:google_analytics_purchase_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4715]:
+                    - button [ref=e4716] [cursor=pointer]:
+                      - img [ref=e4717]
+                  - generic "Use in chat" [ref=e4719]:
+                    - button [ref=e4720] [cursor=pointer]:
+                      - img [ref=e4721]
+            - row "Google Analytics - form_start - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:google_analytics_form_start_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4723]:
+              - cell "Google Analytics - form_start - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4724]:
+                - paragraph [ref=e4725]: Google Analytics - form_start - (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4726]
+              - cell [ref=e4727]
+              - cell [ref=e4728]
+              - cell [ref=e4729]
+              - cell "custom:google_analytics_form_start_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4730]:
+                - generic [ref=e4731]:
+                  - generic [ref=e4732]: custom:google_analytics_form_start_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4733]:
+                    - button [ref=e4734] [cursor=pointer]:
+                      - img [ref=e4735]
+                  - generic "Use in chat" [ref=e4737]:
+                    - button [ref=e4738] [cursor=pointer]:
+                      - img [ref=e4739]
+            - row "Google Analytics - phone_number_click - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:google_analytics_phone_number_click_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4741]:
+              - cell "Google Analytics - phone_number_click - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4742]:
+                - paragraph [ref=e4743]: Google Analytics - phone_number_click - (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4744]
+              - cell [ref=e4745]
+              - cell [ref=e4746]
+              - cell [ref=e4747]
+              - cell "custom:google_analytics_phone_number_click_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4748]:
+                - generic [ref=e4749]:
+                  - generic [ref=e4750]: custom:google_analytics_phone_number_click_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4751]:
+                    - button [ref=e4752] [cursor=pointer]:
+                      - img [ref=e4753]
+                  - generic "Use in chat" [ref=e4755]:
+                    - button [ref=e4756] [cursor=pointer]:
+                      - img [ref=e4757]
+            - row "Google Analytics - form_completed - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:google_analytics_form_completed_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4759]:
+              - cell "Google Analytics - form_completed - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4760]:
+                - paragraph [ref=e4761]: Google Analytics - form_completed - (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4762]
+              - cell [ref=e4763]
+              - cell [ref=e4764]
+              - cell [ref=e4765]
+              - cell "custom:google_analytics_form_completed_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4766]:
+                - generic [ref=e4767]:
+                  - generic [ref=e4768]: custom:google_analytics_form_completed_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4769]:
+                    - button [ref=e4770] [cursor=pointer]:
+                      - img [ref=e4771]
+                  - generic "Use in chat" [ref=e4773]:
+                    - button [ref=e4774] [cursor=pointer]:
+                      - img [ref=e4775]
+            - row "Google Analytics - file_downloaded - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:google_analytics_file_downloaded_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4777]:
+              - cell "Google Analytics - file_downloaded - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4778]:
+                - paragraph [ref=e4779]: Google Analytics - file_downloaded - (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4780]
+              - cell [ref=e4781]
+              - cell [ref=e4782]
+              - cell [ref=e4783]
+              - cell "custom:google_analytics_file_downloaded_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4784]:
+                - generic [ref=e4785]:
+                  - generic [ref=e4786]: custom:google_analytics_file_downloaded_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4787]:
+                    - button [ref=e4788] [cursor=pointer]:
+                      - img [ref=e4789]
+                  - generic "Use in chat" [ref=e4791]:
+                    - button [ref=e4792] [cursor=pointer]:
+                      - img [ref=e4793]
+            - row "Google Analytics - form_abandoned - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:google_analytics_form_abandoned_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4795]:
+              - cell "Google Analytics - form_abandoned - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4796]:
+                - paragraph [ref=e4797]: Google Analytics - form_abandoned - (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4798]
+              - cell [ref=e4799]
+              - cell [ref=e4800]
+              - cell [ref=e4801]
+              - cell "custom:google_analytics_form_abandoned_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4802]:
+                - generic [ref=e4803]:
+                  - generic [ref=e4804]: custom:google_analytics_form_abandoned_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4805]:
+                    - button [ref=e4806] [cursor=pointer]:
+                      - img [ref=e4807]
+                  - generic "Use in chat" [ref=e4809]:
+                    - button [ref=e4810] [cursor=pointer]:
+                      - img [ref=e4811]
+            - row "Google Analytics - download_the_app_widget - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:google_analytics_download_the_app_widget_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4813]:
+              - cell "Google Analytics - download_the_app_widget - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4814]:
+                - paragraph [ref=e4815]: Google Analytics - download_the_app_widget - (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4816]
+              - cell [ref=e4817]
+              - cell [ref=e4818]
+              - cell [ref=e4819]
+              - cell "custom:google_analytics_download_the_app_widget_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4820]:
+                - generic [ref=e4821]:
+                  - generic [ref=e4822]: custom:google_analytics_download_the_app_widget_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4823]:
+                    - button [ref=e4824] [cursor=pointer]:
+                      - img [ref=e4825]
+                  - generic "Use in chat" [ref=e4827]:
+                    - button [ref=e4828] [cursor=pointer]:
+                      - img [ref=e4829]
+            - row "Google Analytics - page_view - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled DEFAULT custom:google_analytics_page_view_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4831]:
+              - cell "Google Analytics - page_view - (378721200) GA4 - shell.cz - Shell (Czech Republic) enabled" [ref=e4832]:
+                - paragraph [ref=e4833]: Google Analytics - page_view - (378721200) GA4 - shell.cz - Shell (Czech Republic)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4834]
+              - cell [ref=e4835]
+              - cell [ref=e4836]
+              - cell [ref=e4837]
+              - cell "custom:google_analytics_page_view_378721200_ga4_shell_cz_shell_czech_republic Copy metric key Use in chat" [ref=e4838]:
+                - generic [ref=e4839]:
+                  - generic [ref=e4840]: custom:google_analytics_page_view_378721200_ga4_shell_cz_shell_czech_republic
+                  - generic "Copy metric key" [ref=e4841]:
+                    - button [ref=e4842] [cursor=pointer]:
+                      - img [ref=e4843]
+                  - generic "Use in chat" [ref=e4845]:
+                    - button [ref=e4846] [cursor=pointer]:
+                      - img [ref=e4847]
+            - row "DO_NOT_EDIT Google Analytics property (369109556) GA4 - shell.de - Shell (Germany) enabled DEFAULT custom:do_not_edit_google_analytics_property_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e4849]:
+              - cell "DO_NOT_EDIT Google Analytics property (369109556) GA4 - shell.de - Shell (Germany) enabled" [ref=e4850]:
+                - paragraph [ref=e4851]: DO_NOT_EDIT Google Analytics property (369109556) GA4 - shell.de - Shell (Germany)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4852]
+              - cell [ref=e4853]
+              - cell [ref=e4854]
+              - cell [ref=e4855]
+              - cell "custom:do_not_edit_google_analytics_property_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e4856]:
+                - generic [ref=e4857]:
+                  - generic [ref=e4858]: custom:do_not_edit_google_analytics_property_369109556_ga4_shell_de_shell_germany
+                  - generic "Copy metric key" [ref=e4859]:
+                    - button [ref=e4860] [cursor=pointer]:
+                      - img [ref=e4861]
+                  - generic "Use in chat" [ref=e4863]:
+                    - button [ref=e4864] [cursor=pointer]:
+                      - img [ref=e4865]
+            - row "DO_NOT_EDIT Google Analytics property (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled DEFAULT custom:do_not_edit_google_analytics_property_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e4867]:
+              - cell "DO_NOT_EDIT Google Analytics property (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled" [ref=e4868]:
+                - paragraph [ref=e4869]: DO_NOT_EDIT Google Analytics property (379066446) GA4 - shell.com.sg - Shell (Singapore)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4870]
+              - cell [ref=e4871]
+              - cell [ref=e4872]
+              - cell [ref=e4873]
+              - cell "custom:do_not_edit_google_analytics_property_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e4874]:
+                - generic [ref=e4875]:
+                  - generic [ref=e4876]: custom:do_not_edit_google_analytics_property_379066446_ga4_shell_com_sg_shell_singapore
+                  - generic "Copy metric key" [ref=e4877]:
+                    - button [ref=e4878] [cursor=pointer]:
+                      - img [ref=e4879]
+                  - generic "Use in chat" [ref=e4881]:
+                    - button [ref=e4882] [cursor=pointer]:
+                      - img [ref=e4883]
+            - row "DO_NOT_EDIT Google Analytics property (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled DEFAULT custom:do_not_edit_google_analytics_property_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4885]:
+              - cell "DO_NOT_EDIT Google Analytics property (379074466) GA4 - shell.com.vn - Shell (Vietnam) enabled" [ref=e4886]:
+                - paragraph [ref=e4887]: DO_NOT_EDIT Google Analytics property (379074466) GA4 - shell.com.vn - Shell (Vietnam)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4888]
+              - cell [ref=e4889]
+              - cell [ref=e4890]
+              - cell [ref=e4891]
+              - cell "custom:do_not_edit_google_analytics_property_379074466_ga4_shell_com_vn_shell_vietnam Copy metric key Use in chat" [ref=e4892]:
+                - generic [ref=e4893]:
+                  - generic [ref=e4894]: custom:do_not_edit_google_analytics_property_379074466_ga4_shell_com_vn_shell_vietnam
+                  - generic "Copy metric key" [ref=e4895]:
+                    - button [ref=e4896] [cursor=pointer]:
+                      - img [ref=e4897]
+                  - generic "Use in chat" [ref=e4899]:
+                    - button [ref=e4900] [cursor=pointer]:
+                      - img [ref=e4901]
+            - row "Google Analytics - purchase - (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled DEFAULT custom:google_analytics_purchase_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4903]:
+              - cell "Google Analytics - purchase - (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled" [ref=e4904]:
+                - paragraph [ref=e4905]: Google Analytics - purchase - (379076669) GA4 - shell.com.hk - Shell (HongKong)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4906]
+              - cell [ref=e4907]
+              - cell [ref=e4908]
+              - cell [ref=e4909]
+              - cell "custom:google_analytics_purchase_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4910]:
+                - generic [ref=e4911]:
+                  - generic [ref=e4912]: custom:google_analytics_purchase_379076669_ga4_shell_com_hk_shell_hongkong
+                  - generic "Copy metric key" [ref=e4913]:
+                    - button [ref=e4914] [cursor=pointer]:
+                      - img [ref=e4915]
+                  - generic "Use in chat" [ref=e4917]:
+                    - button [ref=e4918] [cursor=pointer]:
+                      - img [ref=e4919]
+            - row "Google Analytics - file_downloaded - (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled DEFAULT custom:google_analytics_file_downloaded_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4921]:
+              - cell "Google Analytics - file_downloaded - (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled" [ref=e4922]:
+                - paragraph [ref=e4923]: Google Analytics - file_downloaded - (379076669) GA4 - shell.com.hk - Shell (HongKong)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4924]
+              - cell [ref=e4925]
+              - cell [ref=e4926]
+              - cell [ref=e4927]
+              - cell "custom:google_analytics_file_downloaded_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4928]:
+                - generic [ref=e4929]:
+                  - generic [ref=e4930]: custom:google_analytics_file_downloaded_379076669_ga4_shell_com_hk_shell_hongkong
+                  - generic "Copy metric key" [ref=e4931]:
+                    - button [ref=e4932] [cursor=pointer]:
+                      - img [ref=e4933]
+                  - generic "Use in chat" [ref=e4935]:
+                    - button [ref=e4936] [cursor=pointer]:
+                      - img [ref=e4937]
+            - row "Google Analytics - phone_number_click - (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled DEFAULT custom:google_analytics_phone_number_click_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4939]:
+              - cell "Google Analytics - phone_number_click - (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled" [ref=e4940]:
+                - paragraph [ref=e4941]: Google Analytics - phone_number_click - (379076669) GA4 - shell.com.hk - Shell (HongKong)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4942]
+              - cell [ref=e4943]
+              - cell [ref=e4944]
+              - cell [ref=e4945]
+              - cell "custom:google_analytics_phone_number_click_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4946]:
+                - generic [ref=e4947]:
+                  - generic [ref=e4948]: custom:google_analytics_phone_number_click_379076669_ga4_shell_com_hk_shell_hongkong
+                  - generic "Copy metric key" [ref=e4949]:
+                    - button [ref=e4950] [cursor=pointer]:
+                      - img [ref=e4951]
+                  - generic "Use in chat" [ref=e4953]:
+                    - button [ref=e4954] [cursor=pointer]:
+                      - img [ref=e4955]
+            - row "Google Analytics - download_the_app_widget - (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled DEFAULT custom:google_analytics_download_the_app_widget_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4957]:
+              - cell "Google Analytics - download_the_app_widget - (379076669) GA4 - shell.com.hk - Shell (HongKong) enabled" [ref=e4958]:
+                - paragraph [ref=e4959]: Google Analytics - download_the_app_widget - (379076669) GA4 - shell.com.hk - Shell (HongKong)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4960]
+              - cell [ref=e4961]
+              - cell [ref=e4962]
+              - cell [ref=e4963]
+              - cell "custom:google_analytics_download_the_app_widget_379076669_ga4_shell_com_hk_shell_hongkong Copy metric key Use in chat" [ref=e4964]:
+                - generic [ref=e4965]:
+                  - generic [ref=e4966]: custom:google_analytics_download_the_app_widget_379076669_ga4_shell_com_hk_shell_hongkong
+                  - generic "Copy metric key" [ref=e4967]:
+                    - button [ref=e4968] [cursor=pointer]:
+                      - img [ref=e4969]
+                  - generic "Use in chat" [ref=e4971]:
+                    - button [ref=e4972] [cursor=pointer]:
+                      - img [ref=e4973]
+            - row "DO_NOT_EDIT Google Analytics property (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled DEFAULT custom:do_not_edit_google_analytics_property_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e4975]:
+              - cell "DO_NOT_EDIT Google Analytics property (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled" [ref=e4976]:
+                - paragraph [ref=e4977]: DO_NOT_EDIT Google Analytics property (379073993) GA4 - shell.com.mx - Shell (Mexico)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4978]
+              - cell [ref=e4979]
+              - cell [ref=e4980]
+              - cell [ref=e4981]
+              - cell "custom:do_not_edit_google_analytics_property_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e4982]:
+                - generic [ref=e4983]:
+                  - generic [ref=e4984]: custom:do_not_edit_google_analytics_property_379073993_ga4_shell_com_mx_shell_mexico
+                  - generic "Copy metric key" [ref=e4985]:
+                    - button [ref=e4986] [cursor=pointer]:
+                      - img [ref=e4987]
+                  - generic "Use in chat" [ref=e4989]:
+                    - button [ref=e4990] [cursor=pointer]:
+                      - img [ref=e4991]
+            - row "Google Analytics - purchase - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled DEFAULT custom:google_analytics_purchase_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e4993]:
+              - cell "Google Analytics - purchase - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled" [ref=e4994]:
+                - paragraph [ref=e4995]: Google Analytics - purchase - (379073993) GA4 - shell.com.mx - Shell (Mexico)
+                - text: enabled
+              - cell "DEFAULT" [ref=e4996]
+              - cell [ref=e4997]
+              - cell [ref=e4998]
+              - cell [ref=e4999]
+              - cell "custom:google_analytics_purchase_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5000]:
+                - generic [ref=e5001]:
+                  - generic [ref=e5002]: custom:google_analytics_purchase_379073993_ga4_shell_com_mx_shell_mexico
+                  - generic "Copy metric key" [ref=e5003]:
+                    - button [ref=e5004] [cursor=pointer]:
+                      - img [ref=e5005]
+                  - generic "Use in chat" [ref=e5007]:
+                    - button [ref=e5008] [cursor=pointer]:
+                      - img [ref=e5009]
+            - row "Google Analytics - form_completed - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled DEFAULT custom:google_analytics_form_completed_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5011]:
+              - cell "Google Analytics - form_completed - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled" [ref=e5012]:
+                - paragraph [ref=e5013]: Google Analytics - form_completed - (379073993) GA4 - shell.com.mx - Shell (Mexico)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5014]
+              - cell [ref=e5015]
+              - cell [ref=e5016]
+              - cell [ref=e5017]
+              - cell "custom:google_analytics_form_completed_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5018]:
+                - generic [ref=e5019]:
+                  - generic [ref=e5020]: custom:google_analytics_form_completed_379073993_ga4_shell_com_mx_shell_mexico
+                  - generic "Copy metric key" [ref=e5021]:
+                    - button [ref=e5022] [cursor=pointer]:
+                      - img [ref=e5023]
+                  - generic "Use in chat" [ref=e5025]:
+                    - button [ref=e5026] [cursor=pointer]:
+                      - img [ref=e5027]
+            - row "Google Analytics - form_start - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled DEFAULT custom:google_analytics_form_start_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5029]:
+              - cell "Google Analytics - form_start - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled" [ref=e5030]:
+                - paragraph [ref=e5031]: Google Analytics - form_start - (379073993) GA4 - shell.com.mx - Shell (Mexico)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5032]
+              - cell [ref=e5033]
+              - cell [ref=e5034]
+              - cell [ref=e5035]
+              - cell "custom:google_analytics_form_start_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5036]:
+                - generic [ref=e5037]:
+                  - generic [ref=e5038]: custom:google_analytics_form_start_379073993_ga4_shell_com_mx_shell_mexico
+                  - generic "Copy metric key" [ref=e5039]:
+                    - button [ref=e5040] [cursor=pointer]:
+                      - img [ref=e5041]
+                  - generic "Use in chat" [ref=e5043]:
+                    - button [ref=e5044] [cursor=pointer]:
+                      - img [ref=e5045]
+            - row "Google Analytics - form_abandoned - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled DEFAULT custom:google_analytics_form_abandoned_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5047]:
+              - cell "Google Analytics - form_abandoned - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled" [ref=e5048]:
+                - paragraph [ref=e5049]: Google Analytics - form_abandoned - (379073993) GA4 - shell.com.mx - Shell (Mexico)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5050]
+              - cell [ref=e5051]
+              - cell [ref=e5052]
+              - cell [ref=e5053]
+              - cell "custom:google_analytics_form_abandoned_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5054]:
+                - generic [ref=e5055]:
+                  - generic [ref=e5056]: custom:google_analytics_form_abandoned_379073993_ga4_shell_com_mx_shell_mexico
+                  - generic "Copy metric key" [ref=e5057]:
+                    - button [ref=e5058] [cursor=pointer]:
+                      - img [ref=e5059]
+                  - generic "Use in chat" [ref=e5061]:
+                    - button [ref=e5062] [cursor=pointer]:
+                      - img [ref=e5063]
+            - row "Google Analytics - file_downloaded - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled DEFAULT custom:google_analytics_file_downloaded_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5065]:
+              - cell "Google Analytics - file_downloaded - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled" [ref=e5066]:
+                - paragraph [ref=e5067]: Google Analytics - file_downloaded - (379073993) GA4 - shell.com.mx - Shell (Mexico)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5068]
+              - cell [ref=e5069]
+              - cell [ref=e5070]
+              - cell [ref=e5071]
+              - cell "custom:google_analytics_file_downloaded_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5072]:
+                - generic [ref=e5073]:
+                  - generic [ref=e5074]: custom:google_analytics_file_downloaded_379073993_ga4_shell_com_mx_shell_mexico
+                  - generic "Copy metric key" [ref=e5075]:
+                    - button [ref=e5076] [cursor=pointer]:
+                      - img [ref=e5077]
+                  - generic "Use in chat" [ref=e5079]:
+                    - button [ref=e5080] [cursor=pointer]:
+                      - img [ref=e5081]
+            - row "Google Analytics - phone_number_click - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled DEFAULT custom:google_analytics_phone_number_click_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5083]:
+              - cell "Google Analytics - phone_number_click - (379073993) GA4 - shell.com.mx - Shell (Mexico) enabled" [ref=e5084]:
+                - paragraph [ref=e5085]: Google Analytics - phone_number_click - (379073993) GA4 - shell.com.mx - Shell (Mexico)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5086]
+              - cell [ref=e5087]
+              - cell [ref=e5088]
+              - cell [ref=e5089]
+              - cell "custom:google_analytics_phone_number_click_379073993_ga4_shell_com_mx_shell_mexico Copy metric key Use in chat" [ref=e5090]:
+                - generic [ref=e5091]:
+                  - generic [ref=e5092]: custom:google_analytics_phone_number_click_379073993_ga4_shell_com_mx_shell_mexico
+                  - generic "Copy metric key" [ref=e5093]:
+                    - button [ref=e5094] [cursor=pointer]:
+                      - img [ref=e5095]
+                  - generic "Use in chat" [ref=e5097]:
+                    - button [ref=e5098] [cursor=pointer]:
+                      - img [ref=e5099]
+            - row "Google Analytics - purchase - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled DEFAULT custom:google_analytics_purchase_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5101]:
+              - cell "Google Analytics - purchase - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled" [ref=e5102]:
+                - paragraph [ref=e5103]: Google Analytics - purchase - (404785443) GA4 - shell.co.kr - Shell (South Korea)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5104]
+              - cell [ref=e5105]
+              - cell [ref=e5106]
+              - cell [ref=e5107]
+              - cell "custom:google_analytics_purchase_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5108]:
+                - generic [ref=e5109]:
+                  - generic [ref=e5110]: custom:google_analytics_purchase_404785443_ga4_shell_co_kr_shell_south_korea
+                  - generic "Copy metric key" [ref=e5111]:
+                    - button [ref=e5112] [cursor=pointer]:
+                      - img [ref=e5113]
+                  - generic "Use in chat" [ref=e5115]:
+                    - button [ref=e5116] [cursor=pointer]:
+                      - img [ref=e5117]
+            - row "Google Analytics - form_start - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled DEFAULT custom:google_analytics_form_start_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5119]:
+              - cell "Google Analytics - form_start - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled" [ref=e5120]:
+                - paragraph [ref=e5121]: Google Analytics - form_start - (404785443) GA4 - shell.co.kr - Shell (South Korea)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5122]
+              - cell [ref=e5123]
+              - cell [ref=e5124]
+              - cell [ref=e5125]
+              - cell "custom:google_analytics_form_start_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5126]:
+                - generic [ref=e5127]:
+                  - generic [ref=e5128]: custom:google_analytics_form_start_404785443_ga4_shell_co_kr_shell_south_korea
+                  - generic "Copy metric key" [ref=e5129]:
+                    - button [ref=e5130] [cursor=pointer]:
+                      - img [ref=e5131]
+                  - generic "Use in chat" [ref=e5133]:
+                    - button [ref=e5134] [cursor=pointer]:
+                      - img [ref=e5135]
+            - row "Google Analytics - form_abandoned - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled DEFAULT custom:google_analytics_form_abandoned_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5137]:
+              - cell "Google Analytics - form_abandoned - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled" [ref=e5138]:
+                - paragraph [ref=e5139]: Google Analytics - form_abandoned - (404785443) GA4 - shell.co.kr - Shell (South Korea)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5140]
+              - cell [ref=e5141]
+              - cell [ref=e5142]
+              - cell [ref=e5143]
+              - cell "custom:google_analytics_form_abandoned_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5144]:
+                - generic [ref=e5145]:
+                  - generic [ref=e5146]: custom:google_analytics_form_abandoned_404785443_ga4_shell_co_kr_shell_south_korea
+                  - generic "Copy metric key" [ref=e5147]:
+                    - button [ref=e5148] [cursor=pointer]:
+                      - img [ref=e5149]
+                  - generic "Use in chat" [ref=e5151]:
+                    - button [ref=e5152] [cursor=pointer]:
+                      - img [ref=e5153]
+            - row "Google Analytics - file_downloaded - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled DEFAULT custom:google_analytics_file_downloaded_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5155]:
+              - cell "Google Analytics - file_downloaded - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled" [ref=e5156]:
+                - paragraph [ref=e5157]: Google Analytics - file_downloaded - (404785443) GA4 - shell.co.kr - Shell (South Korea)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5158]
+              - cell [ref=e5159]
+              - cell [ref=e5160]
+              - cell [ref=e5161]
+              - cell "custom:google_analytics_file_downloaded_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5162]:
+                - generic [ref=e5163]:
+                  - generic [ref=e5164]: custom:google_analytics_file_downloaded_404785443_ga4_shell_co_kr_shell_south_korea
+                  - generic "Copy metric key" [ref=e5165]:
+                    - button [ref=e5166] [cursor=pointer]:
+                      - img [ref=e5167]
+                  - generic "Use in chat" [ref=e5169]:
+                    - button [ref=e5170] [cursor=pointer]:
+                      - img [ref=e5171]
+            - row "Google Analytics - form_completed - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled DEFAULT custom:google_analytics_form_completed_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5173]:
+              - cell "Google Analytics - form_completed - (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled" [ref=e5174]:
+                - paragraph [ref=e5175]: Google Analytics - form_completed - (404785443) GA4 - shell.co.kr - Shell (South Korea)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5176]
+              - cell [ref=e5177]
+              - cell [ref=e5178]
+              - cell [ref=e5179]
+              - cell "custom:google_analytics_form_completed_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5180]:
+                - generic [ref=e5181]:
+                  - generic [ref=e5182]: custom:google_analytics_form_completed_404785443_ga4_shell_co_kr_shell_south_korea
+                  - generic "Copy metric key" [ref=e5183]:
+                    - button [ref=e5184] [cursor=pointer]:
+                      - img [ref=e5185]
+                  - generic "Use in chat" [ref=e5187]:
+                    - button [ref=e5188] [cursor=pointer]:
+                      - img [ref=e5189]
+            - row "DO_NOT_EDIT Google Analytics property (378760376) GA4 - shell.ch - Shell (Switzerland) enabled DEFAULT custom:do_not_edit_google_analytics_property_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5191]:
+              - cell "DO_NOT_EDIT Google Analytics property (378760376) GA4 - shell.ch - Shell (Switzerland) enabled" [ref=e5192]:
+                - paragraph [ref=e5193]: DO_NOT_EDIT Google Analytics property (378760376) GA4 - shell.ch - Shell (Switzerland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5194]
+              - cell [ref=e5195]
+              - cell [ref=e5196]
+              - cell [ref=e5197]
+              - cell "custom:do_not_edit_google_analytics_property_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5198]:
+                - generic [ref=e5199]:
+                  - generic [ref=e5200]: custom:do_not_edit_google_analytics_property_378760376_ga4_shell_ch_shell_switzerland
+                  - generic "Copy metric key" [ref=e5201]:
+                    - button [ref=e5202] [cursor=pointer]:
+                      - img [ref=e5203]
+                  - generic "Use in chat" [ref=e5205]:
+                    - button [ref=e5206] [cursor=pointer]:
+                      - img [ref=e5207]
+            - row "Google Analytics - purchase - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled DEFAULT custom:google_analytics_purchase_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5209]:
+              - cell "Google Analytics - purchase - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled" [ref=e5210]:
+                - paragraph [ref=e5211]: Google Analytics - purchase - (378760376) GA4 - shell.ch - Shell (Switzerland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5212]
+              - cell [ref=e5213]
+              - cell [ref=e5214]
+              - cell [ref=e5215]
+              - cell "custom:google_analytics_purchase_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5216]:
+                - generic [ref=e5217]:
+                  - generic [ref=e5218]: custom:google_analytics_purchase_378760376_ga4_shell_ch_shell_switzerland
+                  - generic "Copy metric key" [ref=e5219]:
+                    - button [ref=e5220] [cursor=pointer]:
+                      - img [ref=e5221]
+                  - generic "Use in chat" [ref=e5223]:
+                    - button [ref=e5224] [cursor=pointer]:
+                      - img [ref=e5225]
+            - row "Google Analytics - phone_number_click - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled DEFAULT custom:google_analytics_phone_number_click_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5227]:
+              - cell "Google Analytics - phone_number_click - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled" [ref=e5228]:
+                - paragraph [ref=e5229]: Google Analytics - phone_number_click - (378760376) GA4 - shell.ch - Shell (Switzerland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5230]
+              - cell [ref=e5231]
+              - cell [ref=e5232]
+              - cell [ref=e5233]
+              - cell "custom:google_analytics_phone_number_click_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5234]:
+                - generic [ref=e5235]:
+                  - generic [ref=e5236]: custom:google_analytics_phone_number_click_378760376_ga4_shell_ch_shell_switzerland
+                  - generic "Copy metric key" [ref=e5237]:
+                    - button [ref=e5238] [cursor=pointer]:
+                      - img [ref=e5239]
+                  - generic "Use in chat" [ref=e5241]:
+                    - button [ref=e5242] [cursor=pointer]:
+                      - img [ref=e5243]
+            - row "Google Analytics - form_abandoned - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled DEFAULT custom:google_analytics_form_abandoned_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5245]:
+              - cell "Google Analytics - form_abandoned - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled" [ref=e5246]:
+                - paragraph [ref=e5247]: Google Analytics - form_abandoned - (378760376) GA4 - shell.ch - Shell (Switzerland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5248]
+              - cell [ref=e5249]
+              - cell [ref=e5250]
+              - cell [ref=e5251]
+              - cell "custom:google_analytics_form_abandoned_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5252]:
+                - generic [ref=e5253]:
+                  - generic [ref=e5254]: custom:google_analytics_form_abandoned_378760376_ga4_shell_ch_shell_switzerland
+                  - generic "Copy metric key" [ref=e5255]:
+                    - button [ref=e5256] [cursor=pointer]:
+                      - img [ref=e5257]
+                  - generic "Use in chat" [ref=e5259]:
+                    - button [ref=e5260] [cursor=pointer]:
+                      - img [ref=e5261]
+            - row "Google Analytics - form_start - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled DEFAULT custom:google_analytics_form_start_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5263]:
+              - cell "Google Analytics - form_start - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled" [ref=e5264]:
+                - paragraph [ref=e5265]: Google Analytics - form_start - (378760376) GA4 - shell.ch - Shell (Switzerland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5266]
+              - cell [ref=e5267]
+              - cell [ref=e5268]
+              - cell [ref=e5269]
+              - cell "custom:google_analytics_form_start_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5270]:
+                - generic [ref=e5271]:
+                  - generic [ref=e5272]: custom:google_analytics_form_start_378760376_ga4_shell_ch_shell_switzerland
+                  - generic "Copy metric key" [ref=e5273]:
+                    - button [ref=e5274] [cursor=pointer]:
+                      - img [ref=e5275]
+                  - generic "Use in chat" [ref=e5277]:
+                    - button [ref=e5278] [cursor=pointer]:
+                      - img [ref=e5279]
+            - row "Google Analytics - form_completed - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled DEFAULT custom:google_analytics_form_completed_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5281]:
+              - cell "Google Analytics - form_completed - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled" [ref=e5282]:
+                - paragraph [ref=e5283]: Google Analytics - form_completed - (378760376) GA4 - shell.ch - Shell (Switzerland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5284]
+              - cell [ref=e5285]
+              - cell [ref=e5286]
+              - cell [ref=e5287]
+              - cell "custom:google_analytics_form_completed_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5288]:
+                - generic [ref=e5289]:
+                  - generic [ref=e5290]: custom:google_analytics_form_completed_378760376_ga4_shell_ch_shell_switzerland
+                  - generic "Copy metric key" [ref=e5291]:
+                    - button [ref=e5292] [cursor=pointer]:
+                      - img [ref=e5293]
+                  - generic "Use in chat" [ref=e5295]:
+                    - button [ref=e5296] [cursor=pointer]:
+                      - img [ref=e5297]
+            - row "Google Analytics - file_downloaded - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled DEFAULT custom:google_analytics_file_downloaded_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5299]:
+              - cell "Google Analytics - file_downloaded - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled" [ref=e5300]:
+                - paragraph [ref=e5301]: Google Analytics - file_downloaded - (378760376) GA4 - shell.ch - Shell (Switzerland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5302]
+              - cell [ref=e5303]
+              - cell [ref=e5304]
+              - cell [ref=e5305]
+              - cell "custom:google_analytics_file_downloaded_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5306]:
+                - generic [ref=e5307]:
+                  - generic [ref=e5308]: custom:google_analytics_file_downloaded_378760376_ga4_shell_ch_shell_switzerland
+                  - generic "Copy metric key" [ref=e5309]:
+                    - button [ref=e5310] [cursor=pointer]:
+                      - img [ref=e5311]
+                  - generic "Use in chat" [ref=e5313]:
+                    - button [ref=e5314] [cursor=pointer]:
+                      - img [ref=e5315]
+            - row "Google Analytics - download_the_app_widget - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled DEFAULT custom:google_analytics_download_the_app_widget_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5317]:
+              - cell "Google Analytics - download_the_app_widget - (378760376) GA4 - shell.ch - Shell (Switzerland) enabled" [ref=e5318]:
+                - paragraph [ref=e5319]: Google Analytics - download_the_app_widget - (378760376) GA4 - shell.ch - Shell (Switzerland)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5320]
+              - cell [ref=e5321]
+              - cell [ref=e5322]
+              - cell [ref=e5323]
+              - cell "custom:google_analytics_download_the_app_widget_378760376_ga4_shell_ch_shell_switzerland Copy metric key Use in chat" [ref=e5324]:
+                - generic [ref=e5325]:
+                  - generic [ref=e5326]: custom:google_analytics_download_the_app_widget_378760376_ga4_shell_ch_shell_switzerland
+                  - generic "Copy metric key" [ref=e5327]:
+                    - button [ref=e5328] [cursor=pointer]:
+                      - img [ref=e5329]
+                  - generic "Use in chat" [ref=e5331]:
+                    - button [ref=e5332] [cursor=pointer]:
+                      - img [ref=e5333]
+            - row "DO_NOT_EDIT Google Analytics property (378678895) GA4 - shell.hu - Shell (Hungary) enabled DEFAULT custom:do_not_edit_google_analytics_property_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e5335]:
+              - cell "DO_NOT_EDIT Google Analytics property (378678895) GA4 - shell.hu - Shell (Hungary) enabled" [ref=e5336]:
+                - paragraph [ref=e5337]: DO_NOT_EDIT Google Analytics property (378678895) GA4 - shell.hu - Shell (Hungary)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5338]
+              - cell [ref=e5339]
+              - cell [ref=e5340]
+              - cell [ref=e5341]
+              - cell "custom:do_not_edit_google_analytics_property_378678895_ga4_shell_hu_shell_hungary Copy metric key Use in chat" [ref=e5342]:
+                - generic [ref=e5343]:
+                  - generic [ref=e5344]: custom:do_not_edit_google_analytics_property_378678895_ga4_shell_hu_shell_hungary
+                  - generic "Copy metric key" [ref=e5345]:
+                    - button [ref=e5346] [cursor=pointer]:
+                      - img [ref=e5347]
+                  - generic "Use in chat" [ref=e5349]:
+                    - button [ref=e5350] [cursor=pointer]:
+                      - img [ref=e5351]
+            - row "Google Analytics - purchase - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled DEFAULT custom:google_analytics_purchase_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5353]:
+              - cell "Google Analytics - purchase - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled" [ref=e5354]:
+                - paragraph [ref=e5355]: Google Analytics - purchase - (379030167) GA4 - shell.co.id - Shell (Indonesia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5356]
+              - cell [ref=e5357]
+              - cell [ref=e5358]
+              - cell [ref=e5359]
+              - cell "custom:google_analytics_purchase_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5360]:
+                - generic [ref=e5361]:
+                  - generic [ref=e5362]: custom:google_analytics_purchase_379030167_ga4_shell_co_id_shell_indonesia
+                  - generic "Copy metric key" [ref=e5363]:
+                    - button [ref=e5364] [cursor=pointer]:
+                      - img [ref=e5365]
+                  - generic "Use in chat" [ref=e5367]:
+                    - button [ref=e5368] [cursor=pointer]:
+                      - img [ref=e5369]
+            - row "Google Analytics - phone_number_click - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled DEFAULT custom:google_analytics_phone_number_click_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5371]:
+              - cell "Google Analytics - phone_number_click - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled" [ref=e5372]:
+                - paragraph [ref=e5373]: Google Analytics - phone_number_click - (379030167) GA4 - shell.co.id - Shell (Indonesia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5374]
+              - cell [ref=e5375]
+              - cell [ref=e5376]
+              - cell [ref=e5377]
+              - cell "custom:google_analytics_phone_number_click_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5378]:
+                - generic [ref=e5379]:
+                  - generic [ref=e5380]: custom:google_analytics_phone_number_click_379030167_ga4_shell_co_id_shell_indonesia
+                  - generic "Copy metric key" [ref=e5381]:
+                    - button [ref=e5382] [cursor=pointer]:
+                      - img [ref=e5383]
+                  - generic "Use in chat" [ref=e5385]:
+                    - button [ref=e5386] [cursor=pointer]:
+                      - img [ref=e5387]
+            - row "Google Analytics - file_downloaded - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled DEFAULT custom:google_analytics_file_downloaded_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5389]:
+              - cell "Google Analytics - file_downloaded - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled" [ref=e5390]:
+                - paragraph [ref=e5391]: Google Analytics - file_downloaded - (379030167) GA4 - shell.co.id - Shell (Indonesia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5392]
+              - cell [ref=e5393]
+              - cell [ref=e5394]
+              - cell [ref=e5395]
+              - cell "custom:google_analytics_file_downloaded_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5396]:
+                - generic [ref=e5397]:
+                  - generic [ref=e5398]: custom:google_analytics_file_downloaded_379030167_ga4_shell_co_id_shell_indonesia
+                  - generic "Copy metric key" [ref=e5399]:
+                    - button [ref=e5400] [cursor=pointer]:
+                      - img [ref=e5401]
+                  - generic "Use in chat" [ref=e5403]:
+                    - button [ref=e5404] [cursor=pointer]:
+                      - img [ref=e5405]
+            - row "Google Analytics - form_start - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled DEFAULT custom:google_analytics_form_start_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5407]:
+              - cell "Google Analytics - form_start - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled" [ref=e5408]:
+                - paragraph [ref=e5409]: Google Analytics - form_start - (379030167) GA4 - shell.co.id - Shell (Indonesia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5410]
+              - cell [ref=e5411]
+              - cell [ref=e5412]
+              - cell [ref=e5413]
+              - cell "custom:google_analytics_form_start_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5414]:
+                - generic [ref=e5415]:
+                  - generic [ref=e5416]: custom:google_analytics_form_start_379030167_ga4_shell_co_id_shell_indonesia
+                  - generic "Copy metric key" [ref=e5417]:
+                    - button [ref=e5418] [cursor=pointer]:
+                      - img [ref=e5419]
+                  - generic "Use in chat" [ref=e5421]:
+                    - button [ref=e5422] [cursor=pointer]:
+                      - img [ref=e5423]
+            - row "Google Analytics - form_abandoned - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled DEFAULT custom:google_analytics_form_abandoned_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5425]:
+              - cell "Google Analytics - form_abandoned - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled" [ref=e5426]:
+                - paragraph [ref=e5427]: Google Analytics - form_abandoned - (379030167) GA4 - shell.co.id - Shell (Indonesia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5428]
+              - cell [ref=e5429]
+              - cell [ref=e5430]
+              - cell [ref=e5431]
+              - cell "custom:google_analytics_form_abandoned_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5432]:
+                - generic [ref=e5433]:
+                  - generic [ref=e5434]: custom:google_analytics_form_abandoned_379030167_ga4_shell_co_id_shell_indonesia
+                  - generic "Copy metric key" [ref=e5435]:
+                    - button [ref=e5436] [cursor=pointer]:
+                      - img [ref=e5437]
+                  - generic "Use in chat" [ref=e5439]:
+                    - button [ref=e5440] [cursor=pointer]:
+                      - img [ref=e5441]
+            - row "Google Analytics - form_completed - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled DEFAULT custom:google_analytics_form_completed_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5443]:
+              - cell "Google Analytics - form_completed - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled" [ref=e5444]:
+                - paragraph [ref=e5445]: Google Analytics - form_completed - (379030167) GA4 - shell.co.id - Shell (Indonesia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5446]
+              - cell [ref=e5447]
+              - cell [ref=e5448]
+              - cell [ref=e5449]
+              - cell "custom:google_analytics_form_completed_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5450]:
+                - generic [ref=e5451]:
+                  - generic [ref=e5452]: custom:google_analytics_form_completed_379030167_ga4_shell_co_id_shell_indonesia
+                  - generic "Copy metric key" [ref=e5453]:
+                    - button [ref=e5454] [cursor=pointer]:
+                      - img [ref=e5455]
+                  - generic "Use in chat" [ref=e5457]:
+                    - button [ref=e5458] [cursor=pointer]:
+                      - img [ref=e5459]
+            - row "Google Analytics - download_the_app_widget - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled DEFAULT custom:google_analytics_download_the_app_widget_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5461]:
+              - cell "Google Analytics - download_the_app_widget - (379030167) GA4 - shell.co.id - Shell (Indonesia) enabled" [ref=e5462]:
+                - paragraph [ref=e5463]: Google Analytics - download_the_app_widget - (379030167) GA4 - shell.co.id - Shell (Indonesia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5464]
+              - cell [ref=e5465]
+              - cell [ref=e5466]
+              - cell [ref=e5467]
+              - cell "custom:google_analytics_download_the_app_widget_379030167_ga4_shell_co_id_shell_indonesia Copy metric key Use in chat" [ref=e5468]:
+                - generic [ref=e5469]:
+                  - generic [ref=e5470]: custom:google_analytics_download_the_app_widget_379030167_ga4_shell_co_id_shell_indonesia
+                  - generic "Copy metric key" [ref=e5471]:
+                    - button [ref=e5472] [cursor=pointer]:
+                      - img [ref=e5473]
+                  - generic "Use in chat" [ref=e5475]:
+                    - button [ref=e5476] [cursor=pointer]:
+                      - img [ref=e5477]
+            - row "Google Analytics - purchase - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_purchase_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5479]:
+              - cell "Google Analytics - purchase - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5480]:
+                - paragraph [ref=e5481]: Google Analytics - purchase - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5482]
+              - cell [ref=e5483]
+              - cell [ref=e5484]
+              - cell [ref=e5485]
+              - cell "custom:google_analytics_purchase_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5486]:
+                - generic [ref=e5487]:
+                  - generic [ref=e5488]: custom:google_analytics_purchase_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5489]:
+                    - button [ref=e5490] [cursor=pointer]:
+                      - img [ref=e5491]
+                  - generic "Use in chat" [ref=e5493]:
+                    - button [ref=e5494] [cursor=pointer]:
+                      - img [ref=e5495]
+            - row "Google Analytics - user_engagement - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_user_engagement_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5497]:
+              - cell "Google Analytics - user_engagement - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5498]:
+                - paragraph [ref=e5499]: Google Analytics - user_engagement - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5500]
+              - cell [ref=e5501]
+              - cell [ref=e5502]
+              - cell [ref=e5503]
+              - cell "custom:google_analytics_user_engagement_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5504]:
+                - generic [ref=e5505]:
+                  - generic [ref=e5506]: custom:google_analytics_user_engagement_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5507]:
+                    - button [ref=e5508] [cursor=pointer]:
+                      - img [ref=e5509]
+                  - generic "Use in chat" [ref=e5511]:
+                    - button [ref=e5512] [cursor=pointer]:
+                      - img [ref=e5513]
+            - row "Google Analytics - station_search - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_station_search_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5515]:
+              - cell "Google Analytics - station_search - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5516]:
+                - paragraph [ref=e5517]: Google Analytics - station_search - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5518]
+              - cell [ref=e5519]
+              - cell [ref=e5520]
+              - cell [ref=e5521]
+              - cell "custom:google_analytics_station_search_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5522]:
+                - generic [ref=e5523]:
+                  - generic [ref=e5524]: custom:google_analytics_station_search_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5525]:
+                    - button [ref=e5526] [cursor=pointer]:
+                      - img [ref=e5527]
+                  - generic "Use in chat" [ref=e5529]:
+                    - button [ref=e5530] [cursor=pointer]:
+                      - img [ref=e5531]
+            - row "Google Analytics - send_directions_to_phone - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_send_directions_to_phone_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5533]:
+              - cell "Google Analytics - send_directions_to_phone - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5534]:
+                - paragraph [ref=e5535]: Google Analytics - send_directions_to_phone - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5536]
+              - cell [ref=e5537]
+              - cell [ref=e5538]
+              - cell [ref=e5539]
+              - cell "custom:google_analytics_send_directions_to_phone_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5540]:
+                - generic [ref=e5541]:
+                  - generic [ref=e5542]: custom:google_analytics_send_directions_to_phone_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5543]:
+                    - button [ref=e5544] [cursor=pointer]:
+                      - img [ref=e5545]
+                  - generic "Use in chat" [ref=e5547]:
+                    - button [ref=e5548] [cursor=pointer]:
+                      - img [ref=e5549]
+            - row "Google Analytics - plan_route - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_plan_route_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5551]:
+              - cell "Google Analytics - plan_route - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5552]:
+                - paragraph [ref=e5553]: Google Analytics - plan_route - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5554]
+              - cell [ref=e5555]
+              - cell [ref=e5556]
+              - cell [ref=e5557]
+              - cell "custom:google_analytics_plan_route_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5558]:
+                - generic [ref=e5559]:
+                  - generic [ref=e5560]: custom:google_analytics_plan_route_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5561]:
+                    - button [ref=e5562] [cursor=pointer]:
+                      - img [ref=e5563]
+                  - generic "Use in chat" [ref=e5565]:
+                    - button [ref=e5566] [cursor=pointer]:
+                      - img [ref=e5567]
+            - row "Google Analytics - app_stores_click_out - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_app_stores_click_out_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5569]:
+              - cell "Google Analytics - app_stores_click_out - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5570]:
+                - paragraph [ref=e5571]: Google Analytics - app_stores_click_out - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5572]
+              - cell [ref=e5573]
+              - cell [ref=e5574]
+              - cell [ref=e5575]
+              - cell "custom:google_analytics_app_stores_click_out_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5576]:
+                - generic [ref=e5577]:
+                  - generic [ref=e5578]: custom:google_analytics_app_stores_click_out_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5579]:
+                    - button [ref=e5580] [cursor=pointer]:
+                      - img [ref=e5581]
+                  - generic "Use in chat" [ref=e5583]:
+                    - button [ref=e5584] [cursor=pointer]:
+                      - img [ref=e5585]
+            - row "Google Analytics - TOS15 - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_tos15_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5587]:
+              - cell "Google Analytics - TOS15 - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5588]:
+                - paragraph [ref=e5589]: Google Analytics - TOS15 - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5590]
+              - cell [ref=e5591]
+              - cell [ref=e5592]
+              - cell [ref=e5593]
+              - cell "custom:google_analytics_tos15_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5594]:
+                - generic [ref=e5595]:
+                  - generic [ref=e5596]: custom:google_analytics_tos15_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5597]:
+                    - button [ref=e5598] [cursor=pointer]:
+                      - img [ref=e5599]
+                  - generic "Use in chat" [ref=e5601]:
+                    - button [ref=e5602] [cursor=pointer]:
+                      - img [ref=e5603]
+            - row "Google Analytics - TOS30 - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_tos30_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5605]:
+              - cell "Google Analytics - TOS30 - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5606]:
+                - paragraph [ref=e5607]: Google Analytics - TOS30 - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5608]
+              - cell [ref=e5609]
+              - cell [ref=e5610]
+              - cell [ref=e5611]
+              - cell "custom:google_analytics_tos30_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5612]:
+                - generic [ref=e5613]:
+                  - generic [ref=e5614]: custom:google_analytics_tos30_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5615]:
+                    - button [ref=e5616] [cursor=pointer]:
+                      - img [ref=e5617]
+                  - generic "Use in chat" [ref=e5619]:
+                    - button [ref=e5620] [cursor=pointer]:
+                      - img [ref=e5621]
+            - row "Google Analytics - TOS10 - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_tos10_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5623]:
+              - cell "Google Analytics - TOS10 - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5624]:
+                - paragraph [ref=e5625]: Google Analytics - TOS10 - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5626]
+              - cell [ref=e5627]
+              - cell [ref=e5628]
+              - cell [ref=e5629]
+              - cell "custom:google_analytics_tos10_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5630]:
+                - generic [ref=e5631]:
+                  - generic [ref=e5632]: custom:google_analytics_tos10_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5633]:
+                    - button [ref=e5634] [cursor=pointer]:
+                      - img [ref=e5635]
+                  - generic "Use in chat" [ref=e5637]:
+                    - button [ref=e5638] [cursor=pointer]:
+                      - img [ref=e5639]
+            - row "Google Analytics - form_completed - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_form_completed_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5641]:
+              - cell "Google Analytics - form_completed - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5642]:
+                - paragraph [ref=e5643]: Google Analytics - form_completed - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5644]
+              - cell [ref=e5645]
+              - cell [ref=e5646]
+              - cell [ref=e5647]
+              - cell "custom:google_analytics_form_completed_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5648]:
+                - generic [ref=e5649]:
+                  - generic [ref=e5650]: custom:google_analytics_form_completed_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5651]:
+                    - button [ref=e5652] [cursor=pointer]:
+                      - img [ref=e5653]
+                  - generic "Use in chat" [ref=e5655]:
+                    - button [ref=e5656] [cursor=pointer]:
+                      - img [ref=e5657]
+            - row "Google Analytics - site_click_30_voertuigen_of_meer - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_site_click_30_voertuigen_of_meer_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5659]:
+              - cell "Google Analytics - site_click_30_voertuigen_of_meer - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5660]:
+                - paragraph [ref=e5661]: Google Analytics - site_click_30_voertuigen_of_meer - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5662]
+              - cell [ref=e5663]
+              - cell [ref=e5664]
+              - cell [ref=e5665]
+              - cell "custom:google_analytics_site_click_30_voertuigen_of_meer_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5666]:
+                - generic [ref=e5667]:
+                  - generic [ref=e5668]: custom:google_analytics_site_click_30_voertuigen_of_meer_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5669]:
+                    - button [ref=e5670] [cursor=pointer]:
+                      - img [ref=e5671]
+                  - generic "Use in chat" [ref=e5673]:
+                    - button [ref=e5674] [cursor=pointer]:
+                      - img [ref=e5675]
+            - row "Google Analytics - site_click_tot_30_voertuigen - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_site_click_tot_30_voertuigen_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5677]:
+              - cell "Google Analytics - site_click_tot_30_voertuigen - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5678]:
+                - paragraph [ref=e5679]: Google Analytics - site_click_tot_30_voertuigen - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5680]
+              - cell [ref=e5681]
+              - cell [ref=e5682]
+              - cell [ref=e5683]
+              - cell "custom:google_analytics_site_click_tot_30_voertuigen_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5684]:
+                - generic [ref=e5685]:
+                  - generic [ref=e5686]: custom:google_analytics_site_click_tot_30_voertuigen_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5687]:
+                    - button [ref=e5688] [cursor=pointer]:
+                      - img [ref=e5689]
+                  - generic "Use in chat" [ref=e5691]:
+                    - button [ref=e5692] [cursor=pointer]:
+                      - img [ref=e5693]
+            - row "Google Analytics - file_downloaded - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_file_downloaded_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5695]:
+              - cell "Google Analytics - file_downloaded - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5696]:
+                - paragraph [ref=e5697]: Google Analytics - file_downloaded - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5698]
+              - cell [ref=e5699]
+              - cell [ref=e5700]
+              - cell [ref=e5701]
+              - cell "custom:google_analytics_file_downloaded_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5702]:
+                - generic [ref=e5703]:
+                  - generic [ref=e5704]: custom:google_analytics_file_downloaded_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5705]:
+                    - button [ref=e5706] [cursor=pointer]:
+                      - img [ref=e5707]
+                  - generic "Use in chat" [ref=e5709]:
+                    - button [ref=e5710] [cursor=pointer]:
+                      - img [ref=e5711]
+            - row "Google Analytics - form_start - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_form_start_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5713]:
+              - cell "Google Analytics - form_start - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5714]:
+                - paragraph [ref=e5715]: Google Analytics - form_start - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5716]
+              - cell [ref=e5717]
+              - cell [ref=e5718]
+              - cell [ref=e5719]
+              - cell "custom:google_analytics_form_start_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5720]:
+                - generic [ref=e5721]:
+                  - generic [ref=e5722]: custom:google_analytics_form_start_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5723]:
+                    - button [ref=e5724] [cursor=pointer]:
+                      - img [ref=e5725]
+                  - generic "Use in chat" [ref=e5727]:
+                    - button [ref=e5728] [cursor=pointer]:
+                      - img [ref=e5729]
+            - row "Google Analytics - phone_number_click - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_phone_number_click_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5731]:
+              - cell "Google Analytics - phone_number_click - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5732]:
+                - paragraph [ref=e5733]: Google Analytics - phone_number_click - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5734]
+              - cell [ref=e5735]
+              - cell [ref=e5736]
+              - cell [ref=e5737]
+              - cell "custom:google_analytics_phone_number_click_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5738]:
+                - generic [ref=e5739]:
+                  - generic [ref=e5740]: custom:google_analytics_phone_number_click_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5741]:
+                    - button [ref=e5742] [cursor=pointer]:
+                      - img [ref=e5743]
+                  - generic "Use in chat" [ref=e5745]:
+                    - button [ref=e5746] [cursor=pointer]:
+                      - img [ref=e5747]
+            - row "Google Analytics - form_abandoned - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_form_abandoned_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5749]:
+              - cell "Google Analytics - form_abandoned - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5750]:
+                - paragraph [ref=e5751]: Google Analytics - form_abandoned - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5752]
+              - cell [ref=e5753]
+              - cell [ref=e5754]
+              - cell [ref=e5755]
+              - cell "custom:google_analytics_form_abandoned_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5756]:
+                - generic [ref=e5757]:
+                  - generic [ref=e5758]: custom:google_analytics_form_abandoned_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5759]:
+                    - button [ref=e5760] [cursor=pointer]:
+                      - img [ref=e5761]
+                  - generic "Use in chat" [ref=e5763]:
+                    - button [ref=e5764] [cursor=pointer]:
+                      - img [ref=e5765]
+            - row "Google Analytics - download_the_app_widget - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled DEFAULT custom:google_analytics_download_the_app_widget_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5767]:
+              - cell "Google Analytics - download_the_app_widget - (369087348) GA4 - shell.nl - Shell (Netherlands) enabled" [ref=e5768]:
+                - paragraph [ref=e5769]: Google Analytics - download_the_app_widget - (369087348) GA4 - shell.nl - Shell (Netherlands)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5770]
+              - cell [ref=e5771]
+              - cell [ref=e5772]
+              - cell [ref=e5773]
+              - cell "custom:google_analytics_download_the_app_widget_369087348_ga4_shell_nl_shell_netherlands Copy metric key Use in chat" [ref=e5774]:
+                - generic [ref=e5775]:
+                  - generic [ref=e5776]: custom:google_analytics_download_the_app_widget_369087348_ga4_shell_nl_shell_netherlands
+                  - generic "Copy metric key" [ref=e5777]:
+                    - button [ref=e5778] [cursor=pointer]:
+                      - img [ref=e5779]
+                  - generic "Use in chat" [ref=e5781]:
+                    - button [ref=e5782] [cursor=pointer]:
+                      - img [ref=e5783]
+            - row "DO_NOT_EDIT Google Analytics property (378731462) GA4 - shell.sk - Shell (Slovakia) enabled DEFAULT custom:do_not_edit_google_analytics_property_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e5785]:
+              - cell "DO_NOT_EDIT Google Analytics property (378731462) GA4 - shell.sk - Shell (Slovakia) enabled" [ref=e5786]:
+                - paragraph [ref=e5787]: DO_NOT_EDIT Google Analytics property (378731462) GA4 - shell.sk - Shell (Slovakia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5788]
+              - cell [ref=e5789]
+              - cell [ref=e5790]
+              - cell [ref=e5791]
+              - cell "custom:do_not_edit_google_analytics_property_378731462_ga4_shell_sk_shell_slovakia Copy metric key Use in chat" [ref=e5792]:
+                - generic [ref=e5793]:
+                  - generic [ref=e5794]: custom:do_not_edit_google_analytics_property_378731462_ga4_shell_sk_shell_slovakia
+                  - generic "Copy metric key" [ref=e5795]:
+                    - button [ref=e5796] [cursor=pointer]:
+                      - img [ref=e5797]
+                  - generic "Use in chat" [ref=e5799]:
+                    - button [ref=e5800] [cursor=pointer]:
+                      - img [ref=e5801]
+            - row "Google Analytics - purchase - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT custom:google_analytics_purchase_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e5803]:
+              - cell "Google Analytics - purchase - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e5804]:
+                - paragraph [ref=e5805]: Google Analytics - purchase - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5806]
+              - cell [ref=e5807]
+              - cell [ref=e5808]
+              - cell [ref=e5809]
+              - cell "custom:google_analytics_purchase_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e5810]:
+                - generic [ref=e5811]:
+                  - generic [ref=e5812]: custom:google_analytics_purchase_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e5813]:
+                    - button [ref=e5814] [cursor=pointer]:
+                      - img [ref=e5815]
+                  - generic "Use in chat" [ref=e5817]:
+                    - button [ref=e5818] [cursor=pointer]:
+                      - img [ref=e5819]
+            - row "Google Analytics - phone_number_click - (342943257) GA4 - shell.us - Shell (United States of America) enabled DEFAULT custom:google_analytics_phone_number_click_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e5821]:
+              - cell "Google Analytics - phone_number_click - (342943257) GA4 - shell.us - Shell (United States of America) enabled" [ref=e5822]:
+                - paragraph [ref=e5823]: Google Analytics - phone_number_click - (342943257) GA4 - shell.us - Shell (United States of America)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5824]
+              - cell [ref=e5825]
+              - cell [ref=e5826]
+              - cell [ref=e5827]
+              - cell "custom:google_analytics_phone_number_click_342943257_ga4_shell_us_shell_united_states_of_america Copy metric key Use in chat" [ref=e5828]:
+                - generic [ref=e5829]:
+                  - generic [ref=e5830]: custom:google_analytics_phone_number_click_342943257_ga4_shell_us_shell_united_states_of_america
+                  - generic "Copy metric key" [ref=e5831]:
+                    - button [ref=e5832] [cursor=pointer]:
+                      - img [ref=e5833]
+                  - generic "Use in chat" [ref=e5835]:
+                    - button [ref=e5836] [cursor=pointer]:
+                      - img [ref=e5837]
+            - row "DO_NOT_EDIT Google Analytics property (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled DEFAULT custom:do_not_edit_google_analytics_property_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5839]:
+              - cell "DO_NOT_EDIT Google Analytics property (404785443) GA4 - shell.co.kr - Shell (South Korea) enabled" [ref=e5840]:
+                - paragraph [ref=e5841]: DO_NOT_EDIT Google Analytics property (404785443) GA4 - shell.co.kr - Shell (South Korea)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5842]
+              - cell [ref=e5843]
+              - cell [ref=e5844]
+              - cell [ref=e5845]
+              - cell "custom:do_not_edit_google_analytics_property_404785443_ga4_shell_co_kr_shell_south_korea Copy metric key Use in chat" [ref=e5846]:
+                - generic [ref=e5847]:
+                  - generic [ref=e5848]: custom:do_not_edit_google_analytics_property_404785443_ga4_shell_co_kr_shell_south_korea
+                  - generic "Copy metric key" [ref=e5849]:
+                    - button [ref=e5850] [cursor=pointer]:
+                      - img [ref=e5851]
+                  - generic "Use in chat" [ref=e5853]:
+                    - button [ref=e5854] [cursor=pointer]:
+                      - img [ref=e5855]
+            - row "Google Analytics - purchase - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_purchase_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5857]:
+              - cell "Google Analytics - purchase - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e5858]:
+                - paragraph [ref=e5859]: Google Analytics - purchase - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5860]
+              - cell [ref=e5861]
+              - cell [ref=e5862]
+              - cell [ref=e5863]
+              - cell "custom:google_analytics_purchase_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5864]:
+                - generic [ref=e5865]:
+                  - generic [ref=e5866]: custom:google_analytics_purchase_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e5867]:
+                    - button [ref=e5868] [cursor=pointer]:
+                      - img [ref=e5869]
+                  - generic "Use in chat" [ref=e5871]:
+                    - button [ref=e5872] [cursor=pointer]:
+                      - img [ref=e5873]
+            - row "Google Analytics - phone_number_click - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_phone_number_click_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5875]:
+              - cell "Google Analytics - phone_number_click - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e5876]:
+                - paragraph [ref=e5877]: Google Analytics - phone_number_click - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5878]
+              - cell [ref=e5879]
+              - cell [ref=e5880]
+              - cell [ref=e5881]
+              - cell "custom:google_analytics_phone_number_click_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5882]:
+                - generic [ref=e5883]:
+                  - generic [ref=e5884]: custom:google_analytics_phone_number_click_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e5885]:
+                    - button [ref=e5886] [cursor=pointer]:
+                      - img [ref=e5887]
+                  - generic "Use in chat" [ref=e5889]:
+                    - button [ref=e5890] [cursor=pointer]:
+                      - img [ref=e5891]
+            - row "Google Analytics - form_completed - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_form_completed_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5893]:
+              - cell "Google Analytics - form_completed - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e5894]:
+                - paragraph [ref=e5895]: Google Analytics - form_completed - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5896]
+              - cell [ref=e5897]
+              - cell [ref=e5898]
+              - cell [ref=e5899]
+              - cell "custom:google_analytics_form_completed_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5900]:
+                - generic [ref=e5901]:
+                  - generic [ref=e5902]: custom:google_analytics_form_completed_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e5903]:
+                    - button [ref=e5904] [cursor=pointer]:
+                      - img [ref=e5905]
+                  - generic "Use in chat" [ref=e5907]:
+                    - button [ref=e5908] [cursor=pointer]:
+                      - img [ref=e5909]
+            - row "Google Analytics - form_abandoned - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_form_abandoned_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5911]:
+              - cell "Google Analytics - form_abandoned - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e5912]:
+                - paragraph [ref=e5913]: Google Analytics - form_abandoned - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5914]
+              - cell [ref=e5915]
+              - cell [ref=e5916]
+              - cell [ref=e5917]
+              - cell "custom:google_analytics_form_abandoned_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5918]:
+                - generic [ref=e5919]:
+                  - generic [ref=e5920]: custom:google_analytics_form_abandoned_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e5921]:
+                    - button [ref=e5922] [cursor=pointer]:
+                      - img [ref=e5923]
+                  - generic "Use in chat" [ref=e5925]:
+                    - button [ref=e5926] [cursor=pointer]:
+                      - img [ref=e5927]
+            - row "Google Analytics - form_start - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_form_start_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5929]:
+              - cell "Google Analytics - form_start - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e5930]:
+                - paragraph [ref=e5931]: Google Analytics - form_start - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5932]
+              - cell [ref=e5933]
+              - cell [ref=e5934]
+              - cell [ref=e5935]
+              - cell "custom:google_analytics_form_start_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5936]:
+                - generic [ref=e5937]:
+                  - generic [ref=e5938]: custom:google_analytics_form_start_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e5939]:
+                    - button [ref=e5940] [cursor=pointer]:
+                      - img [ref=e5941]
+                  - generic "Use in chat" [ref=e5943]:
+                    - button [ref=e5944] [cursor=pointer]:
+                      - img [ref=e5945]
+            - row "Google Analytics - file_downloaded - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_file_downloaded_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5947]:
+              - cell "Google Analytics - file_downloaded - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e5948]:
+                - paragraph [ref=e5949]: Google Analytics - file_downloaded - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5950]
+              - cell [ref=e5951]
+              - cell [ref=e5952]
+              - cell [ref=e5953]
+              - cell "custom:google_analytics_file_downloaded_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5954]:
+                - generic [ref=e5955]:
+                  - generic [ref=e5956]: custom:google_analytics_file_downloaded_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e5957]:
+                    - button [ref=e5958] [cursor=pointer]:
+                      - img [ref=e5959]
+                  - generic "Use in chat" [ref=e5961]:
+                    - button [ref=e5962] [cursor=pointer]:
+                      - img [ref=e5963]
+            - row "Google Analytics - download_the_app_widget - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_download_the_app_widget_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5965]:
+              - cell "Google Analytics - download_the_app_widget - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e5966]:
+                - paragraph [ref=e5967]: Google Analytics - download_the_app_widget - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5968]
+              - cell [ref=e5969]
+              - cell [ref=e5970]
+              - cell [ref=e5971]
+              - cell "custom:google_analytics_download_the_app_widget_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e5972]:
+                - generic [ref=e5973]:
+                  - generic [ref=e5974]: custom:google_analytics_download_the_app_widget_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e5975]:
+                    - button [ref=e5976] [cursor=pointer]:
+                      - img [ref=e5977]
+                  - generic "Use in chat" [ref=e5979]:
+                    - button [ref=e5980] [cursor=pointer]:
+                      - img [ref=e5981]
+            - row "Google Analytics - purchase - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled DEFAULT custom:google_analytics_purchase_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e5983]:
+              - cell "Google Analytics - purchase - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled" [ref=e5984]:
+                - paragraph [ref=e5985]: Google Analytics - purchase - (379066446) GA4 - shell.com.sg - Shell (Singapore)
+                - text: enabled
+              - cell "DEFAULT" [ref=e5986]
+              - cell [ref=e5987]
+              - cell [ref=e5988]
+              - cell [ref=e5989]
+              - cell "custom:google_analytics_purchase_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e5990]:
+                - generic [ref=e5991]:
+                  - generic [ref=e5992]: custom:google_analytics_purchase_379066446_ga4_shell_com_sg_shell_singapore
+                  - generic "Copy metric key" [ref=e5993]:
+                    - button [ref=e5994] [cursor=pointer]:
+                      - img [ref=e5995]
+                  - generic "Use in chat" [ref=e5997]:
+                    - button [ref=e5998] [cursor=pointer]:
+                      - img [ref=e5999]
+            - row "Google Analytics - file_downloaded - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled DEFAULT custom:google_analytics_file_downloaded_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6001]:
+              - cell "Google Analytics - file_downloaded - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled" [ref=e6002]:
+                - paragraph [ref=e6003]: Google Analytics - file_downloaded - (379066446) GA4 - shell.com.sg - Shell (Singapore)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6004]
+              - cell [ref=e6005]
+              - cell [ref=e6006]
+              - cell [ref=e6007]
+              - cell "custom:google_analytics_file_downloaded_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6008]:
+                - generic [ref=e6009]:
+                  - generic [ref=e6010]: custom:google_analytics_file_downloaded_379066446_ga4_shell_com_sg_shell_singapore
+                  - generic "Copy metric key" [ref=e6011]:
+                    - button [ref=e6012] [cursor=pointer]:
+                      - img [ref=e6013]
+                  - generic "Use in chat" [ref=e6015]:
+                    - button [ref=e6016] [cursor=pointer]:
+                      - img [ref=e6017]
+            - row "Google Analytics - form_abandoned - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled DEFAULT custom:google_analytics_form_abandoned_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6019]:
+              - cell "Google Analytics - form_abandoned - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled" [ref=e6020]:
+                - paragraph [ref=e6021]: Google Analytics - form_abandoned - (379066446) GA4 - shell.com.sg - Shell (Singapore)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6022]
+              - cell [ref=e6023]
+              - cell [ref=e6024]
+              - cell [ref=e6025]
+              - cell "custom:google_analytics_form_abandoned_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6026]:
+                - generic [ref=e6027]:
+                  - generic [ref=e6028]: custom:google_analytics_form_abandoned_379066446_ga4_shell_com_sg_shell_singapore
+                  - generic "Copy metric key" [ref=e6029]:
+                    - button [ref=e6030] [cursor=pointer]:
+                      - img [ref=e6031]
+                  - generic "Use in chat" [ref=e6033]:
+                    - button [ref=e6034] [cursor=pointer]:
+                      - img [ref=e6035]
+            - row "Google Analytics - form_start - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled DEFAULT custom:google_analytics_form_start_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6037]:
+              - cell "Google Analytics - form_start - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled" [ref=e6038]:
+                - paragraph [ref=e6039]: Google Analytics - form_start - (379066446) GA4 - shell.com.sg - Shell (Singapore)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6040]
+              - cell [ref=e6041]
+              - cell [ref=e6042]
+              - cell [ref=e6043]
+              - cell "custom:google_analytics_form_start_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6044]:
+                - generic [ref=e6045]:
+                  - generic [ref=e6046]: custom:google_analytics_form_start_379066446_ga4_shell_com_sg_shell_singapore
+                  - generic "Copy metric key" [ref=e6047]:
+                    - button [ref=e6048] [cursor=pointer]:
+                      - img [ref=e6049]
+                  - generic "Use in chat" [ref=e6051]:
+                    - button [ref=e6052] [cursor=pointer]:
+                      - img [ref=e6053]
+            - row "Google Analytics - phone_number_click - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled DEFAULT custom:google_analytics_phone_number_click_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6055]:
+              - cell "Google Analytics - phone_number_click - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled" [ref=e6056]:
+                - paragraph [ref=e6057]: Google Analytics - phone_number_click - (379066446) GA4 - shell.com.sg - Shell (Singapore)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6058]
+              - cell [ref=e6059]
+              - cell [ref=e6060]
+              - cell [ref=e6061]
+              - cell "custom:google_analytics_phone_number_click_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6062]:
+                - generic [ref=e6063]:
+                  - generic [ref=e6064]: custom:google_analytics_phone_number_click_379066446_ga4_shell_com_sg_shell_singapore
+                  - generic "Copy metric key" [ref=e6065]:
+                    - button [ref=e6066] [cursor=pointer]:
+                      - img [ref=e6067]
+                  - generic "Use in chat" [ref=e6069]:
+                    - button [ref=e6070] [cursor=pointer]:
+                      - img [ref=e6071]
+            - row "Google Analytics - form_completed - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled DEFAULT custom:google_analytics_form_completed_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6073]:
+              - cell "Google Analytics - form_completed - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled" [ref=e6074]:
+                - paragraph [ref=e6075]: Google Analytics - form_completed - (379066446) GA4 - shell.com.sg - Shell (Singapore)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6076]
+              - cell [ref=e6077]
+              - cell [ref=e6078]
+              - cell [ref=e6079]
+              - cell "custom:google_analytics_form_completed_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6080]:
+                - generic [ref=e6081]:
+                  - generic [ref=e6082]: custom:google_analytics_form_completed_379066446_ga4_shell_com_sg_shell_singapore
+                  - generic "Copy metric key" [ref=e6083]:
+                    - button [ref=e6084] [cursor=pointer]:
+                      - img [ref=e6085]
+                  - generic "Use in chat" [ref=e6087]:
+                    - button [ref=e6088] [cursor=pointer]:
+                      - img [ref=e6089]
+            - row "Google Analytics - download_the_app_widget - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled DEFAULT custom:google_analytics_download_the_app_widget_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6091]:
+              - cell "Google Analytics - download_the_app_widget - (379066446) GA4 - shell.com.sg - Shell (Singapore) enabled" [ref=e6092]:
+                - paragraph [ref=e6093]: Google Analytics - download_the_app_widget - (379066446) GA4 - shell.com.sg - Shell (Singapore)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6094]
+              - cell [ref=e6095]
+              - cell [ref=e6096]
+              - cell [ref=e6097]
+              - cell "custom:google_analytics_download_the_app_widget_379066446_ga4_shell_com_sg_shell_singapore Copy metric key Use in chat" [ref=e6098]:
+                - generic [ref=e6099]:
+                  - generic [ref=e6100]: custom:google_analytics_download_the_app_widget_379066446_ga4_shell_com_sg_shell_singapore
+                  - generic "Copy metric key" [ref=e6101]:
+                    - button [ref=e6102] [cursor=pointer]:
+                      - img [ref=e6103]
+                  - generic "Use in chat" [ref=e6105]:
+                    - button [ref=e6106] [cursor=pointer]:
+                      - img [ref=e6107]
+            - row "Google Analytics - purchase - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled DEFAULT custom:google_analytics_purchase_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6109]:
+              - cell "Google Analytics - purchase - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled" [ref=e6110]:
+                - paragraph [ref=e6111]: Google Analytics - purchase - (378713455) GA4 - shell.com.tr - Shell (Turkey)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6112]
+              - cell [ref=e6113]
+              - cell [ref=e6114]
+              - cell [ref=e6115]
+              - cell "custom:google_analytics_purchase_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6116]:
+                - generic [ref=e6117]:
+                  - generic [ref=e6118]: custom:google_analytics_purchase_378713455_ga4_shell_com_tr_shell_turkey
+                  - generic "Copy metric key" [ref=e6119]:
+                    - button [ref=e6120] [cursor=pointer]:
+                      - img [ref=e6121]
+                  - generic "Use in chat" [ref=e6123]:
+                    - button [ref=e6124] [cursor=pointer]:
+                      - img [ref=e6125]
+            - row "Google Analytics - phone_number_click - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled DEFAULT custom:google_analytics_phone_number_click_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6127]:
+              - cell "Google Analytics - phone_number_click - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled" [ref=e6128]:
+                - paragraph [ref=e6129]: Google Analytics - phone_number_click - (378713455) GA4 - shell.com.tr - Shell (Turkey)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6130]
+              - cell [ref=e6131]
+              - cell [ref=e6132]
+              - cell [ref=e6133]
+              - cell "custom:google_analytics_phone_number_click_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6134]:
+                - generic [ref=e6135]:
+                  - generic [ref=e6136]: custom:google_analytics_phone_number_click_378713455_ga4_shell_com_tr_shell_turkey
+                  - generic "Copy metric key" [ref=e6137]:
+                    - button [ref=e6138] [cursor=pointer]:
+                      - img [ref=e6139]
+                  - generic "Use in chat" [ref=e6141]:
+                    - button [ref=e6142] [cursor=pointer]:
+                      - img [ref=e6143]
+            - row "Google Analytics - form_completed - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled DEFAULT custom:google_analytics_form_completed_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6145]:
+              - cell "Google Analytics - form_completed - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled" [ref=e6146]:
+                - paragraph [ref=e6147]: Google Analytics - form_completed - (378713455) GA4 - shell.com.tr - Shell (Turkey)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6148]
+              - cell [ref=e6149]
+              - cell [ref=e6150]
+              - cell [ref=e6151]
+              - cell "custom:google_analytics_form_completed_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6152]:
+                - generic [ref=e6153]:
+                  - generic [ref=e6154]: custom:google_analytics_form_completed_378713455_ga4_shell_com_tr_shell_turkey
+                  - generic "Copy metric key" [ref=e6155]:
+                    - button [ref=e6156] [cursor=pointer]:
+                      - img [ref=e6157]
+                  - generic "Use in chat" [ref=e6159]:
+                    - button [ref=e6160] [cursor=pointer]:
+                      - img [ref=e6161]
+            - row "Google Analytics - form_start - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled DEFAULT custom:google_analytics_form_start_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6163]:
+              - cell "Google Analytics - form_start - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled" [ref=e6164]:
+                - paragraph [ref=e6165]: Google Analytics - form_start - (378713455) GA4 - shell.com.tr - Shell (Turkey)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6166]
+              - cell [ref=e6167]
+              - cell [ref=e6168]
+              - cell [ref=e6169]
+              - cell "custom:google_analytics_form_start_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6170]:
+                - generic [ref=e6171]:
+                  - generic [ref=e6172]: custom:google_analytics_form_start_378713455_ga4_shell_com_tr_shell_turkey
+                  - generic "Copy metric key" [ref=e6173]:
+                    - button [ref=e6174] [cursor=pointer]:
+                      - img [ref=e6175]
+                  - generic "Use in chat" [ref=e6177]:
+                    - button [ref=e6178] [cursor=pointer]:
+                      - img [ref=e6179]
+            - row "Google Analytics - form_abandoned - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled DEFAULT custom:google_analytics_form_abandoned_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6181]:
+              - cell "Google Analytics - form_abandoned - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled" [ref=e6182]:
+                - paragraph [ref=e6183]: Google Analytics - form_abandoned - (378713455) GA4 - shell.com.tr - Shell (Turkey)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6184]
+              - cell [ref=e6185]
+              - cell [ref=e6186]
+              - cell [ref=e6187]
+              - cell "custom:google_analytics_form_abandoned_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6188]:
+                - generic [ref=e6189]:
+                  - generic [ref=e6190]: custom:google_analytics_form_abandoned_378713455_ga4_shell_com_tr_shell_turkey
+                  - generic "Copy metric key" [ref=e6191]:
+                    - button [ref=e6192] [cursor=pointer]:
+                      - img [ref=e6193]
+                  - generic "Use in chat" [ref=e6195]:
+                    - button [ref=e6196] [cursor=pointer]:
+                      - img [ref=e6197]
+            - row "Google Analytics - file_downloaded - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled DEFAULT custom:google_analytics_file_downloaded_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6199]:
+              - cell "Google Analytics - file_downloaded - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled" [ref=e6200]:
+                - paragraph [ref=e6201]: Google Analytics - file_downloaded - (378713455) GA4 - shell.com.tr - Shell (Turkey)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6202]
+              - cell [ref=e6203]
+              - cell [ref=e6204]
+              - cell [ref=e6205]
+              - cell "custom:google_analytics_file_downloaded_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6206]:
+                - generic [ref=e6207]:
+                  - generic [ref=e6208]: custom:google_analytics_file_downloaded_378713455_ga4_shell_com_tr_shell_turkey
+                  - generic "Copy metric key" [ref=e6209]:
+                    - button [ref=e6210] [cursor=pointer]:
+                      - img [ref=e6211]
+                  - generic "Use in chat" [ref=e6213]:
+                    - button [ref=e6214] [cursor=pointer]:
+                      - img [ref=e6215]
+            - row "Google Analytics - download_the_app_widget - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled DEFAULT custom:google_analytics_download_the_app_widget_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6217]:
+              - cell "Google Analytics - download_the_app_widget - (378713455) GA4 - shell.com.tr - Shell (Turkey) enabled" [ref=e6218]:
+                - paragraph [ref=e6219]: Google Analytics - download_the_app_widget - (378713455) GA4 - shell.com.tr - Shell (Turkey)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6220]
+              - cell [ref=e6221]
+              - cell [ref=e6222]
+              - cell [ref=e6223]
+              - cell "custom:google_analytics_download_the_app_widget_378713455_ga4_shell_com_tr_shell_turkey Copy metric key Use in chat" [ref=e6224]:
+                - generic [ref=e6225]:
+                  - generic [ref=e6226]: custom:google_analytics_download_the_app_widget_378713455_ga4_shell_com_tr_shell_turkey
+                  - generic "Copy metric key" [ref=e6227]:
+                    - button [ref=e6228] [cursor=pointer]:
+                      - img [ref=e6229]
+                  - generic "Use in chat" [ref=e6231]:
+                    - button [ref=e6232] [cursor=pointer]:
+                      - img [ref=e6233]
+            - row "DO_NOT_EDIT Google Analytics property (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:do_not_edit_google_analytics_property_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6235]:
+              - cell "DO_NOT_EDIT Google Analytics property (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6236]:
+                - paragraph [ref=e6237]: DO_NOT_EDIT Google Analytics property (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6238]
+              - cell [ref=e6239]
+              - cell [ref=e6240]
+              - cell [ref=e6241]
+              - cell "custom:do_not_edit_google_analytics_property_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6242]:
+                - generic [ref=e6243]:
+                  - generic [ref=e6244]: custom:do_not_edit_google_analytics_property_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6245]:
+                    - button [ref=e6246] [cursor=pointer]:
+                      - img [ref=e6247]
+                  - generic "Use in chat" [ref=e6249]:
+                    - button [ref=e6250] [cursor=pointer]:
+                      - img [ref=e6251]
+            - row "DO_NOT_EDIT Google Analytics property (378718380) GA4 - shell.ca - Shell (Canada) enabled DEFAULT custom:do_not_edit_google_analytics_property_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e6253]:
+              - cell "DO_NOT_EDIT Google Analytics property (378718380) GA4 - shell.ca - Shell (Canada) enabled" [ref=e6254]:
+                - paragraph [ref=e6255]: DO_NOT_EDIT Google Analytics property (378718380) GA4 - shell.ca - Shell (Canada)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6256]
+              - cell [ref=e6257]
+              - cell [ref=e6258]
+              - cell [ref=e6259]
+              - cell "custom:do_not_edit_google_analytics_property_378718380_ga4_shell_ca_shell_canada Copy metric key Use in chat" [ref=e6260]:
+                - generic [ref=e6261]:
+                  - generic [ref=e6262]: custom:do_not_edit_google_analytics_property_378718380_ga4_shell_ca_shell_canada
+                  - generic "Copy metric key" [ref=e6263]:
+                    - button [ref=e6264] [cursor=pointer]:
+                      - img [ref=e6265]
+                  - generic "Use in chat" [ref=e6267]:
+                    - button [ref=e6268] [cursor=pointer]:
+                      - img [ref=e6269]
+            - row "Google Analytics - purchase - (369109556) GA4 - shell.de - Shell (Germany) enabled DEFAULT custom:google_analytics_purchase_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6271]:
+              - cell "Google Analytics - purchase - (369109556) GA4 - shell.de - Shell (Germany) enabled" [ref=e6272]:
+                - paragraph [ref=e6273]: Google Analytics - purchase - (369109556) GA4 - shell.de - Shell (Germany)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6274]
+              - cell [ref=e6275]
+              - cell [ref=e6276]
+              - cell [ref=e6277]
+              - cell "custom:google_analytics_purchase_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6278]:
+                - generic [ref=e6279]:
+                  - generic [ref=e6280]: custom:google_analytics_purchase_369109556_ga4_shell_de_shell_germany
+                  - generic "Copy metric key" [ref=e6281]:
+                    - button [ref=e6282] [cursor=pointer]:
+                      - img [ref=e6283]
+                  - generic "Use in chat" [ref=e6285]:
+                    - button [ref=e6286] [cursor=pointer]:
+                      - img [ref=e6287]
+            - row "Google Analytics - file_downloaded - (369109556) GA4 - shell.de - Shell (Germany) enabled DEFAULT custom:google_analytics_file_downloaded_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6289]:
+              - cell "Google Analytics - file_downloaded - (369109556) GA4 - shell.de - Shell (Germany) enabled" [ref=e6290]:
+                - paragraph [ref=e6291]: Google Analytics - file_downloaded - (369109556) GA4 - shell.de - Shell (Germany)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6292]
+              - cell [ref=e6293]
+              - cell [ref=e6294]
+              - cell [ref=e6295]
+              - cell "custom:google_analytics_file_downloaded_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6296]:
+                - generic [ref=e6297]:
+                  - generic [ref=e6298]: custom:google_analytics_file_downloaded_369109556_ga4_shell_de_shell_germany
+                  - generic "Copy metric key" [ref=e6299]:
+                    - button [ref=e6300] [cursor=pointer]:
+                      - img [ref=e6301]
+                  - generic "Use in chat" [ref=e6303]:
+                    - button [ref=e6304] [cursor=pointer]:
+                      - img [ref=e6305]
+            - row "Google Analytics - form_start - (369109556) GA4 - shell.de - Shell (Germany) enabled DEFAULT custom:google_analytics_form_start_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6307]:
+              - cell "Google Analytics - form_start - (369109556) GA4 - shell.de - Shell (Germany) enabled" [ref=e6308]:
+                - paragraph [ref=e6309]: Google Analytics - form_start - (369109556) GA4 - shell.de - Shell (Germany)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6310]
+              - cell [ref=e6311]
+              - cell [ref=e6312]
+              - cell [ref=e6313]
+              - cell "custom:google_analytics_form_start_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6314]:
+                - generic [ref=e6315]:
+                  - generic [ref=e6316]: custom:google_analytics_form_start_369109556_ga4_shell_de_shell_germany
+                  - generic "Copy metric key" [ref=e6317]:
+                    - button [ref=e6318] [cursor=pointer]:
+                      - img [ref=e6319]
+                  - generic "Use in chat" [ref=e6321]:
+                    - button [ref=e6322] [cursor=pointer]:
+                      - img [ref=e6323]
+            - row "Google Analytics - form_abandoned - (369109556) GA4 - shell.de - Shell (Germany) enabled DEFAULT custom:google_analytics_form_abandoned_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6325]:
+              - cell "Google Analytics - form_abandoned - (369109556) GA4 - shell.de - Shell (Germany) enabled" [ref=e6326]:
+                - paragraph [ref=e6327]: Google Analytics - form_abandoned - (369109556) GA4 - shell.de - Shell (Germany)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6328]
+              - cell [ref=e6329]
+              - cell [ref=e6330]
+              - cell [ref=e6331]
+              - cell "custom:google_analytics_form_abandoned_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6332]:
+                - generic [ref=e6333]:
+                  - generic [ref=e6334]: custom:google_analytics_form_abandoned_369109556_ga4_shell_de_shell_germany
+                  - generic "Copy metric key" [ref=e6335]:
+                    - button [ref=e6336] [cursor=pointer]:
+                      - img [ref=e6337]
+                  - generic "Use in chat" [ref=e6339]:
+                    - button [ref=e6340] [cursor=pointer]:
+                      - img [ref=e6341]
+            - row "Google Analytics - phone_number_click - (369109556) GA4 - shell.de - Shell (Germany) enabled DEFAULT custom:google_analytics_phone_number_click_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6343]:
+              - cell "Google Analytics - phone_number_click - (369109556) GA4 - shell.de - Shell (Germany) enabled" [ref=e6344]:
+                - paragraph [ref=e6345]: Google Analytics - phone_number_click - (369109556) GA4 - shell.de - Shell (Germany)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6346]
+              - cell [ref=e6347]
+              - cell [ref=e6348]
+              - cell [ref=e6349]
+              - cell "custom:google_analytics_phone_number_click_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6350]:
+                - generic [ref=e6351]:
+                  - generic [ref=e6352]: custom:google_analytics_phone_number_click_369109556_ga4_shell_de_shell_germany
+                  - generic "Copy metric key" [ref=e6353]:
+                    - button [ref=e6354] [cursor=pointer]:
+                      - img [ref=e6355]
+                  - generic "Use in chat" [ref=e6357]:
+                    - button [ref=e6358] [cursor=pointer]:
+                      - img [ref=e6359]
+            - row "Google Analytics - form_completed - (369109556) GA4 - shell.de - Shell (Germany) enabled DEFAULT custom:google_analytics_form_completed_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6361]:
+              - cell "Google Analytics - form_completed - (369109556) GA4 - shell.de - Shell (Germany) enabled" [ref=e6362]:
+                - paragraph [ref=e6363]: Google Analytics - form_completed - (369109556) GA4 - shell.de - Shell (Germany)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6364]
+              - cell [ref=e6365]
+              - cell [ref=e6366]
+              - cell [ref=e6367]
+              - cell "custom:google_analytics_form_completed_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6368]:
+                - generic [ref=e6369]:
+                  - generic [ref=e6370]: custom:google_analytics_form_completed_369109556_ga4_shell_de_shell_germany
+                  - generic "Copy metric key" [ref=e6371]:
+                    - button [ref=e6372] [cursor=pointer]:
+                      - img [ref=e6373]
+                  - generic "Use in chat" [ref=e6375]:
+                    - button [ref=e6376] [cursor=pointer]:
+                      - img [ref=e6377]
+            - row "Google Analytics - download_the_app_widget - (369109556) GA4 - shell.de - Shell (Germany) enabled DEFAULT custom:google_analytics_download_the_app_widget_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6379]:
+              - cell "Google Analytics - download_the_app_widget - (369109556) GA4 - shell.de - Shell (Germany) enabled" [ref=e6380]:
+                - paragraph [ref=e6381]: Google Analytics - download_the_app_widget - (369109556) GA4 - shell.de - Shell (Germany)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6382]
+              - cell [ref=e6383]
+              - cell [ref=e6384]
+              - cell [ref=e6385]
+              - cell "custom:google_analytics_download_the_app_widget_369109556_ga4_shell_de_shell_germany Copy metric key Use in chat" [ref=e6386]:
+                - generic [ref=e6387]:
+                  - generic [ref=e6388]: custom:google_analytics_download_the_app_widget_369109556_ga4_shell_de_shell_germany
+                  - generic "Copy metric key" [ref=e6389]:
+                    - button [ref=e6390] [cursor=pointer]:
+                      - img [ref=e6391]
+                  - generic "Use in chat" [ref=e6393]:
+                    - button [ref=e6394] [cursor=pointer]:
+                      - img [ref=e6395]
+            - row "Google Analytics - vloga_za_shell_kartico - (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:google_analytics_vloga_za_shell_kartico_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6397]:
+              - cell "Google Analytics - vloga_za_shell_kartico - (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6398]:
+                - paragraph [ref=e6399]: Google Analytics - vloga_za_shell_kartico - (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6400]
+              - cell [ref=e6401]
+              - cell [ref=e6402]
+              - cell [ref=e6403]
+              - cell "custom:google_analytics_vloga_za_shell_kartico_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6404]:
+                - generic [ref=e6405]:
+                  - generic [ref=e6406]: custom:google_analytics_vloga_za_shell_kartico_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6407]:
+                    - button [ref=e6408] [cursor=pointer]:
+                      - img [ref=e6409]
+                  - generic "Use in chat" [ref=e6411]:
+                    - button [ref=e6412] [cursor=pointer]:
+                      - img [ref=e6413]
+            - row "Google Analytics - vloga_za_kartice_2 - (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:google_analytics_vloga_za_kartice_2_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6415]:
+              - cell "Google Analytics - vloga_za_kartice_2 - (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6416]:
+                - paragraph [ref=e6417]: Google Analytics - vloga_za_kartice_2 - (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6418]
+              - cell [ref=e6419]
+              - cell [ref=e6420]
+              - cell [ref=e6421]
+              - cell "custom:google_analytics_vloga_za_kartice_2_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6422]:
+                - generic [ref=e6423]:
+                  - generic [ref=e6424]: custom:google_analytics_vloga_za_kartice_2_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6425]:
+                    - button [ref=e6426] [cursor=pointer]:
+                      - img [ref=e6427]
+                  - generic "Use in chat" [ref=e6429]:
+                    - button [ref=e6430] [cursor=pointer]:
+                      - img [ref=e6431]
+            - row "Google Analytics - purchase - (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:google_analytics_purchase_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6433]:
+              - cell "Google Analytics - purchase - (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6434]:
+                - paragraph [ref=e6435]: Google Analytics - purchase - (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6436]
+              - cell [ref=e6437]
+              - cell [ref=e6438]
+              - cell [ref=e6439]
+              - cell "custom:google_analytics_purchase_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6440]:
+                - generic [ref=e6441]:
+                  - generic [ref=e6442]: custom:google_analytics_purchase_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6443]:
+                    - button [ref=e6444] [cursor=pointer]:
+                      - img [ref=e6445]
+                  - generic "Use in chat" [ref=e6447]:
+                    - button [ref=e6448] [cursor=pointer]:
+                      - img [ref=e6449]
+            - row "Google Analytics - form_completed - (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:google_analytics_form_completed_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6451]:
+              - cell "Google Analytics - form_completed - (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6452]:
+                - paragraph [ref=e6453]: Google Analytics - form_completed - (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6454]
+              - cell [ref=e6455]
+              - cell [ref=e6456]
+              - cell [ref=e6457]
+              - cell "custom:google_analytics_form_completed_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6458]:
+                - generic [ref=e6459]:
+                  - generic [ref=e6460]: custom:google_analytics_form_completed_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6461]:
+                    - button [ref=e6462] [cursor=pointer]:
+                      - img [ref=e6463]
+                  - generic "Use in chat" [ref=e6465]:
+                    - button [ref=e6466] [cursor=pointer]:
+                      - img [ref=e6467]
+            - row "Google Analytics - form_abandoned - (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:google_analytics_form_abandoned_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6469]:
+              - cell "Google Analytics - form_abandoned - (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6470]:
+                - paragraph [ref=e6471]: Google Analytics - form_abandoned - (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6472]
+              - cell [ref=e6473]
+              - cell [ref=e6474]
+              - cell [ref=e6475]
+              - cell "custom:google_analytics_form_abandoned_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6476]:
+                - generic [ref=e6477]:
+                  - generic [ref=e6478]: custom:google_analytics_form_abandoned_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6479]:
+                    - button [ref=e6480] [cursor=pointer]:
+                      - img [ref=e6481]
+                  - generic "Use in chat" [ref=e6483]:
+                    - button [ref=e6484] [cursor=pointer]:
+                      - img [ref=e6485]
+            - row "Google Analytics - form_start - (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:google_analytics_form_start_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6487]:
+              - cell "Google Analytics - form_start - (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6488]:
+                - paragraph [ref=e6489]: Google Analytics - form_start - (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6490]
+              - cell [ref=e6491]
+              - cell [ref=e6492]
+              - cell [ref=e6493]
+              - cell "custom:google_analytics_form_start_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6494]:
+                - generic [ref=e6495]:
+                  - generic [ref=e6496]: custom:google_analytics_form_start_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6497]:
+                    - button [ref=e6498] [cursor=pointer]:
+                      - img [ref=e6499]
+                  - generic "Use in chat" [ref=e6501]:
+                    - button [ref=e6502] [cursor=pointer]:
+                      - img [ref=e6503]
+            - row "Google Analytics - phone_number_click - (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:google_analytics_phone_number_click_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6505]:
+              - cell "Google Analytics - phone_number_click - (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6506]:
+                - paragraph [ref=e6507]: Google Analytics - phone_number_click - (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6508]
+              - cell [ref=e6509]
+              - cell [ref=e6510]
+              - cell [ref=e6511]
+              - cell "custom:google_analytics_phone_number_click_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6512]:
+                - generic [ref=e6513]:
+                  - generic [ref=e6514]: custom:google_analytics_phone_number_click_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6515]:
+                    - button [ref=e6516] [cursor=pointer]:
+                      - img [ref=e6517]
+                  - generic "Use in chat" [ref=e6519]:
+                    - button [ref=e6520] [cursor=pointer]:
+                      - img [ref=e6521]
+            - row "Google Analytics - file_downloaded - (399342600) GA4 - shell.si - Shell (Slovenia) enabled DEFAULT custom:google_analytics_file_downloaded_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6523]:
+              - cell "Google Analytics - file_downloaded - (399342600) GA4 - shell.si - Shell (Slovenia) enabled" [ref=e6524]:
+                - paragraph [ref=e6525]: Google Analytics - file_downloaded - (399342600) GA4 - shell.si - Shell (Slovenia)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6526]
+              - cell [ref=e6527]
+              - cell [ref=e6528]
+              - cell [ref=e6529]
+              - cell "custom:google_analytics_file_downloaded_399342600_ga4_shell_si_shell_slovenia Copy metric key Use in chat" [ref=e6530]:
+                - generic [ref=e6531]:
+                  - generic [ref=e6532]: custom:google_analytics_file_downloaded_399342600_ga4_shell_si_shell_slovenia
+                  - generic "Copy metric key" [ref=e6533]:
+                    - button [ref=e6534] [cursor=pointer]:
+                      - img [ref=e6535]
+                  - generic "Use in chat" [ref=e6537]:
+                    - button [ref=e6538] [cursor=pointer]:
+                      - img [ref=e6539]
+            - row "Google Analytics - close_convert_lead - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_close_convert_lead_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e6541]:
+              - cell "Google Analytics - close_convert_lead - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e6542]:
+                - paragraph [ref=e6543]: Google Analytics - close_convert_lead - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6544]
+              - cell [ref=e6545]
+              - cell [ref=e6546]
+              - cell [ref=e6547]
+              - cell "custom:google_analytics_close_convert_lead_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e6548]:
+                - generic [ref=e6549]:
+                  - generic [ref=e6550]: custom:google_analytics_close_convert_lead_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e6551]:
+                    - button [ref=e6552] [cursor=pointer]:
+                      - img [ref=e6553]
+                  - generic "Use in chat" [ref=e6555]:
+                    - button [ref=e6556] [cursor=pointer]:
+                      - img [ref=e6557]
+            - row "Google Analytics - qualify_lead - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled DEFAULT custom:google_analytics_qualify_lead_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e6559]:
+              - cell "Google Analytics - qualify_lead - (369104901) GA4 - shell.co.uk - Shell (United Kingdom) enabled" [ref=e6560]:
+                - paragraph [ref=e6561]: Google Analytics - qualify_lead - (369104901) GA4 - shell.co.uk - Shell (United Kingdom)
+                - text: enabled
+              - cell "DEFAULT" [ref=e6562]
+              - cell [ref=e6563]
+              - cell [ref=e6564]
+              - cell [ref=e6565]
+              - cell "custom:google_analytics_qualify_lead_369104901_ga4_shell_co_uk_shell_united_kingdom Copy metric key Use in chat" [ref=e6566]:
+                - generic [ref=e6567]:
+                  - generic [ref=e6568]: custom:google_analytics_qualify_lead_369104901_ga4_shell_co_uk_shell_united_kingdom
+                  - generic "Copy metric key" [ref=e6569]:
+                    - button [ref=e6570] [cursor=pointer]:
+                      - img [ref=e6571]
+                  - generic "Use in chat" [ref=e6573]:
+                    - button [ref=e6574] [cursor=pointer]:
+                      - img [ref=e6575]
+            - row "UTTS_Lead form_Turkey enabled SUBMIT_LEAD_FORM custom:utts_lead_form_turkey Copy metric key Use in chat" [ref=e6577]:
+              - cell "UTTS_Lead form_Turkey enabled" [ref=e6578]:
+                - paragraph [ref=e6579]: UTTS_Lead form_Turkey
+                - text: enabled
+              - cell "SUBMIT_LEAD_FORM" [ref=e6580]
+              - cell [ref=e6581]
+              - cell [ref=e6582]
+              - cell [ref=e6583]
+              - cell "custom:utts_lead_form_turkey Copy metric key Use in chat" [ref=e6584]:
+                - generic [ref=e6585]:
+                  - generic [ref=e6586]: custom:utts_lead_form_turkey
+                  - generic "Copy metric key" [ref=e6587]:
+                    - button [ref=e6588] [cursor=pointer]:
+                      - img [ref=e6589]
+                  - generic "Use in chat" [ref=e6591]:
+                    - button [ref=e6592] [cursor=pointer]:
+                      - img [ref=e6593]
+            - row "TTS_Lead form_Turkey enabled SUBMIT_LEAD_FORM custom:tts_lead_form_turkey Copy metric key Use in chat" [ref=e6595]:
+              - cell "TTS_Lead form_Turkey enabled" [ref=e6596]:
+                - paragraph [ref=e6597]: TTS_Lead form_Turkey
+                - text: enabled
+              - cell "SUBMIT_LEAD_FORM" [ref=e6598]
+              - cell [ref=e6599]
+              - cell [ref=e6600]
+              - cell [ref=e6601]
+              - cell "custom:tts_lead_form_turkey Copy metric key Use in chat" [ref=e6602]:
+                - generic [ref=e6603]:
+                  - generic [ref=e6604]: custom:tts_lead_form_turkey
+                  - generic "Copy metric key" [ref=e6605]:
+                    - button [ref=e6606] [cursor=pointer]:
+                      - img [ref=e6607]
+                  - generic "Use in chat" [ref=e6609]:
+                    - button [ref=e6610] [cursor=pointer]:
+                      - img [ref=e6611]
+```

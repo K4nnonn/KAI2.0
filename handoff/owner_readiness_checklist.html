@@ -1,0 +1,100 @@
+﻿<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Owner Readiness Checklist</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; color: #0f172a; line-height: 1.45; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 18px; margin-top: 18px; }
+    h3 { font-size: 15px; margin-top: 12px; }
+    pre { background: #f8fafc; padding: 8px; border-radius: 6px; }
+    .box { background: #f1f5f9; padding: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Owner Readiness Checklist (Kai / Klaudit System)</h1>
+  <p><strong>Audience:</strong> Business Owner + Technical Admin</p>
+  <p><strong>Format:</strong> Step‑by‑step</p>
+
+  <h2>Step 0 — What You’re Getting</h2>
+  <div class="box">
+    <p>Complete app: UI + API + Worker. No secrets or prior data included.</p>
+    <ul>
+      <li>UI: apps/web</li>
+      <li>API: services/api</li>
+      <li>Worker: services/worker</li>
+      <li>Verification: scripts/verification/verify_system_integrity.ps1</li>
+    </ul>
+  </div>
+
+  <h2>A) Business Owner Steps (Non‑Technical)</h2>
+  <h3>Step 1 — Choose Hosting</h3>
+  <ul>
+    <li>Local App (test)</li>
+    <li>Azure App (production)</li>
+  </ul>
+
+  <h3>Step 2 — Provide Access Credentials</h3>
+  <ul>
+    <li>Azure Subscription ID</li>
+    <li>Tenant ID</li>
+    <li>Resource Group name</li>
+    <li>Temporary Owner/Contributor access during migration</li>
+  </ul>
+
+  <h3>Step 3 — Decide Optional Features</h3>
+  <ul>
+    <li>Azure OpenAI (optional)</li>
+    <li>SA360 (optional)</li>
+    <li>Vector Search (optional)</li>
+  </ul>
+
+  <h2>B) Technical Admin Steps</h2>
+  <h3>Step 1 — Configure Environment</h3>
+  <p>Use .env.example as your source of truth.</p>
+  <pre>KAI_BACKEND_URL
+KAI_FRONTEND_URL
+KAI_ACCESS_PASSWORD
+KAI_ENV_GUI_PASSWORD</pre>
+
+  <h3>Step 2 — Storage (Required for audits + worker)</h3>
+  <pre>AZURE_STORAGE_CONNECTION_STRING
+AZURE_STORAGE_ACCOUNT
+AZURE_STORAGE_CONTAINER</pre>
+
+  <h3>Step 3 — Optional Credentials</h3>
+  <p>Only if you enable the feature.</p>
+  <pre>Azure OpenAI: AZURE_OPENAI_ENDPOINT / AZURE_OPENAI_API_KEY / AZURE_OPENAI_DEPLOYMENT
+Local LLM: LOCAL_LLM_ENDPOINT / LOCAL_LLM_MODEL
+SA360: SA360_CLIENT_ID / SA360_CLIENT_SECRET / SA360_REFRESH_TOKEN / SA360_LOGIN_CUSTOMER_ID / SA360_OAUTH_REDIRECT_URI
+Vector Search: CONCIERGE_SEARCH_ENDPOINT / CONCIERGE_SEARCH_KEY / CONCIERGE_SEARCH_INDEX</pre>
+
+  <h3>Step 4 — Run Locally (Fast sanity check)</h3>
+  <pre>python services/api/main.py
+python services/worker/jobs_worker.py
+cd apps/web && npm install && npm run dev</pre>
+
+  <h3>Step 5 — Deploy to Azure</h3>
+  <p>API + Worker as Container Apps; UI as Static Web App or Storage static site.</p>
+
+  <h3>Step 6 — Verify</h3>
+  <pre>scripts/verification/verify_system_integrity.ps1 -Mode azure</pre>
+
+  <h2>C) What “Working” Looks Like</h2>
+  <ul>
+    <li>/api/health OK</li>
+    <li>/api/diagnostics/health OK</li>
+    <li>/api/audit/generate works</li>
+    <li>/api/settings/env works</li>
+  </ul>
+
+  <h2>D) Ownership Transfer Checklist</h2>
+  <ul>
+    <li>Azure subscription ready</li>
+    <li>Storage containers ready</li>
+    <li>Env vars set</li>
+    <li>Verification green</li>
+  </ul>
+</body>
+</html>

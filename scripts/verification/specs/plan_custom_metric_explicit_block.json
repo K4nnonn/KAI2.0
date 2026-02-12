@@ -1,0 +1,18 @@
+{
+  "id": "PLAN_CUSTOM_METRIC_EXPLICIT_BLOCK",
+  "pillar": "quality",
+  "kind": "plan_and_run",
+  "request": {
+    "message": "Why did FR_Intent_Clicks change week over week? Which campaigns drove it?",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "executed": false,
+    "error": "custom_metric_not_found"
+  },
+  "assert": {
+    "custom_metric_suggestions_min": 1
+  }
+}
+

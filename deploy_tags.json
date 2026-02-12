@@ -1,0 +1,6 @@
+{
+    "loginServer":  "kaiacr13a9aa.azurecr.io",
+    "api":  "kaiacr13a9aa.azurecr.io/kai-api:fix-20260204203406",
+    "web":  "kaiacr13a9aa.azurecr.io/kai-web:fix-20260205154127",
+    "stamp":  "20260205154127"
+}

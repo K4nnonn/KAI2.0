@@ -1,0 +1,38 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install build deps for llama-cpp-python and curl to fetch the model
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY kai_core/ ./kai_core/
+COPY utils/ ./utils/
+COPY static/ ./static/
+COPY *.py ./
+
+# Download llama model (approx 770MB) into image
+RUN mkdir -p /app/models && \
+    curl -L "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf" \
+    -o /app/models/llama-3.2-1b-instruct-q4_k_m.gguf
+
+# Environment defaults for local model
+ENV ENABLE_ML_REASONING=true
+ENV LOCAL_LLM_MODEL_PATH=/app/models/llama-3.2-1b-instruct-q4_k_m.gguf
+ENV LOCAL_LLM_TIMEOUT_SECONDS=30
+ENV ENABLE_LOCAL_LLM_WRAPPER=false
+ENV PYTHONPATH=/app
+ENV AZURE_CONFIG_DIR=/app/.azure
+
+EXPOSE 8000
+
+# Run FastAPI with uvicorn (via gunicorn for multiprocess)
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000", "--timeout", "600"]

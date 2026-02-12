@@ -1,0 +1,38 @@
+# FastAPI Backend Dockerfile for Azure Container Apps
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install build dependencies for llama-cpp-python
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy kai_core from parent directory
+COPY kai_core ./kai_core
+COPY demo_for_testing ./demo_for_testing
+
+# Copy only required utils (avoid streamlit dependency)
+RUN mkdir -p ./utils
+COPY utils/db_manager.py ./utils/
+RUN echo 'from .db_manager import *' > ./utils/__init__.py
+
+# Download model directly (Bypasses local upload - uses Azure's gigabit connection)
+RUN apt-get update && apt-get install -y curl \
+    && mkdir -p /app/models \
+    && curl -L "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf" -o /app/models/llama-3.2-1b-instruct-q4_k_m.gguf \
+    && apt-get remove -y curl && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+
+# Copy backend application code
+COPY backend/ .
+
+# Expose port 8000
+EXPOSE 8000
+
+# Run gunicorn with uvicorn workers
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000", "--timeout", "600"]

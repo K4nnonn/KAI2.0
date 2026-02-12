@@ -1,0 +1,4713 @@
+"""
+FastAPI Backend for Kai Platform
+Modern REST API replacing Streamlit
+"""
+from __future__ import annotations
+
+import sys
+import os
+import tempfile
+from pathlib import Path
+from typing import Any, List
+import time
+from datetime import datetime, date, timedelta
+import math
+import pandas as pd
+import traceback
+import json
+import io
+import re
+import traceback
+import hashlib
+
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from azure.storage.blob import BlobServiceClient
+from kai_core.account_utils import slugify_account_name
+
+# Add project root to path
+# In container: /app/main.py → ROOT should be /app
+# Locally: Z:\Kai_Personal_WebApp\backend\main.py → ROOT should be Z:\Kai_Personal_WebApp
+ROOT = Path(__file__).resolve().parent
+# Check if we're in container (flat structure) or local dev (backend subdirectory)
+if (ROOT / "kai_core").exists():
+    pass  # Already at the right level (container)
+else:
+    ROOT = ROOT.parent  # Go up one level (local dev)
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
+
+from utils import db_manager
+from kai_core.Concierge import call_azure_openai
+from kai_core.core_logic import UnifiedAuditEngine
+from kai_core.plugins.creative import CreativeFactory
+from kai_core.shared.adapters import CreativeContext
+from kai_core.plugins.pmax import PMaxAnalyzer
+from kai_core.plugins.serp import SerpScanner, check_url_health
+from kai_core.plugins.competitor_intelligence import analyze_competitor
+from kai_core.pmax_channel_split import PMaxChannelSplitter
+from kai_core.data_validation import DataValidator
+from kai_core.market_intelligence import MarketIntelligence
+from kai_core.unified_schema_manager import UnifiedSchemaManager
+from kai_core.agentic_orchestrator import MarketingReasoningAgent
+from ml_reasoning_engine import get_ml_reasoning_engine
+import httpx
+from trends_service import fetch_trends, seasonality_multipliers, summarize_seasonality, ENABLE_TRENDS
+from fastapi import status
+import csv
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="Kai Platform API",
+    description="PPC Marketing Intelligence Platform",
+    version="2.0.0",
+)
+
+# CORS middleware for React frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify exact origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize database
+db_manager.init_db()
+
+
+# Pydantic models
+class ChatMessage(BaseModel):
+    message: str
+    ai_enabled: bool = True
+    top_k: int | None = None  # optional: number of sources to retrieve for web lookup
+    account_name: str | None = None  # optional for audit/upload flows
+    context: dict[str, Any] | None = None  # optional: tool routing hints (serp/pmax/competitor/etc.) and data context (customer_ids/date_range)
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    role: str = "assistant"
+    sources: list[dict] = []
+
+
+class AuditRequest(BaseModel):
+    business_unit: str
+    account_name: str
+    use_mock_data: bool = False  # deprecated; blob download is used when available
+
+
+class CreativeRequest(BaseModel):
+    business_name: str
+    url: str | None = None
+    keywords: list[str] = []
+    usps: list[str] = []
+
+
+class PMaxRequest(BaseModel):
+    placements: list[dict] = []
+    spend: float | None = None
+    total_cost: float | None = None
+    conversions: float | None = None
+
+
+class IntelRequest(BaseModel):
+    query: str = "Why is performance down?"
+    pmax: list[dict] = []
+    creative: list[dict] = []
+    market: list[dict] = []
+    brand_terms: list[str] = []
+
+
+# Helpers
+def _load_dataframes_from_dir(directory: Path) -> list[pd.DataFrame]:
+    """Best-effort load of CSV/XLSX files from a directory into pandas dataframes."""
+    frames: list[pd.DataFrame] = []
+    if not directory.exists():
+        return frames
+    for file in directory.iterdir():
+        if file.suffix.lower() == ".csv":
+            try:
+                frames.append(pd.read_csv(file))
+            except Exception:
+                continue
+        elif file.suffix.lower() in {".xlsx", ".xls"}:
+            try:
+                frames.append(pd.read_excel(file))
+            except Exception:
+                continue
+    return frames
+
+
+def _pick_frame(frames: list[pd.DataFrame], required_columns: list[str]) -> pd.DataFrame | None:
+    """Return the first frame containing all required columns (case-insensitive)."""
+    if not frames:
+        return None
+    req = {c.lower() for c in required_columns}
+    for frame in frames:
+        cols = {c.lower() for c in frame.columns}
+        if req.issubset(cols):
+            return frame
+    return None
+
+
+class SerpRequest(BaseModel):
+    urls: list[str]
+
+
+class CompetitorObservation(BaseModel):
+    """Competitor observation from conversational extraction."""
+    competitor_domain: str
+    impression_share_current: float | None = None
+    impression_share_previous: float | None = None
+    outranking_rate: float | None = None
+    top_of_page_rate: float | None = None
+    position_above_rate: float | None = None
+    raw_description: str | None = None  # Fallback for fuzzy inference
+
+
+class AuthRequest(BaseModel):
+    password: str
+
+
+class KeywordMetricsQuery(BaseModel):
+    keyword: str
+    month: str | None = None  # optional, e.g., "2025-11" or "last_month"
+
+
+class SearchQuery(BaseModel):
+    query: str
+    count: int = 3  # number of results to return
+
+
+class PlanRequest(BaseModel):
+    message: str
+    customer_ids: list[str] = []
+    account_name: str | None = None
+    default_date_range: str | None = "LAST_7_DAYS"
+    generate_report: bool = False  # If true, return XLSX link; otherwise keep chat-only
+    intent_hint: str | None = None  # optional: 'performance' | 'audit' to override heuristic intent
+
+
+class PlanResponse(BaseModel):
+    plan: dict
+    notes: str | None = None
+    executed: bool = False
+    result: dict | None = None
+    summary: str | None = None
+    enhanced_summary: str | None = None
+    error: str | None = None
+    analysis: dict | None = None
+
+
+class QaAccuracyRequest(BaseModel):
+    customer_id: str
+    date_range: str | None = "LAST_7_DAYS"
+
+
+class QaAccuracyResponse(BaseModel):
+    raw_totals: dict
+    aggregated_totals: dict
+    matches: dict
+
+
+class RouteRequest(BaseModel):
+    message: str
+    account_name: str | None = None
+    customer_ids: list[str] = []
+
+
+class RouteResponse(BaseModel):
+    intent: str
+    tool: str | None = None
+    run_planner: bool = False
+    run_trends: bool = False
+    customer_ids: list[str] = []
+    needs_ids: bool = False
+    notes: str | None = None
+    confidence: float | None = None
+    needs_clarification: bool = False
+    clarification: str | None = None
+    candidates: list[str] = []
+
+
+class EnvUpdateRequest(BaseModel):
+    key: str
+    value: str
+    admin_password: str
+
+
+def _safe_route_intent(payload: dict) -> RouteResponse:
+    """Validate/normalize router JSON from LLM."""
+    allowed_intents = {"general_chat", "audit", "performance", "pmax", "serp", "competitor", "creative", "seasonality"}
+    intent = payload.get("intent") if isinstance(payload, dict) else None
+    intent = intent.lower() if isinstance(intent, str) else "general_chat"
+    if intent not in allowed_intents:
+        intent = "general_chat"
+
+    tool = payload.get("tool") if isinstance(payload, dict) else None
+    tool = tool.lower() if isinstance(tool, str) else None
+    allowed_tools = {"audit", "pmax", "serp", "competitor", "creative", "performance", None}
+    if tool not in allowed_tools:
+        tool = None
+
+    # Force tool alignment: performance intent should not be labeled as audit
+    if intent == "performance":
+        tool = "performance"
+
+    run_planner = bool(payload.get("run_planner")) if isinstance(payload, dict) else False
+    run_trends = bool(payload.get("run_trends")) if isinstance(payload, dict) else False
+
+    ids_raw = payload.get("customer_ids") if isinstance(payload, dict) else []
+    ids = []
+    if isinstance(ids_raw, list):
+        ids = [str(i) for i in ids_raw if str(i).isdigit()]
+    needs_ids = bool(payload.get("needs_ids")) if isinstance(payload, dict) else False
+    notes = payload.get("notes") if isinstance(payload, dict) else None
+    confidence = None
+    try:
+        if isinstance(payload, dict) and payload.get("confidence") is not None:
+            confidence = float(payload.get("confidence"))
+            confidence = max(0.0, min(1.0, confidence))
+    except Exception:
+        confidence = None
+    needs_clarification = bool(payload.get("needs_clarification")) if isinstance(payload, dict) else False
+    clarification = payload.get("clarification") if isinstance(payload, dict) else None
+    candidates_raw = payload.get("candidates") if isinstance(payload, dict) else []
+    candidates = [c for c in candidates_raw if isinstance(c, str)]
+
+    return RouteResponse(
+        intent=intent,
+        tool=tool,
+        run_planner=run_planner,
+        run_trends=run_trends,
+        customer_ids=ids,
+        needs_ids=needs_ids,
+        notes=notes if isinstance(notes, str) else None,
+        confidence=confidence,
+        needs_clarification=needs_clarification,
+        clarification=clarification if isinstance(clarification, str) else None,
+        candidates=candidates,
+    )
+
+
+# Lightweight account aliasing for chat-to-plan resolution
+DEFAULT_ACCOUNT_ALIASES = [
+    {
+        "customer_id": "7902313748",
+        "name": "US_Mobility Loyalty",
+        "aliases": ["loyalty", "loyalty account", "us mobility loyalty", "mobility loyalty"],
+    },
+    {
+        # Name-only entry to allow resolving account name without forcing a default ID; ID can be provided via ACCOUNT_ALIASES_JSON
+        "customer_id": None,
+        "name": "Recharge",
+        "aliases": ["mobility recharge", "recharge account", "recharge mobility"],
+    },
+]
+
+def _load_brand_competitor_aliases() -> tuple[list[str], list[str]]:
+    """
+    Load brand/competitor aliases from env.
+    BRAND_ALIASES="brand,brand inc,brand.com"
+    COMPETITOR_ALIASES="competitor1,comp one,competitor2"
+    """
+    def parse_env(key: str) -> list[str]:
+        raw = os.environ.get(key, "") or ""
+        return [t.strip().lower() for t in raw.split(",") if t.strip()]
+    return parse_env("BRAND_ALIASES"), parse_env("COMPETITOR_ALIASES")
+
+def _classify_campaign(name: str | None, channel_type: str | None, brand_aliases: list[str], competitor_aliases: list[str]) -> str:
+    n = (name or "").lower()
+    ch = (channel_type or "").lower()
+    if "performance_max" in ch or "performance max" in n or "pmax" in n:
+        return "pmax"
+    for b in brand_aliases:
+        if b and b in n:
+            return "brand"
+    for c in competitor_aliases:
+        if c and c in n:
+            return "competitor"
+    return "nonbrand"
+
+
+def _normalize_text(value: str | None) -> str:
+    if not value:
+        return ""
+    return re.sub(r"\s+", " ", value.strip().lower())
+
+def _fuzzy_score(a: str, b: str) -> float:
+    """Lightweight similarity score between two strings."""
+    from difflib import SequenceMatcher
+    return SequenceMatcher(None, a, b).ratio() if a and b else 0.0
+
+
+def _extract_keyword_from_text(text: str) -> str | None:
+    """Pull a keyword/phrase from quotes; fallback to trimmed text."""
+    import re as _re
+    if not text:
+        return None
+    m = _re.search(r'"([^"]+)"', text)
+    if m and m.group(1).strip():
+        return m.group(1).strip()
+    cleaned = text.strip()
+    return cleaned if cleaned else None
+
+
+def _extract_customer_ids_from_text(text: str | None) -> list[str]:
+    """Find potential customer IDs (8-12 digit) in free text."""
+    if not text:
+        return []
+    return list({m.group(0) for m in re.finditer(r"\b\d{8,12}\b", text)})
+
+
+def _load_account_aliases() -> list[dict]:
+    """
+    Merge default aliases with optional ACCOUNT_ALIASES_JSON env override.
+    Env format: JSON list of {"customer_id": "...", "name": "...", "aliases": ["..."]} or a dict keyed by id.
+    """
+    aliases: list[dict] = list(DEFAULT_ACCOUNT_ALIASES)
+
+    # Add live SA360 accounts (dynamic, adaptive to new accounts)
+    try:
+        for acct in _sa360_list_customers_cached():
+            if not isinstance(acct, dict):
+                continue
+            cid = str(acct.get("customer_id") or "").strip()
+            name = (acct.get("name") or "").strip()
+            if not cid or not name:
+                continue
+            aliases.append(
+                {
+                    "customer_id": cid,
+                    "name": name,
+                    "aliases": [name.lower(), name.replace("_", " "), name.replace("-", " ")],
+                }
+            )
+    except Exception:
+        pass
+    raw = os.environ.get("ACCOUNT_ALIASES_JSON")
+    if not raw:
+        return aliases
+    try:
+        parsed = json.loads(raw)
+        extra: list[dict] = []
+        if isinstance(parsed, list):
+            extra = [e for e in parsed if isinstance(e, dict) and "customer_id" in e]
+        elif isinstance(parsed, dict):
+            for cid, meta in parsed.items():
+                if not isinstance(meta, dict):
+                    continue
+                extra.append(
+                    {
+                        "customer_id": cid,
+                        "name": meta.get("name", cid),
+                        "aliases": meta.get("aliases", []),
+                    }
+                )
+        # merge by customer_id (env overrides defaults)
+        merged: dict[str, dict] = {}
+        for item in aliases + extra:
+            cid = str(item.get("customer_id", "")).strip()
+            if not cid:
+                continue
+            merged[cid] = {
+                "customer_id": cid,
+                "name": item.get("name", cid),
+                "aliases": item.get("aliases", []) or [],
+            }
+        return list(merged.values())
+    except Exception:
+        return aliases
+
+
+def _extract_entity_intent(message: str) -> dict:
+    """
+    Very lightweight entity intent extractor for ad/keyword queries.
+    Returns dict with keys: entity_type ('ad'|'keyword'|'campaign'|None), identifier (str|None), metric (str|None), compare_wow (bool), device (str|None)
+    """
+    t = (message or "").lower()
+    entity_type = None
+    if "keyword" in t:
+        entity_type = "keyword"
+    elif "campaign" in t:
+        entity_type = "campaign"
+    elif "ad copy" in t or "ad performance" in t or "ad " in t or t.startswith("ad "):
+        entity_type = "ad"
+    elif "pmax" in t or "performance max" in t:
+        entity_type = "pmax"
+
+    metric = None
+    for m in [
+        "conversions",
+        "conv",
+        "clicks",
+        "ctr",
+        "cpc",
+        "cpa",
+        "roas",
+        "cost",
+        "spend",
+        "impression share",
+        "is",
+        "lost is",
+        "rank",
+        "budget",
+        "auction",
+        "outranking",
+        "top of page",
+        "quality score",
+        "qs",
+        "policy",
+        "disapproval",
+        "feed",
+    ]:
+        if m in t:
+            metric = m
+            break
+
+    # Identifier: quoted string or trailing after keyword/ad
+    identifier = None
+    m_quote = re.search(r'"([^"]+)"', message or "")
+    if m_quote:
+        identifier = m_quote.group(1).strip()
+    else:
+        # crude heuristic: take token after 'keyword' or 'ad'
+        tokens = re.split(r"\s+", message)
+        for i, tok in enumerate(tokens):
+            if tok.lower() in ("keyword", "ad", "adcopy", "ad_copy", "campaign") and i + 1 < len(tokens):
+                candidate = tokens[i + 1].strip(" ,.?;:\"'()[]{}")
+                if candidate:
+                    identifier = candidate
+                break
+
+    device = None
+    if "mobile" in t:
+        device = "MOBILE"
+    elif "desktop" in t:
+        device = "DESKTOP"
+    elif "tablet" in t:
+        device = "TABLET"
+
+    network = None
+    if "search partner" in t:
+        network = "SEARCH_PARTNERS"
+    elif "search" in t:
+        network = "SEARCH"
+    elif "display" in t:
+        network = "DISPLAY"
+
+    brand_scope = None
+    if "nonbrand" in t or "non-brand" in t or "generic" in t:
+        brand_scope = "NON_BRAND"
+    elif "brand" in t:
+        brand_scope = "BRAND"
+
+    match_type = None
+    for mt in ["exact", "phrase", "broad"]:
+        if mt in t:
+            match_type = mt.upper()
+            break
+
+    audience = None
+    if "remarketing" in t or "retarget" in t:
+        audience = "REMARKETING"
+    elif "similar" in t or "similar to" in t or "similar audience" in t:
+        audience = "SIMILAR"
+
+    geo = None
+    geo_match = re.search(r"in ([A-Za-z\s]+)$", message or "")
+    if geo_match:
+        geo = geo_match.group(1).strip()
+
+    daypart = None
+    for dp in ["morning", "afternoon", "evening", "night"]:
+        if dp in t:
+            daypart = dp.upper()
+            break
+
+    compare_wow = any(p in t for p in ["wow", "week over week", "week-over-week", "week over-week", "w/w", "down", "up"])
+
+    return {
+        "entity_type": entity_type,
+        "identifier": identifier,
+        "metric": metric,
+        "compare_wow": compare_wow,
+        "device": device,
+        "network": network,
+        "brand_scope": brand_scope,
+        "match_type": match_type,
+        "audience": audience,
+        "geo": geo,
+        "daypart": daypart,
+    }
+
+
+def _extract_top_mover_intent(message: str) -> dict:
+    """
+    Detect top mover/anomaly intent when no specific entity identifier is given.
+    """
+    t = (message or "").lower()
+    keywords = [
+        "top",
+        "best",
+        "worst",
+        "down",
+        "up",
+        "drop",
+        "increase",
+        "decrease",
+        "spike",
+        "anomaly",
+        "mover",
+        "trending",
+        "performance",
+        "shift",
+        "change",
+        "moved",
+    ]
+    is_top = any(k in t for k in keywords)
+    entity_type = None
+    if "keyword" in t:
+        entity_type = "keyword"
+    elif "ad" in t or "creative" in t:
+        entity_type = "ad"
+    elif "campaign" in t:
+        entity_type = "campaign"
+    elif "asset group" in t or "asset" in t:
+        entity_type = "asset_group"
+
+    metric = None
+    for m in ["conversions", "conv", "clicks", "ctr", "cpc", "cpa", "roas", "cost", "spend", "impression share", "auction", "budget"]:
+        if m in t:
+            metric = m
+            break
+
+    device = None
+    if "mobile" in t:
+        device = "MOBILE"
+    elif "desktop" in t:
+        device = "DESKTOP"
+    elif "tablet" in t:
+        device = "TABLET"
+
+    return {"is_top_intent": is_top, "entity_type": entity_type, "metric": metric, "device": device}
+
+
+def _resolve_account_context(message: str, customer_ids: list[str], account_name: str | None) -> tuple[list[str], str | None, str | None]:
+    """
+    Resolve account/customer from free-text using aliases and optional explicit IDs.
+    Returns (customer_ids, account_name, notes)
+    """
+    notes: list[str] = []
+    resolved_ids = [cid for cid in customer_ids or [] if cid]
+    resolved_account = account_name
+
+    aliases = _load_account_aliases()
+    msg_norm = _normalize_text(message)
+    acct_norm = _normalize_text(account_name)
+
+    def matches_entry(entry: dict) -> bool:
+        names = [entry.get("name", "")] + entry.get("aliases", []) or []
+        for name in names:
+            if not name:
+                continue
+            if _normalize_text(name) and _normalize_text(name) in msg_norm:
+                return True
+            if acct_norm and _normalize_text(name) == acct_norm:
+                return True
+        return False
+
+    matched_entries = [e for e in aliases if matches_entry(e)]
+    # Digits present in message (possible customer_id)
+    if not resolved_ids:
+        import re as _re
+
+        ids_in_text = _re.findall(r"\b\d{8,12}\b", msg_norm)
+        if ids_in_text:
+            resolved_ids = [ids_in_text[0]]
+            notes.append(f"Detected customer_id {ids_in_text[0]} from message.")
+
+    if matched_entries:
+        # If multiple matches, disambiguate instead of guessing
+        if len(matched_entries) > 1:
+            human_names = [f"{m.get('name','')} ({m.get('customer_id') or 'needs id'})".strip() for m in matched_entries]
+            notes.append(f"Multiple account matches found: {', '.join(human_names)}. Please specify a customer ID.")
+            resolved_ids = []
+            resolved_account = None
+        else:
+            m = matched_entries[0]
+            if m.get("customer_id"):
+                if not resolved_ids:
+                    resolved_ids = [m["customer_id"]]
+                if not resolved_account:
+                    resolved_account = m.get("name") or resolved_account
+                notes.append(f"Resolved account to {m.get('name','')} ({m.get('customer_id')}).")
+            else:
+                # Name-only alias: keep name, require ID
+                resolved_account = resolved_account or m.get("name")
+                notes.append(f"Identified account '{resolved_account}' but need a customer ID.")
+    else:
+        # Try fuzzy match against known aliases/names to propose options without defaulting
+        candidates: list[tuple[float, dict]] = []
+        for entry in aliases:
+            names = [entry.get("name", "")] + entry.get("aliases", []) or []
+            for name in names:
+                score = _fuzzy_score(msg_norm, _normalize_text(name))
+                if score >= 0.72:
+                    candidates.append((score, entry))
+                    break
+        candidates = sorted(candidates, key=lambda x: x[0], reverse=True)[:3]
+        if candidates:
+            human = [f"{c[1].get('name','')} ({c[1].get('customer_id') or 'needs id'})" for c in candidates]
+            notes.append(f"Possible matches: {', '.join(human)}. Please confirm a customer ID.")
+            resolved_ids = []
+            resolved_account = None
+
+    # If defaults were injected but the text points elsewhere (no alias match, no ID found), drop defaults to force clarification
+    default_ids = _default_customer_ids()
+    has_letters = bool(re.search(r"[a-zA-Z]", msg_norm))
+    if (
+        resolved_ids
+        and default_ids
+        and resolved_ids == default_ids
+        and has_letters
+        and not matched_entries
+        and not ids_in_text
+        and not acct_norm
+    ):
+        notes.append("Cleared fallback customer_id because message did not match default account.")
+        resolved_ids = []
+        resolved_account = None
+
+    # If we have an ID but no friendly name, try to backfill from aliases
+    if resolved_ids and not resolved_account:
+        by_id = {a["customer_id"]: a for a in aliases}
+        if resolved_ids[0] in by_id:
+            resolved_account = by_id[resolved_ids[0]].get("name") or resolved_account
+
+    return resolved_ids, resolved_account, "; ".join(notes) if notes else None
+
+
+def _default_customer_ids() -> list[str]:
+    """Best-effort default customer IDs from env DEFAULT_CUSTOMER_IDS (comma-separated)."""
+    env_ids = os.environ.get("DEFAULT_CUSTOMER_IDS", "")
+    if env_ids:
+        return [cid.strip() for cid in env_ids.split(",") if cid.strip()]
+    return []
+
+
+class AdsConnectRequest(BaseModel):
+    client_id: str
+    client_secret: str
+    developer_token: str
+    refresh_token: str
+    customer_ids: list[str] = []
+
+
+class AdsFetchRequest(BaseModel):
+    account_name: str
+    customer_ids: list[str] = []
+    date_range: str | None = "LAST_30_DAYS"  # GAQL date range preset or yyyy-mm-dd..yyyy-mm-dd
+    dry_run: bool = False
+
+
+class AdsFetchAuditRequest(AdsFetchRequest):
+    business_unit: str = "Brand"
+
+
+class Sa360FetchRequest(BaseModel):
+    account_name: str | None = None  # will be auto-derived from SA360 if not provided
+    customer_ids: list[str] = []
+    date_range: str | None = "LAST_30_DAYS"
+    dry_run: bool = False
+    business_unit: str = "Brand"
+
+
+class Sa360DiagnosticsRequest(BaseModel):
+    customer_ids: list[str] = []
+    date_range: str | None = "LAST_7_DAYS"
+    include_previous: bool = True
+    account_name: str | None = None
+    bypass_cache: bool = False
+
+
+class TrendsRequest(BaseModel):
+    account_name: str | None = None
+    customer_ids: list[str] = []
+    themes: list[str] = []
+    timeframe: str = "now 12-m"   # e.g., "now 12-m" or "2025-01-01,2025-03-31"
+    geo: str | None = None
+    budget: float | None = None
+    use_performance: bool = True  # whether to seed weights from SA360 performance
+
+
+# Feature flags
+ADS_FETCH_ENABLED = os.environ.get("ADS_FETCH_ENABLED", "false").lower() == "true"
+# Search Ads 360 fetcher (feature-flagged)
+SA360_FETCH_ENABLED = os.environ.get("SA360_FETCH_ENABLED", "false").lower() == "true"
+SA360_CACHE_ENABLED = os.environ.get("SA360_CACHE_ENABLED", "true").lower() == "true"
+SA360_CACHE_FRESHNESS_DAYS = int(os.environ.get("SA360_CACHE_FRESHNESS_DAYS", "3") or "3")
+SA360_CACHE_PREFIX = os.environ.get("SA360_CACHE_PREFIX", "sa360_cache")
+SA360_ACCOUNT_CACHE_TTL_HOURS = int(os.environ.get("SA360_ACCOUNT_CACHE_TTL_HOURS", "6") or "6")
+SA360_ACCOUNT_CACHE: dict[str, object] = {"ts": None, "data": []}
+ENABLE_SUMMARY_ENHANCER = os.environ.get("ENABLE_SUMMARY_ENHANCER", "true").lower() == "true"
+
+
+class Sa360Account(BaseModel):
+    customer_id: str
+    name: str | None = None
+    manager: bool | None = None
+    # utilization note: exposed to frontend for disambiguation and manager guard
+
+# Canonical CSV schemas for Ads fetch (kept in code for validation and mapping)
+ADS_CSV_SCHEMAS = {
+    "campaign": [
+        "campaign.id",
+        "campaign.name",
+        "campaign.status",
+        "campaign.advertising_channel_type",
+        "campaign.advertising_channel_sub_type",
+        "campaign.start_date",
+        "campaign.end_date",
+        "campaign.bidding_strategy_type",
+        "campaign.budget_id",
+        "campaign.labels",
+        "campaign.resource_name",
+        "campaign.network_settings.target_search_network",
+        "campaign.network_settings.target_google_search",
+        "campaign.network_settings.target_partner_search_network",
+        "campaign.network_settings.target_content_network",
+        "campaign.target_cpa",
+        "campaign.target_roas",
+        "segments.device",
+        "segments.geo_target_region",
+    ],
+    "ad_group": [
+        "ad_group.id",
+        "ad_group.name",
+        "ad_group.status",
+        "ad_group.type",
+        "ad_group.cpc_bid_micros",
+        "ad_group.labels",
+        "campaign.id",
+        "segments.device",
+    ],
+    "ad": [
+        "ad_group_ad.ad.id",
+        "ad_group.id",
+        "campaign.id",
+        "ad_group_ad.status",
+        "ad_group_ad.policy_summary.approval_status",
+        "ad_group_ad.policy_summary.review_status",
+        "ad_group_ad.ad.type",
+        "ad_group_ad.ad.responsive_search_ad.headlines",
+        "ad_group_ad.ad.responsive_search_ad.descriptions",
+        "ad_group_ad.ad.final_urls",
+        "segments.device",
+    ],
+    "keyword_performance": [
+        "ad_group_criterion.criterion_id",
+        "ad_group_criterion.keyword.text",
+        "ad_group_criterion.keyword.match_type",
+        "ad_group_criterion.status",
+        "ad_group.id",
+        "campaign.id",
+        "metrics.impressions",
+        "metrics.clicks",
+        "metrics.cost_micros",
+        "metrics.conversions",
+        "metrics.conversions_value",
+        "metrics.ctr",
+        "metrics.average_cpc",
+        "metrics.cost_per_conversion",
+        "metrics.search_impression_share",
+        "metrics.search_rank_lost_impression_share",
+        "metrics.search_exact_match_impression_share",
+        "segments.device",
+    ],
+    "landing_page": [
+        "landing_page_view.unexpanded_final_url",
+        "metrics.impressions",
+        "metrics.clicks",
+        "metrics.conversions",
+        "metrics.conversions_value",
+        "metrics.average_cpc",
+        "metrics.ctr",
+        "segments.device",
+    ],
+    "account": [
+        "customer.id",
+        "customer.descriptive_name",
+        "customer.currency_code",
+        "customer.time_zone",
+        "customer.status",
+    ],
+}
+
+# SA360 GAQL snippets (mapped to our CSV schemas). Adjust if field coverage changes.
+SA360_QUERIES = {
+    "campaign": """
+        SELECT
+          customer.id,
+          campaign.id,
+          campaign.name,
+          campaign.status,
+          campaign.advertising_channel_type,
+          campaign.advertising_channel_sub_type,
+          campaign.start_date,
+          campaign.end_date,
+          campaign.bidding_strategy_type,
+          campaign.campaign_budget,
+          campaign.target_cpa.target_cpa_micros,
+          campaign.target_roas.target_roas,
+          segments.device,
+          segments.date,
+          segments.geo_target_region,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros
+        FROM campaign
+        WHERE campaign.status != 'REMOVED'
+    """,
+    "ad_group": """
+        SELECT
+          ad_group.id,
+          ad_group.name,
+          ad_group.status,
+          ad_group.type,
+          ad_group.cpc_bid_micros,
+          campaign.id,
+          segments.device,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros
+        FROM ad_group
+        WHERE ad_group.status != 'REMOVED'
+    """,
+    "ad": """
+        SELECT
+          ad_group_ad.ad.id,
+          ad_group.id,
+          campaign.id,
+          ad_group_ad.status,
+          ad_group_ad.ad.type,
+          ad_group_ad.ad.responsive_search_ad.headlines,
+          ad_group_ad.ad.responsive_search_ad.descriptions,
+          ad_group_ad.ad.final_urls,
+          segments.device,
+          segments.date,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros
+        FROM ad_group_ad
+        WHERE ad_group_ad.status != 'REMOVED'
+    """,
+    "keyword_performance": """
+        SELECT
+          ad_group_criterion.criterion_id,
+          ad_group_criterion.keyword.text,
+          ad_group_criterion.keyword.match_type,
+          ad_group_criterion.status,
+          ad_group.id,
+          campaign.id,
+          segments.date,
+          segments.device,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros,
+          metrics.conversions,
+          metrics.conversions_value,
+          metrics.ctr,
+          metrics.average_cpc,
+          metrics.cost_per_conversion
+        FROM keyword_view
+        WHERE ad_group_criterion.status != 'REMOVED'
+    """,
+    "account": """
+        SELECT
+          customer.id,
+          customer.descriptive_name,
+          customer.currency_code,
+          customer.time_zone,
+          customer.status
+        FROM customer
+    """,
+}
+
+
+def _get_nested_value(obj: Any, path: str):
+    cur = obj
+    for part in path.split("."):
+        if cur is None:
+            return None
+        if isinstance(cur, dict):
+            next_val = cur.get(part)
+            if next_val is None and "_" in part:
+                # Try camelCase fallback (e.g., cost_micros -> costMicros)
+                camel = part.split("_")[0] + "".join(x.capitalize() for x in part.split("_")[1:])
+                next_val = cur.get(camel)
+            cur = next_val
+        else:
+            return None
+    if isinstance(cur, list):
+        return ";".join(str(x) for x in cur)
+    if isinstance(cur, dict):
+        return json.dumps(cur)
+    return cur
+
+
+def _parse_human_date(message: str, default: str | None = None) -> str | None:
+    # Expanded natural-language span parsing for PPC-style queries
+    msg = message.lower()
+
+    def _range_days(n: int) -> str:
+        end = date.today()
+        start = end - timedelta(days=max(n - 1, 0))
+        return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+
+    if any(k in msg for k in ["yesterday"]):
+        d = date.today() - timedelta(days=1)
+        return f"{d:%Y-%m-%d},{d:%Y-%m-%d}"
+    if "today" in msg:
+        d = date.today()
+        return f"{d:%Y-%m-%d},{d:%Y-%m-%d}"
+
+    # Weekend handling
+    if "weekend" in msg:
+        today = date.today()
+        if "last weekend" in msg or "over the weekend" in msg:
+            base = today - timedelta(days=today.weekday() + 2)  # previous Saturday
+        elif "this weekend" in msg:
+            days_until_sat = (5 - today.weekday()) % 7
+            base = today + timedelta(days=days_until_sat)
+        else:
+            base = today - timedelta(days=today.weekday() + 2)  # default to last weekend
+        start = base
+        end = base + timedelta(days=1)
+        return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+
+    # Fixed spans
+    if "last 7" in msg or "past 7" in msg or "previous 7" in msg or "last week" in msg or "previous week" in msg:
+        return _range_days(7)
+    if "last 14" in msg or "past 14" in msg or "previous 14" in msg or "last two weeks" in msg or "last 2 weeks" in msg:
+        return _range_days(14)
+    if "last 30" in msg or "past 30" in msg or "previous 30" in msg or "last month" in msg:
+        return _range_days(30)
+    if "last 90" in msg or "past 90" in msg or "previous 90" in msg or "last quarter" in msg:
+        return _range_days(90)
+    if "last 3 days" in msg or "past 3 days" in msg or "3 days ago" in msg:
+        return _range_days(3)
+    if "last 14 days" in msg:
+        return _range_days(14)
+
+    # Week-to-date / Month-to-date / Quarter-to-date / Year-to-date
+    if "wtd" in msg or "week to date" in msg or "this week" in msg:
+        today = date.today()
+        start = today - timedelta(days=today.weekday())
+        return f"{start:%Y-%m-%d},{today:%Y-%m-%d}"
+    if "mtd" in msg or "month to date" in msg or "this month" in msg:
+        today = date.today()
+        start = today.replace(day=1)
+        return f"{start:%Y-%m-%d},{today:%Y-%m-%d}"
+    if "qtd" in msg or "quarter to date" in msg or "this quarter" in msg:
+        today = date.today()
+        quarter_start_month = ((today.month - 1) // 3) * 3 + 1
+        start = today.replace(month=quarter_start_month, day=1)
+        return f"{start:%Y-%m-%d},{today:%Y-%m-%d}"
+    if "ytd" in msg or "year to date" in msg or "this year" in msg:
+        today = date.today()
+        start = today.replace(month=1, day=1)
+        return f"{start:%Y-%m-%d},{today:%Y-%m-%d}"
+
+    # Explicit quarter references
+    if "last quarter" in msg or "previous quarter" in msg:
+        today = date.today()
+        quarter_start_month = ((today.month - 1) // 3) * 3 + 1
+        this_start = today.replace(month=quarter_start_month, day=1)
+        last_end = this_start - timedelta(days=1)
+        last_start = last_end.replace(month=((last_end.month - 1) // 3) * 3 + 1, day=1)
+        return f"{last_start:%Y-%m-%d},{last_end:%Y-%m-%d}"
+    if "q1" in msg or "q2" in msg or "q3" in msg or "q4" in msg:
+        today = date.today()
+        qmap = {"q1": 1, "q2": 4, "q3": 7, "q4": 10}
+        for token, month in qmap.items():
+            if token in msg:
+                start = date(today.year, month, 1)
+                if month == 10:
+                    end = date(today.year, 12, 31)
+                else:
+                    end = date(today.year, month + 3, 1) - timedelta(days=1)
+                return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+
+    # Specific presets
+    for key in [
+        "week before last",
+        "two weeks ago",
+    ]:
+        if key in msg:
+            start_this_week = date.today() - timedelta(days=date.today().weekday())
+            start = start_this_week - timedelta(weeks=2)
+            end = start + timedelta(days=6)
+            return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+
+    # Fallback to provided default
+    return default
+
+
+def _build_sa360_plan_from_chat(message: str, customer_ids: list[str], account_name: str | None, default_date: str | None) -> dict:
+    # Plan = structured request for SA360 fetch-and-audit
+    date_hint = _parse_human_date(message, default_date)
+    bu = "Brand"
+    lower = (message or "").lower()
+    if "pmax" in lower or "performance max" in lower:
+        bu = "PMax"
+    elif "nonbrand" in lower or "non-brand" in lower or "non brand" in lower:
+        bu = "NonBrand"
+    elif "brand" in lower:
+        bu = "Brand"
+    return {
+        "account_name": account_name,
+        "customer_ids": customer_ids,
+        "date_range": date_hint,
+        "dry_run": False,
+        "business_unit": bu,
+    }
+
+
+def _enhance_summary_text(summary: str | None) -> str | None:
+    if not summary:
+        return None
+    follow_up = "Next step: want me to pull campaign and device breakdowns to explain these changes?"
+    # Keep it concise; append a single action-oriented follow-up
+    return f"{summary} {follow_up}"
+
+
+def _qa_raw_totals(frames: dict[str, pd.DataFrame]) -> dict:
+    """Compute raw sums from keyword_performance frame as a QA reference."""
+    df = frames.get("keyword_performance")
+    if df is None:
+        df = pd.DataFrame()
+    if df.empty:
+        return {"impressions": None, "clicks": None, "cost": None, "conversions": None}
+    impr_col = df.get("Impr.")
+    if impr_col is None:
+        impr_col = df.get("impressions")
+    clicks_col = df.get("Clicks")
+    if clicks_col is None:
+        clicks_col = df.get("clicks")
+    cost_col = df.get("Cost")
+    if cost_col is None:
+        cost_col = df.get("cost")
+    conv_col = df.get("Conversions")
+    if conv_col is None:
+        conv_col = df.get("conversions")
+
+    impr = pd.to_numeric(impr_col, errors="coerce").fillna(0).sum() if impr_col is not None else 0.0
+    clicks = pd.to_numeric(clicks_col, errors="coerce").fillna(0).sum() if clicks_col is not None else 0.0
+    cost = pd.to_numeric(cost_col, errors="coerce").fillna(0).sum() if cost_col is not None else 0.0
+    conv = pd.to_numeric(conv_col, errors="coerce").fillna(0).sum() if conv_col is not None else 0.0
+    return {
+        "impressions": float(impr),
+        "clicks": float(clicks),
+        "cost": float(cost),
+        "conversions": float(conv),
+    }
+
+
+def _validate_sa360_plan(plan: dict) -> tuple[dict, str | None]:
+    """
+    Ensure required keys exist and strip unsupported fields from plan body.
+    Currently ensures customer_ids present; leaves geo/device constraints to query definitions.
+    """
+    notes = []
+    if not plan.get("customer_ids"):
+        raise HTTPException(status_code=400, detail="No customer_ids provided in plan.")
+    for cid in plan.get("customer_ids", []):
+        if _is_sa360_manager_account(str(cid)):
+            raise HTTPException(status_code=400, detail="Requested account is a manager (MCC); select a child account for metrics.")
+    if not plan.get("date_range"):
+        notes.append("No date specified; defaulting to LAST_7_DAYS.")
+        plan["date_range"] = "LAST_7_DAYS"
+    # Normalize date_range to string in case a numeric gets through (avoid .strip on numpy scalars)
+    if plan.get("date_range") is not None and not isinstance(plan["date_range"], str):
+        plan["date_range"] = str(plan["date_range"])
+    return plan, "; ".join(notes) if notes else None
+
+
+@app.post("/api/chat/plan-and-run", response_model=PlanResponse)
+async def chat_plan_and_run(req: PlanRequest):
+    """
+    Lightweight planner: interpret human message into SA360 fetch-and-audit call,
+    validate, execute, and return result + notes.
+    """
+    try:
+        intent_hint = (req.intent_hint or "").lower().strip() if req.intent_hint else None
+        # Honor explicit intent hint from router; default to performance unless explicitly audit
+        audit_forced = intent_hint == "audit"
+        perf_intent = not audit_forced
+        entity_intent = _extract_entity_intent(req.message)
+        top_intent = _extract_top_mover_intent(req.message)
+        resolved_ids, resolved_account, resolution_notes = _resolve_account_context(
+            req.message,
+            customer_ids=req.customer_ids or [],
+            account_name=req.account_name,
+        )
+        plan = _build_sa360_plan_from_chat(
+            req.message,
+            customer_ids=resolved_ids,
+            account_name=resolved_account,
+            default_date=req.default_date_range,
+        )
+        plan, notes = _validate_sa360_plan(plan)
+        combined_notes = "; ".join([n for n in [resolution_notes, notes] if n])
+
+        # Performance-only path (no audit score, no XLSX) when the user asks for metrics/deltas or router hinted performance
+        if perf_intent and not audit_forced:
+            _ensure_sa360_feature()
+            _ensure_sa360_enabled()
+
+            span = _date_span_from_range(_coerce_date_range(plan["date_range"]))
+            if not span:
+                plan["date_range"] = "LAST_7_DAYS"
+                span = _date_span_from_range(_coerce_date_range(plan["date_range"]))
+            prev_span = _previous_span(span) if span else None
+
+            def span_to_range(sp: tuple[date, date]) -> str:
+                return f"{sp[0]:%Y-%m-%d},{sp[1]:%Y-%m-%d}"
+
+            current_range = span_to_range(span) if span else plan["date_range"]
+            previous_range = span_to_range(prev_span) if prev_span else None
+
+            frames_current = _collect_sa360_frames(plan["customer_ids"], current_range)
+            frames_previous = _collect_sa360_frames(plan["customer_ids"], previous_range) if previous_range else {}
+
+            perf_current = _aggregate_account_performance(frames_current)
+            perf_previous = _aggregate_account_performance(frames_previous) if previous_range else {}
+            deltas = _compute_perf_deltas(perf_current, perf_previous)
+            debug_perf = _get_perf_frame_debug(frames_current)
+            try:
+                print(f"[perf_debug] frame={debug_perf.get('frame')} rows={debug_perf.get('row_count')} cost_col={debug_perf.get('cost_column')} nonnull={debug_perf.get('cost_nonnull')} sample={debug_perf.get('cost_sample')}", file=sys.stderr, flush=True)
+            except Exception:
+                pass
+
+            missing_spend = (
+                (perf_current.get("cost") in (None, 0, 0.0))
+                and (perf_current.get("clicks") or 0) > 0
+                and (debug_perf.get("cost_nonnull") or 0) == 0
+            )
+
+            acct = plan.get("account_name") or "your account"
+            summary_parts = [f"{acct}: performance {current_range}"]
+            if previous_range:
+                summary_parts.append(f"vs {previous_range}.")
+
+            def fmt_delta(key: str, label: str) -> str | None:
+                d = deltas.get(key) or {}
+                cur = d.get("current")
+                pct = d.get("pct_change")
+                if cur is None:
+                    return None
+                if pct is None:
+                    return f"{label}: {cur:,.2f}"
+                return f"{label}: {cur:,.2f} ({pct:+.1f}% vs prev)"
+
+            def fmt_delta_with_change(key: str, label: str) -> str | None:
+                d = deltas.get(key) or {}
+                cur = d.get("current")
+                prev = d.get("previous")
+                pct = d.get("pct_change")
+                change = d.get("change")
+                if cur is None:
+                    return None
+                def with_currency(val: float) -> str:
+                    return f"${val:,.2f}"
+                is_money = label.lower() in {"cost", "cpc", "cpa"}
+                val_str = with_currency(cur) if is_money else f"{cur:,.2f}"
+                parts = [f"{label}: {val_str}"]
+                # Include absolute change if meaningful
+                if change not in (None, 0):
+                    delta_val = with_currency(change) if is_money else f"{change:+,.2f}"
+                    parts.append(f"(Δ {delta_val}")
+                    if pct is not None:
+                        parts[-1] += f", {pct:+.1f}%"
+                    parts[-1] += ")"
+                elif pct is not None:
+                    parts.append(f"({pct:+.1f}%)")
+                return " ".join(parts)
+
+            highlights = [fmt_delta_with_change("conversions", "Conversions"), fmt_delta_with_change("cost", "Cost"), fmt_delta_with_change("roas", "ROAS")]
+            highlights = [h for h in highlights if h]
+            secondary = [fmt_delta_with_change("ctr", "CTR"), fmt_delta_with_change("cpc", "CPC"), fmt_delta_with_change("cvr", "CVR")]
+            secondary = [s for s in secondary if s]
+
+            summary_text = " ".join(summary_parts).strip()
+            if highlights:
+                summary_text += " | " + " ; ".join(highlights)
+            if secondary:
+                summary_text += " | " + " ; ".join(secondary[:2])
+            if missing_spend:
+                summary_text += " (Spend not returned for this window; data may be missing for this date range.)"
+
+            actions = []
+            conv_pct = deltas.get("conversions", {}).get("pct_change")
+            cost_pct = deltas.get("cost", {}).get("pct_change")
+            roas_pct = deltas.get("roas", {}).get("pct_change")
+            if conv_pct is not None and conv_pct < 0 and (cost_pct is None or cost_pct >= 0):
+                actions.append("Tighten spend to high-conversion segments; pause waste.")
+            if roas_pct is not None and roas_pct < 0:
+                actions.append("Check bidding/attribution shifts impacting ROAS.")
+            if not actions and not highlights:
+                actions.append("No strong signals; consider deeper slice by device/geo/query.")
+            if actions:
+                summary_text += " Next steps: " + " ".join(actions[:2])
+
+            perf_result = {
+                "status": "success",
+                "mode": "performance",
+                "date_range_current": current_range,
+                "date_range_previous": previous_range,
+                "current": _to_primitive(perf_current),
+                "previous": _to_primitive(perf_previous),
+                "deltas": _to_primitive(deltas),
+                "debug": _to_primitive(debug_perf),
+                "data_quality": {"missing_spend": missing_spend},
+            }
+            enhanced = _enhance_summary_text(summary_text) if ENABLE_SUMMARY_ENHANCER else None
+            return PlanResponse(plan=plan, notes=combined_notes, executed=True, result=perf_result, analysis=None, summary=summary_text, enhanced_summary=enhanced)
+
+        # Default path: fetch + audit (optionally with XLSX if requested)
+        fetch_resp = await sa360_fetch_and_audit(Sa360FetchRequest(**plan))
+        # If chat-only, drop the file reference and clean up the generated XLSX
+        if not req.generate_report and isinstance(fetch_resp, dict):
+            file_path = fetch_resp.get("file_path")
+            fetch_resp.pop("file_path", None)
+            fetch_resp.pop("file_name", None)
+            if file_path:
+                try:
+                    Path(file_path).unlink(missing_ok=True)
+                except Exception:
+                    pass
+
+        acct = plan.get("account_name") or "your account"
+        date_span = plan.get("date_range") or "LAST_7_DAYS"
+        audit_result = fetch_resp.get("result") or {}
+        overall_score = audit_result.get("overall_score") or audit_result.get("score") or None
+        confidence = audit_result.get("confidence") or audit_result.get("confidence_label") or None
+        scored = audit_result.get("scored_criteria") or audit_result.get("scored") or None
+        needs = audit_result.get("needs_data") or audit_result.get("needs") or None
+        ml_insights = fetch_resp.get("ml_insights") or audit_result.get("ml_insights") or {}
+        highlight_insights = []
+        key_findings = []
+        actions = []
+        if isinstance(ml_insights, dict):
+            recs = ml_insights.get("recommendations") or ml_insights.get("actions")
+            if isinstance(recs, list):
+                actions.extend([str(x) for x in recs if x][:3])
+            patterns = ml_insights.get("patterns")
+            if isinstance(patterns, list):
+                highlight_insights.extend([str(x) for x in patterns if x][:1])
+            anomalies = ml_insights.get("anomalies")
+            if isinstance(anomalies, list):
+                highlight_insights.extend([str(x) for x in anomalies if x][:1])
+            kf = ml_insights.get("key_findings")
+            if isinstance(kf, list):
+                key_findings.extend([str(x) for x in kf if x][:3])
+            pa = ml_insights.get("priority_actions")
+            if isinstance(pa, list):
+                actions.extend([str(x) for x in pa if x][:3])
+
+        summary_text = f"Here's your KAI audit for {acct} ({date_span})."
+        if overall_score:
+            summary_text += f" Audit health {overall_score:.2f}/5"
+            if confidence:
+                summary_text += f" with {confidence} confidence"
+            summary_text += "."
+        if scored is not None and needs is not None:
+            summary_text += f" Scored {scored} checks; {needs} need more data (partial coverage)."
+        if highlight_insights:
+            summary_text += " Highlights: " + "; ".join(highlight_insights[:3]) + "."
+        if key_findings:
+            summary_text += " Findings: " + "; ".join(key_findings[:2]) + "."
+        if actions:
+            summary_text += " Next steps: " + "; ".join(actions[:2]) + "."
+        if req.generate_report and fetch_resp.get("file_name"):
+            summary_text += f" Report attached: {fetch_resp.get('file_name')}."
+
+        analysis = None
+        if entity_intent.get("entity_type") and entity_intent.get("identifier"):
+            try:
+                analysis = _analyze_entity_performance(entity_intent, plan["customer_ids"], plan["date_range"])
+                if analysis and combined_notes:
+                    combined_notes = f"{combined_notes}; entity analyzed"
+                elif analysis:
+                    combined_notes = "Entity analyzed"
+            except Exception as exc:
+                analysis = {"note": f"Entity analysis failed: {str(exc)[:120]}", "entity": entity_intent}
+        elif top_intent.get("is_top_intent") or (entity_intent.get("entity_type") and not entity_intent.get("identifier")):
+            mover_target_type = entity_intent.get("entity_type") or top_intent.get("entity_type")
+            metric_focus = entity_intent.get("metric") or top_intent.get("metric")
+            device_filter = entity_intent.get("device") or top_intent.get("device")
+            try:
+                analysis = _analyze_top_movers(plan["customer_ids"], plan["date_range"], mover_target_type, metric_focus, device_filter)
+                if analysis and combined_notes:
+                    combined_notes = f"{combined_notes}; top movers analyzed"
+                elif analysis:
+                    combined_notes = "Top movers analyzed"
+            except Exception as exc:
+                analysis = {"note": f"Top movers analysis failed: {str(exc)[:120]}", "entity_type": mover_target_type}
+
+        enhanced = _enhance_summary_text(summary_text) if ENABLE_SUMMARY_ENHANCER else None
+        return PlanResponse(plan=plan, notes=combined_notes, executed=True, result=fetch_resp, analysis=analysis, summary=summary_text, enhanced_summary=enhanced)
+    except HTTPException as exc:
+        err_msg = str(exc.detail)
+        print(f"[planner] HTTPException: {err_msg}", file=sys.stderr, flush=True)
+        return PlanResponse(plan=req.dict(), executed=False, error=err_msg, summary=None, enhanced_summary=None)
+    except Exception as exc:
+        tb = traceback.format_exc()
+        print(f"[planner] Exception: {exc}\n{tb}", file=sys.stderr, flush=True)
+        return PlanResponse(plan=req.dict(), executed=False, error=f"{exc}", summary=None, enhanced_summary=None)
+
+
+@app.post("/api/qa/accuracy")
+async def qa_accuracy(req: QaAccuracyRequest):
+    """
+    QA endpoint: compare raw SA360 sums vs aggregated performance totals for a customer/date_range.
+    Feature-flagged to avoid unexpected exposure in production.
+    """
+    if not ENABLE_SUMMARY_ENHANCER:
+        # Reuse flag to allow quick disable of QA if needed
+        raise HTTPException(status_code=403, detail="QA endpoints disabled.")
+
+    def _as_py_number(val):
+        if val is None:
+            return None
+        try:
+            return float(val)
+        except Exception:
+            try:
+                return float(str(val).replace(",", ""))
+            except Exception:
+                return None
+
+    def _matches(a, b) -> bool:
+        if a is None or b is None:
+            return a == b
+        return math.isclose(float(a), float(b), rel_tol=1e-9, abs_tol=1e-6)
+
+    try:
+        _ensure_sa360_enabled()
+        if _is_sa360_manager_account(req.customer_id):
+            raise HTTPException(status_code=400, detail="Requested account is a manager (MCC); select a child account for metrics.")
+        frames = _collect_sa360_frames([req.customer_id], _coerce_date_range(req.date_range))
+        raw_totals = _qa_raw_totals(frames)
+        agg = _aggregate_account_performance(frames)
+        keys = ["impressions", "clicks", "cost", "conversions"]
+        raw_cast = {k: _as_py_number(raw_totals.get(k)) for k in keys}
+        aggregated_totals = {k: _as_py_number(agg.get(k)) for k in keys}
+        matches = {k: _matches(raw_cast.get(k), aggregated_totals.get(k)) for k in keys}
+        return {"raw_totals": raw_cast, "aggregated_totals": aggregated_totals, "matches": matches}
+    except HTTPException as exc:
+        detail = str(exc.detail)
+        status_code = exc.status_code
+        if "REQUESTED_METRICS_FOR_MANAGER" in detail:
+            status_code = 400
+            detail = "Requested account is a manager (MCC); select a child account for metrics."
+        return JSONResponse(status_code=status_code, content={"error": detail})
+    except Exception as exc:
+        tb = traceback.format_exc()
+        return JSONResponse(status_code=500, content={"error": f"QA failure: {exc}", "traceback": tb})
+
+
+@app.get("/api/diagnostics/health")
+async def diagnostics_health():
+    """
+    Self-serve health check for Kai:
+    - SA360 availability + account count
+    - QA accuracy on a small sample (if available)
+    - Manager/MCC guard presence
+    """
+    try:
+        summary = _health_check_summary()
+        return summary
+    except Exception as exc:
+        tb = traceback.format_exc()
+        return JSONResponse(status_code=500, content={"status": "error", "error": str(exc), "traceback": tb})
+
+
+@app.get("/api/settings/env")
+async def env_list():
+    """
+    List whitelisted environment variables (masked). Read-only unless update endpoint is used.
+    """
+    try:
+        data = []
+        for key in _env_allowlist():
+            data.append({"key": key, "value": _mask_value(os.environ.get(key))})
+        return {"env": data}
+    except Exception as exc:
+        tb = traceback.format_exc()
+        return JSONResponse(status_code=500, content={"error": f"Env list failed: {exc}", "traceback": tb})
+
+
+@app.post("/api/settings/env/update")
+async def env_update(req: EnvUpdateRequest):
+    """
+    Update whitelisted environment variables at runtime.
+    Requires admin password (KAI_ACCESS_PASSWORD). Note: runtime-only; container restarts will revert unless persisted in deployment config.
+    """
+    admin_pwd = os.environ.get("KAI_ACCESS_PASSWORD")
+    if not admin_pwd or req.admin_password != admin_pwd:
+        raise HTTPException(status_code=403, detail="Invalid admin password.")
+    if req.key not in _env_allowlist():
+        raise HTTPException(status_code=400, detail="Key not allowed.")
+    os.environ[req.key] = req.value
+    return {"updated": req.key, "value_masked": _mask_value(req.value)}
+
+
+@app.post("/api/chat/route", response_model=RouteResponse)
+async def chat_route(req: RouteRequest):
+    """
+    LLM-based router: decide which tool to use (audit/performance/pmax/serp/competitor/creative/general),
+    and whether to run planner or trends. Stays fully inside our backend (no external data).
+    """
+    merged_ids = list(dict.fromkeys((req.customer_ids or []) + _extract_customer_ids_from_text(req.message)))
+
+    default_route = RouteResponse(
+        intent="general_chat",
+        tool=None,
+        run_planner=False,
+        run_trends=False,
+        customer_ids=merged_ids,
+        needs_ids=False,
+        notes=None,
+        confidence=None,
+    )
+
+    try:
+        prompt = _router_prompt(req.message, req.account_name)
+        messages = [
+            {"role": "system", "content": "You are a strict JSON router. Follow the instructions exactly."},
+            {"role": "user", "content": prompt},
+        ]
+        raw = call_azure_openai(messages, session_id=None, intent="router", tenant_id=None)
+        router_payload = json.loads(raw) if raw else {}
+        route = _safe_route_intent(router_payload)
+    except Exception as exc:
+        print(f"[router] fallback: {exc}", file=sys.stderr, flush=True)
+        # Fallback to simple rule: performance/audit keywords -> planner
+        t = (req.message or "").lower()
+        perf = _has_performance_intent(t) or "audit" in t
+        route = RouteResponse(
+            intent="performance" if perf else "general_chat",
+            tool="performance" if perf else None,
+            run_planner=perf,
+            run_trends=False,
+            customer_ids=merged_ids,
+            needs_ids=False,
+            notes="router_fallback",
+            confidence=None,
+        )
+
+    # Merge IDs from request + router extraction
+    final_ids = list(dict.fromkeys((route.customer_ids or []) + merged_ids))
+    needs_ids = (route.run_planner and not final_ids) or (route.needs_ids and not final_ids)
+
+    # Low-confidence path: ask for clarification, do not trigger planner
+    route_conf = route.confidence if route.confidence is not None else 0.5
+    if route_conf < 0.4:
+        needs_ids = False
+        route.run_planner = False
+        route.tool = None if route.intent == "general_chat" else route.tool
+        route.needs_clarification = True
+        clarify = route.clarification or "What would you like me to do—run a performance check, an audit, or answer generally?"
+        route.clarification = clarify
+        route.notes = (route.notes or "") + " low_confidence_router"
+
+    # If any provided ID is a manager (MCC), block planner and request a child account
+    manager_ids = [cid for cid in final_ids if _is_sa360_manager_account(str(cid))]
+    if manager_ids:
+        needs_ids = True
+        final_ids = []
+        route.run_planner = False
+        child_hint = ""
+        try:
+            children = [a for a in _sa360_list_customers_cached() if not a.get("manager")]
+            if children:
+                shortlist = children[:5]
+                child_hint = " Pick a child account such as: " + " | ".join(
+                    f"{c.get('name','account')} ({c.get('customer_id')})" for c in shortlist
+                )
+        except Exception:
+            pass
+        note = f"Manager account detected; select a child account.{child_hint}"
+        route.notes = note if not route.notes else f"{route.notes}; {note}"
+
+    return RouteResponse(
+        intent=route.intent,
+        tool=route.tool,
+        run_planner=route.run_planner,
+        run_trends=route.run_trends,
+        customer_ids=final_ids,
+        needs_ids=needs_ids,
+        notes=route.notes,
+        confidence=route.confidence,
+        needs_clarification=route.needs_clarification,
+        clarification=route.clarification,
+        candidates=route.candidates,
+    )
+
+
+def _coerce_date_range(date_range: str | None) -> str | None:
+    """
+    Normalize human-friendly or explicit date ranges to GAQL DURING syntax.
+    Supports presets (last week, last 7 days), week-before-last, and explicit dates.
+    Returns tokens like 'LAST_7_DAYS' or 'YYYY-MM-DD,YYYY-MM-DD'.
+    """
+    if not date_range:
+        return None
+    raw = date_range.strip()
+    if not raw:
+        return None
+
+    upper = raw.upper().strip()
+    simple_presets = {"LAST_7_DAYS", "LAST_30_DAYS", "LAST_MONTH", "THIS_MONTH", "YESTERDAY", "TODAY"}
+    if upper in simple_presets:
+        return upper
+
+    key = raw.lower().replace("_", " ").strip()
+    # Relative offsets: "3 days ago" -> same start/end; "last 3 days"/"past 3 days" -> span
+    m_ago = re.search(r"(\d+)\s+days?\s+ago", key)
+    if m_ago:
+        n = int(m_ago.group(1))
+        target = date.today() - timedelta(days=n)
+        return f"{target:%Y-%m-%d},{target:%Y-%m-%d}"
+    m_span = re.search(r"(last|past)\s+(\d+)\s+days?", key)
+    if m_span:
+        n = int(m_span.group(2))
+        end = date.today()
+        start = end - timedelta(days=max(n - 1, 0))
+        return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+    preset_map = {
+        "last 7 days": "LAST_7_DAYS",
+        "last week": "LAST_WEEK",
+        "previous week": "LAST_WEEK",
+        "last 30 days": "LAST_30_DAYS",
+        "last month": "LAST_MONTH",
+        "this month": "THIS_MONTH",
+        "yesterday": "YESTERDAY",
+        "today": "TODAY",
+        "week before last": "WEEK_BEFORE_LAST",
+        "two weeks ago": "WEEK_BEFORE_LAST",
+    }
+    # Week-based presets
+    if key in ("last week", "previous week"):
+        # Monday-Sunday of prior week
+        start_this_week = date.today() - timedelta(days=date.today().weekday())
+        start = start_this_week - timedelta(weeks=1)
+        end = start + timedelta(days=6)
+        return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+    if key in ("week before last", "two weeks ago"):
+        start_this_week = date.today() - timedelta(days=date.today().weekday())
+        start = start_this_week - timedelta(weeks=2)
+        end = start + timedelta(days=6)
+        return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+
+    if key in preset_map:
+        return preset_map[key]
+
+    def _parse_date_fragment(fragment: str) -> date | None:
+        frag = fragment.strip()
+        for fmt in ("%Y-%m-%d", "%Y%m%d"):
+            try:
+                return datetime.strptime(frag, fmt).date()
+            except Exception:
+                continue
+        return None
+
+    # Explicit ranges with separators
+    for sep in ["..", ",", " to ", " TO ", " - "]:
+        if sep in raw:
+            tokens = raw.replace(" to ", "..").replace(" TO ", "..").replace(" - ", "..").replace(",", "..").split("..")
+            if len(tokens) == 2:
+                d1 = _parse_date_fragment(tokens[0])
+                d2 = _parse_date_fragment(tokens[1])
+                if d1 and d2:
+                    return f"{d1:%Y-%m-%d},{d2:%Y-%m-%d}"
+
+    # Fallback: if raw already looks like YYYYMMDD,YYYYMMDD keep as-is
+    if len(raw) == 17 and "," in raw and raw.replace(",", "").isdigit():
+        return raw  # already looks like YYYYMMDD,YYYYMMDD
+
+    # Last resort: return upper-cased raw to allow existing presets to flow through
+    return raw.upper()
+
+
+def _date_span_from_range(date_range: str | None) -> tuple[date, date] | None:
+    """
+    Convert our date_range tokens into concrete start/end dates (inclusive).
+    Supports presets used above and explicit YYYY-MM-DD,YYYY-MM-DD.
+    """
+    if not date_range:
+        return None
+    raw = date_range.strip()
+    if not raw:
+        return None
+
+    def monday_of_week(d: date) -> date:
+        return d - timedelta(days=d.weekday())
+
+    upper = raw.upper()
+    today = date.today()
+
+    if "," in raw and len(raw) >= 17:
+        try:
+            p1, p2 = raw.split(",", 1)
+            d1 = datetime.strptime(p1.strip(), "%Y-%m-%d").date()
+            d2 = datetime.strptime(p2.strip(), "%Y-%m-%d").date()
+            return d1, d2
+        except Exception:
+            pass
+
+    if upper in ("LAST_7_DAYS", "LAST7DAYS"):
+        end = today
+        start = end - timedelta(days=6)
+        return start, end
+    if upper in ("LAST_30_DAYS", "LAST30DAYS"):
+        end = today
+        start = end - timedelta(days=29)
+        return start, end
+    if upper in ("LAST_MONTH",):
+        first_this = today.replace(day=1)
+        last_prev = first_this - timedelta(days=1)
+        first_prev = last_prev.replace(day=1)
+        return first_prev, last_prev
+    if upper in ("THIS_MONTH",):
+        first_this = today.replace(day=1)
+        return first_this, today
+    if upper in ("YESTERDAY",):
+        y = today - timedelta(days=1)
+        return y, y
+    if upper in ("TODAY",):
+        return today, today
+    if upper in ("LAST_WEEK", "PREVIOUS WEEK"):
+        start_this_week = monday_of_week(today)
+        start = start_this_week - timedelta(weeks=1)
+        end = start + timedelta(days=6)
+        return start, end
+    if upper in ("WEEK_BEFORE_LAST", "TWO WEEKS AGO"):
+        start_this_week = monday_of_week(today)
+        start = start_this_week - timedelta(weeks=2)
+        end = start + timedelta(days=6)
+        return start, end
+    # 3 days ago
+    m_ago = re.search(r"(\\d+)\\s+days?\\s+ago", raw.lower())
+    if m_ago:
+        n = int(m_ago.group(1))
+        d1 = today - timedelta(days=n)
+        return d1, d1
+    m_span = re.search(r"(last|past)\\s+(\\d+)\\s+days?", raw.lower())
+    if m_span:
+        n = int(m_span.group(2))
+        end = today
+        start = end - timedelta(days=max(n - 1, 0))
+        return start, end
+    return None
+
+
+def _previous_span(span: tuple[date, date] | None) -> tuple[date, date] | None:
+    if not span:
+        return None
+    start, end = span
+    length = (end - start).days + 1
+    prev_end = start - timedelta(days=1)
+    prev_start = prev_end - timedelta(days=length - 1)
+    return prev_start, prev_end
+
+
+def _keyword_volume_snapshot(keyword: str, customer_ids: list[str], date_range: str | None, include_previous: bool = True) -> tuple[dict, list[dict]]:
+    """
+    Fetch impressions/clicks/cost for a keyword (case-insensitive) from SA360 keyword_performance.
+    Returns (exact_summary, close_matches[])
+    """
+    if not keyword:
+        return {}, []
+    # Always bypass cache to avoid stale/lifetime aggregates for volume asks
+    frames = _collect_sa360_frames(customer_ids, date_range, bypass_cache=True, write_cache=False)
+    # Build campaign type map for grouping (brand/nonbrand/competitor/pmax)
+    brand_aliases, competitor_aliases = _load_brand_competitor_aliases()
+    campaign_types: dict[str, str] = {}
+    camp_df = frames.get("campaign")
+    if camp_df is not None and not camp_df.empty:
+        for _, row in camp_df.iterrows():
+            cid = str(row.get("campaign.id") or "").strip()
+            cname = row.get("campaign.name") or ""
+            ctype = row.get("campaign.advertising_channel_type") or ""
+            if cid:
+                campaign_types[cid] = _classify_campaign(cname, ctype, brand_aliases, competitor_aliases)
+    kw_df = frames.get("keyword_performance")
+    if kw_df is None or kw_df.empty or "ad_group_criterion.keyword.text" not in kw_df.columns:
+        return {}, []
+    df = kw_df.copy()
+    df["__key"] = df["ad_group_criterion.keyword.text"].astype(str).str.lower()
+    # optional: restrict to search network by device if desired later
+    match_key = keyword.lower().strip()
+
+    def summarize(df_slice: pd.DataFrame) -> dict:
+        metrics = {
+            "impressions": pd.to_numeric(df_slice.get("metrics.impressions"), errors="coerce").sum(skipna=True),
+            "clicks": pd.to_numeric(df_slice.get("metrics.clicks"), errors="coerce").sum(skipna=True),
+            "cost": pd.to_numeric(df_slice.get("metrics.cost_micros"), errors="coerce").sum(skipna=True),
+            "conversions": pd.to_numeric(df_slice.get("metrics.conversions"), errors="coerce").sum(skipna=True),
+            "conversions_value": pd.to_numeric(df_slice.get("metrics.conversions_value"), errors="coerce").sum(skipna=True),
+        }
+        return _summarize_numeric(metrics)
+
+    def summarize_by_type(df_slice: pd.DataFrame) -> dict:
+        if df_slice is None or df_slice.empty:
+            return {}
+        by_type = {}
+        for ctype, g in df_slice.groupby("__campaign_type"):
+            by_type[ctype] = summarize(g)
+        return by_type
+
+    # annotate campaign type
+    if "campaign.id" in df.columns:
+        df["__campaign_type"] = df["campaign.id"].astype(str).map(campaign_types).fillna("nonbrand")
+    else:
+        df["__campaign_type"] = "nonbrand"
+    exact_df = df[df["__key"] == match_key]
+    exact = summarize(exact_df) if not exact_df.empty else {}
+    exact_types = summarize_by_type(exact_df) if not exact_df.empty else {}
+
+    close_matches: list[dict] = []
+    if exact_df.empty:
+        contains = df[df["__key"].str.contains(match_key, na=False)]
+        if not contains.empty:
+            agg = (
+                contains.groupby("__key")
+                .agg({"metrics.impressions": "sum", "metrics.clicks": "sum"})
+                .reset_index()
+                .sort_values("metrics.impressions", ascending=False)
+                .head(5)
+            )
+            for _, row in agg.iterrows():
+                close_matches.append(
+                    {
+                        "keyword": row["__key"],
+                        "impressions": float(row.get("metrics.impressions") or 0),
+                        "clicks": float(row.get("metrics.clicks") or 0),
+                    }
+                )
+
+    if include_previous and (exact or close_matches):
+        norm_range = _coerce_date_range(date_range) or "LAST_30_DAYS"
+        span = _date_span_from_range(norm_range)
+        prev_span = _previous_span(span) if span else None
+        if prev_span:
+            def span_to_range(sp: tuple[date, date]) -> str:
+                return f"{sp[0]:%Y-%m-%d},{sp[1]:%Y-%m-%d}"
+            prev_frames = _collect_sa360_frames(customer_ids, span_to_range(prev_span), bypass_cache=True, write_cache=False)
+            prev_df = prev_frames.get("keyword_performance")
+            if prev_df is None:
+                prev_df = pd.DataFrame()
+            if not prev_df.empty:
+                if "campaign.id" in prev_df.columns:
+                    prev_df["__campaign_type"] = prev_df["campaign.id"].astype(str).map(campaign_types).fillna("nonbrand")
+                else:
+                    prev_df["__campaign_type"] = "nonbrand"
+                prev_df["__key"] = prev_df["ad_group_criterion.keyword.text"].astype(str).str.lower()
+                if exact:
+                    prev_exact = prev_df[prev_df["__key"] == match_key]
+                    prev = summarize(prev_exact) if not prev_exact.empty else {}
+                    if prev:
+                        change = exact.get("impressions", 0) - prev.get("impressions", 0)
+                        pct = (change / prev.get("impressions", 0) * 100) if prev.get("impressions", 0) else None
+                        exact["previous_impressions"] = prev.get("impressions", 0)
+                        exact["impressions_change"] = change
+                        exact["impressions_pct_change"] = pct
+                if exact_types:
+                    # Build previous type-level deltas
+                    prev_df = prev_df.copy()
+                    prev_df["__campaign_type"] = prev_df["campaign.id"].astype(str).map(campaign_types).fillna("nonbrand")
+                    prev_types = summarize_by_type(prev_df)
+                    for ctype, metrics in (prev_types or {}).items():
+                        cur = exact_types.get(ctype) or {}
+                        change = (cur.get("impressions", 0) - metrics.get("impressions", 0)) if metrics else None
+                        pct = (change / metrics.get("impressions", 0) * 100) if metrics and metrics.get("impressions", 0) else None
+                        if ctype in exact_types:
+                            exact_types[ctype]["previous_impressions"] = metrics.get("impressions", 0)
+                            exact_types[ctype]["impressions_change"] = change
+                            exact_types[ctype]["impressions_pct_change"] = pct
+                if close_matches:
+                    for cm in close_matches:
+                        prev_match = prev_df[prev_df["__key"] == cm["keyword"]] if "__key" in prev_df.columns else pd.DataFrame()
+                        if not prev_match.empty:
+                            prev_m = summarize(prev_match)
+                            change = cm.get("impressions", 0) - prev_m.get("impressions", 0)
+                            pct = (change / prev_m.get("impressions", 0) * 100) if prev_m.get("impressions", 0) else None
+                            cm["previous_impressions"] = prev_m.get("impressions", 0)
+                            cm["impressions_change"] = change
+                            cm["impressions_pct_change"] = pct
+
+    return {"total": exact, "by_type": exact_types}, close_matches
+
+
+def _format_volume_reply(keyword: str, exact: dict, close_matches: list[dict], date_range: str | None) -> str:
+    if not exact:
+        return "I could not find that keyword in your SA360 data. Share the account or customer ID and I’ll pull it again."
+    parts = []
+    total = exact.get("total") if isinstance(exact, dict) else exact
+    by_type = exact.get("by_type") if isinstance(exact, dict) else {}
+    if total:
+        base = f"{keyword}: {total.get('impressions',0):,.0f} impressions"
+        clicks = total.get("clicks")
+        if clicks:
+            base += f", {clicks:,.0f} clicks"
+        ctr = total.get("ctr")
+        if ctr:
+            base += f", CTR {ctr:.2f}%"
+        cpc = total.get("cpc")
+        if cpc:
+            base += f", CPC {cpc:.2f}"
+        parts.append(base)
+        if total.get("previous_impressions") is not None:
+            pct = total.get("impressions_pct_change")
+            prev = total.get("previous_impressions", 0)
+            parts.append(f"Prev: {prev:,.0f} impressions ({pct:+.1f}%)." if pct is not None else f"Prev: {prev:,.0f} impressions.")
+        if by_type:
+            breakdown = []
+            for ctype, m in by_type.items():
+                txt = f"{ctype}: {m.get('impressions',0):,.0f}"
+                if m.get("impressions_pct_change") is not None:
+                    txt += f" ({m.get('impressions_pct_change'):+.1f}% vs prev)"
+                breakdown.append(txt)
+            if breakdown:
+                parts.append("By type: " + "; ".join(breakdown))
+    if date_range:
+        parts.append(f"Range: {date_range}.")
+    return " ".join(parts).strip()
+
+
+def _exchange_google_access_token(client_id: str, client_secret: str, refresh_token: str) -> str:
+    token_url = "https://oauth2.googleapis.com/token"
+    data = {
+        "grant_type": "refresh_token",
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "refresh_token": refresh_token,
+    }
+    resp = httpx.post(token_url, data=data, timeout=20)
+    if resp.status_code != 200:
+        raise HTTPException(status_code=400, detail=f"Token exchange failed: {resp.text}")
+    return resp.json().get("access_token")
+
+
+def _google_ads_search_stream(customer_id: str, developer_token: str, access_token: str, query: str):
+    url = f"https://googleads.googleapis.com/v15/customers/{customer_id}/googleAds:searchStream"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "developer-token": developer_token,
+        "Content-Type": "application/json",
+    }
+    resp = httpx.post(url, headers=headers, json={"query": query}, timeout=60)
+    if resp.status_code != 200:
+        raise HTTPException(status_code=400, detail=f"Google Ads search error: {resp.text}")
+    # Streaming response is a JSON array (not NDJSON); parse once.
+    try:
+        payload = resp.json()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to parse Google Ads response.")
+    # payload is a list of chunks, each with results
+    for chunk in payload:
+        for result in chunk.get("results", []):
+            yield result
+
+
+def _gaql_query(name: str, date_range: str | None) -> str:
+    # Basic GAQL snippets for required reports
+    if name == "campaign":
+        return f"""
+        SELECT
+          campaign.id,
+          campaign.name,
+          campaign.status,
+          campaign.advertising_channel_type,
+          campaign.advertising_channel_sub_type,
+          campaign.start_date,
+          campaign.end_date,
+          campaign.bidding_strategy_type,
+          campaign.campaign_budget,
+          campaign.labels,
+          campaign.resource_name,
+          campaign.network_settings.target_search_network,
+          campaign.network_settings.target_google_search,
+          campaign.network_settings.target_partner_search_network,
+          campaign.network_settings.target_content_network
+        FROM campaign
+        WHERE campaign.status != 'REMOVED'
+        {f' DURING {date_range}' if date_range else ''}
+        """
+    if name == "ad_group":
+        return f"""
+        SELECT
+          ad_group.id,
+          ad_group.name,
+          ad_group.status,
+          ad_group.type,
+          ad_group.cpc_bid_micros,
+          ad_group.labels,
+          ad_group.campaign
+        FROM ad_group
+        WHERE ad_group.status != 'REMOVED'
+        """
+    if name == "ad":
+        return f"""
+        SELECT
+          ad_group_ad.ad.id,
+          ad_group.id,
+          campaign.id,
+          ad_group_ad.status,
+          ad_group_ad.policy_summary.approval_status,
+          ad_group_ad.policy_summary.review_status,
+          ad_group_ad.ad.type,
+          ad_group_ad.ad.responsive_search_ad.headlines,
+          ad_group_ad.ad.responsive_search_ad.descriptions,
+          ad_group_ad.ad.final_urls
+        FROM ad_group_ad
+        WHERE ad_group_ad.status != 'REMOVED'
+        """
+    if name == "keyword_performance":
+        return f"""
+        SELECT
+          ad_group_criterion.criterion_id,
+          ad_group_criterion.keyword.text,
+          ad_group_criterion.keyword.match_type,
+          ad_group_criterion.status,
+          ad_group.id,
+          campaign.id,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros,
+          metrics.conversions,
+          metrics.conversions_value,
+          metrics.ctr,
+          metrics.average_cpc,
+          metrics.cost_per_conversion,
+          metrics.search_impression_share,
+          metrics.search_rank_lost_impression_share,
+          metrics.search_exact_match_impression_share
+        FROM keyword_view
+        WHERE ad_group_criterion.status != 'REMOVED'
+        {f' AND segments.date DURING {date_range}' if date_range else ''}
+        """
+    if name == "landing_page":
+        return f"""
+        SELECT
+          landing_page_view.unexpanded_final_url,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.conversions,
+          metrics.conversions_value,
+          metrics.average_cpc,
+          metrics.ctr
+        FROM landing_page_view
+        {f'WHERE segments.date DURING {date_range}' if date_range else ''}
+        """
+    if name == "account":
+        return """
+        SELECT
+          customer.id,
+          customer.descriptive_name,
+          customer.currency_code,
+          customer.time_zone,
+          customer.status
+        FROM customer
+        """
+    raise HTTPException(status_code=400, detail=f"Unknown GAQL template: {name}")
+
+
+def _collect_ads_frames(customer_ids: list[str], developer_token: str, access_token: str, date_range: str | None):
+    frames: dict[str, list[dict]] = {k: [] for k in ADS_CSV_SCHEMAS.keys()}
+    for cust in customer_ids:
+        for report_name in ADS_CSV_SCHEMAS.keys():
+            query = _gaql_query(report_name, date_range)
+            rows = []
+            for res in _google_ads_search_stream(cust, developer_token, access_token, query):
+                row = {}
+                for col in ADS_CSV_SCHEMAS[report_name]:
+                    row[col] = _get_nested_value(res, col)
+                row["customer_id"] = cust
+                rows.append(row)
+            frames[report_name].extend(rows)
+    return {k: pd.DataFrame(v) if v else pd.DataFrame(columns=ADS_CSV_SCHEMAS[k]) for k, v in frames.items()}
+
+
+# ============================
+# SA360 helpers (feature-flagged)
+# ============================
+def _ensure_sa360_enabled():
+    if not SA360_FETCH_ENABLED:
+        raise HTTPException(status_code=400, detail="SA360 fetch is disabled. Set SA360_FETCH_ENABLED=true to enable.")
+    # We rely on google-auth + direct HTTP calls; no client library import needed. If we fail later, it will be due to
+    # missing credentials or HTTP errors, not missing google ads modules.
+
+
+def _sa360_get_access_token() -> str:
+    from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request
+
+    client_id = os.environ.get("SA360_CLIENT_ID")
+    client_secret = os.environ.get("SA360_CLIENT_SECRET")
+    refresh_token = os.environ.get("SA360_REFRESH_TOKEN")
+    if not all([client_id, client_secret, refresh_token]):
+        raise HTTPException(status_code=500, detail="Missing SA360 OAuth credentials.")
+
+    creds = Credentials(
+        None,
+        refresh_token=refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=client_id,
+        client_secret=client_secret,
+        scopes=["https://www.googleapis.com/auth/doubleclicksearch"],
+    )
+    try:
+        creds.refresh(Request())
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"SA360 token refresh failed: {exc}")
+    if not creds.token:
+        raise HTTPException(status_code=500, detail="SA360 access token not obtained.")
+    return creds.token
+
+
+def _sa360_search(customer_id: str, query: str):
+    access_token = _sa360_get_access_token()
+    # SA360 expects numeric customer IDs without dashes; normalize inbound strings.
+    normalized_cid = (customer_id or "").replace("-", "")
+    url = f"https://searchads360.googleapis.com/v0/customers/{normalized_cid}/searchAds360:search"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "developer-token": os.environ.get("SA360_DEVELOPER_TOKEN", ""),
+        "Content-Type": "application/json",
+    }
+    login_cid = os.environ.get("SA360_LOGIN_CUSTOMER_ID")
+    if login_cid:
+        headers["login-customer-id"] = login_cid.replace("-", "")
+    try:
+        resp = httpx.post(url, headers=headers, json={"query": query}, timeout=60)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"SA360 HTTP error: {exc}")
+    if resp.status_code != 200:
+        raise HTTPException(status_code=500, detail=f"SA360 search failed: {resp.text}")
+    try:
+        payload = resp.json()
+    except Exception:
+        raise HTTPException(status_code=500, detail="SA360 response parse error")
+    # Return list of result rows (mimic client behavior)
+    results = []
+    for row in payload.get("results", []):
+        results.append(row)
+    return results
+
+
+def _sa360_list_customers_cached() -> list[dict]:
+    """
+    Discover accessible SA360 customers (id + descriptive_name) using GAQL.
+    Cached to avoid repeated list calls; respects SA360_FETCH_ENABLED.
+    """
+    if not SA360_FETCH_ENABLED:
+        return []
+
+    now = datetime.utcnow()
+    try:
+        if SA360_ACCOUNT_CACHE.get("ts") and SA360_ACCOUNT_CACHE.get("data"):
+            age = now - SA360_ACCOUNT_CACHE["ts"]
+            if age <= timedelta(hours=max(1, SA360_ACCOUNT_CACHE_TTL_HOURS)):
+                return SA360_ACCOUNT_CACHE["data"]
+    except Exception:
+        pass
+
+    login_cid = os.environ.get("SA360_LOGIN_CUSTOMER_ID")
+    if not login_cid:
+        return []
+
+    customers: list[dict] = []
+    rows: list[dict] = []
+    # Prefer customer_client to enumerate child accounts; fallback to customer for direct account.
+    try:
+        rows = _sa360_search(
+            login_cid,
+            "SELECT customer_client.client_customer, customer_client.descriptive_name, customer_client.hidden, customer_client.manager FROM customer_client",
+        )
+    except Exception:
+        rows = []
+
+    if not rows:
+        try:
+            rows = _sa360_search(login_cid, "SELECT customer.id, customer.descriptive_name FROM customer")
+        except Exception:
+            rows = []
+
+    for row in rows or []:
+        cust = row.get("customerClient") or row.get("customer_client") or row.get("customer") or {}
+        cid = (
+            cust.get("clientCustomer")
+            or cust.get("client_customer")
+            or cust.get("id")
+            or (cust.get("resourceName", "").split("/")[-1] if isinstance(cust.get("resourceName"), str) else None)
+        )
+        if isinstance(cid, str):
+            if cid.startswith("customers/"):
+                cid = cid.split("/")[-1]
+            elif "customers/" in cid:
+                cid = cid.split("/")[-1]
+        elif isinstance(cid, dict):
+            res = cid.get("resourceName") if isinstance(cid.get("resourceName", ""), str) else None
+            if res and "customers/" in res:
+                cid = res.split("/")[-1]
+        name = cust.get("descriptiveName") or cust.get("descriptive_name") or cust.get("name")
+        is_hidden = cust.get("hidden", False)
+        is_manager = cust.get("manager", False) or (login_cid and str(cid) == str(login_cid))
+        if cid and not is_hidden:
+            customers.append({"customer_id": str(cid), "name": name or f"Account {cid}", "manager": is_manager})
+
+    # Normalize IDs once more to guard against any residual prefixes and dedupe.
+    normed = []
+    seen = set()
+    for c in customers:
+        cid = c.get("customer_id")
+        if isinstance(cid, str) and "customers/" in cid:
+            cid = cid.split("/")[-1]
+        if cid and cid not in seen:
+            seen.add(cid)
+            c["customer_id"] = str(cid)
+            if login_cid and str(cid) == str(login_cid):
+                c["manager"] = True
+            normed.append(c)
+    customers = normed
+
+    SA360_ACCOUNT_CACHE["ts"] = now
+    SA360_ACCOUNT_CACHE["data"] = customers
+    return customers
+
+
+def _is_sa360_manager_account(customer_id: str) -> bool:
+    """Return True if cached discovery marks this ID as a manager (MCC)."""
+    if not customer_id:
+        return False
+    cid = customer_id.replace("customers/", "")
+    login_cid = os.environ.get("SA360_LOGIN_CUSTOMER_ID")
+    if login_cid and str(cid) == str(login_cid):
+        return True
+    try:
+        if not SA360_ACCOUNT_CACHE.get("data"):
+            _sa360_list_customers_cached()
+    except Exception:
+        pass
+    try:
+        if SA360_ACCOUNT_CACHE.get("data"):
+            for acc in SA360_ACCOUNT_CACHE["data"]:
+                if str(acc.get("customer_id")) == cid:
+                    return bool(acc.get("manager"))
+    except Exception:
+        return False
+    return False
+
+
+def _health_check_summary() -> dict:
+    """
+    Lightweight health check across core dependencies without relying on external terminal tools.
+    - SA360 account discovery
+    - QA accuracy on a small sample of customer_ids (if available)
+    - Manager guard presence
+    """
+    out = {"status": "ok", "errors": [], "accounts": None, "qa": [], "manager_guard": None}
+    try:
+        _ensure_sa360_enabled()
+        accounts = _sa360_list_customers_cached()
+        out["accounts"] = {"count": len(accounts or []), "sample": accounts[:5] if accounts else []}
+    except Exception as exc:
+        out["status"] = "degraded"
+        out["errors"].append(f"SA360 unavailable: {exc}")
+        return out
+
+    # Manager guard: report if login MCC exists
+    login_cid = os.environ.get("SA360_LOGIN_CUSTOMER_ID")
+    if login_cid:
+        out["manager_guard"] = {"login_customer_id": login_cid, "guard_active": True}
+
+    # QA sample set (keep small to avoid heavy load)
+    sample_ids = ["3532896537", "3956251331", "7902313748"]
+    available_ids = {str(a.get("customer_id")) for a in (accounts or []) if a.get("customer_id")}
+    for cid in sample_ids:
+        if cid not in available_ids:
+            continue
+        try:
+            frames = _collect_sa360_frames([cid], "2025-12-14,2025-12-20")
+            raw_totals = _qa_raw_totals(frames)
+            agg = _aggregate_account_performance(frames)
+            keys = ["impressions", "clicks", "cost", "conversions"]
+            match = all(raw_totals.get(k) == agg.get(k) for k in keys)
+            out["qa"].append({"customer_id": cid, "matches": match, "raw": raw_totals, "agg": agg})
+            if not match:
+                out["status"] = "degraded"
+        except Exception as exc:
+            out["qa"].append({"customer_id": cid, "error": str(exc)})
+            out["status"] = "degraded"
+    return out
+
+
+def _env_allowlist() -> list[str]:
+    return [
+        "AZURE_OPENAI_ENDPOINT",
+        "AZURE_OPENAI_API_KEY",
+        "AZURE_OPENAI_DEPLOYMENT",
+        "AZURE_OPENAI_API_VERSION",
+        "SA360_DEVELOPER_TOKEN",
+        "SA360_CLIENT_ID",
+        "SA360_CLIENT_SECRET",
+        "SA360_REFRESH_TOKEN",
+        "SA360_LOGIN_CUSTOMER_ID",
+        "ENABLE_ML_REASONING",
+        "ENABLE_SUMMARY_ENHANCER",
+        "ADS_FETCH_ENABLED",
+        "SA360_FETCH_ENABLED",
+        "ENABLE_TRENDS",
+        "DEFAULT_CUSTOMER_IDS",
+    ]
+
+
+def _mask_value(val: str | None) -> str | None:
+    if val is None:
+        return None
+    s = str(val)
+    if len(s) <= 4:
+        return "*" * len(s)
+    return "*" * max(0, len(s) - 4) + s[-4:]
+
+
+@app.get("/api/sa360/accounts", response_model=list[Sa360Account])
+async def sa360_accounts():
+    """
+    Return accessible SA360 accounts (id + descriptive name) using cached GAQL discovery.
+    """
+    _ensure_sa360_enabled()
+    accounts = _sa360_list_customers_cached()
+    if not accounts:
+        raise HTTPException(status_code=404, detail="No SA360 accounts found.")
+    return [
+        Sa360Account(customer_id=a.get("customer_id"), name=a.get("name"), manager=a.get("manager"))
+        for a in accounts
+        if a.get("customer_id")
+    ]
+
+
+def _date_range_bounds(normalized_range: str | None) -> tuple[date, date] | None:
+    """Return (start, end) dates for common presets or explicit ranges. None if unknown."""
+    if not normalized_range:
+        return None
+    today = date.today()
+    try:
+        if "," in normalized_range and all(part.strip() for part in normalized_range.split(",")):
+            parts = normalized_range.split(",")
+            if len(parts) == 2:
+                start = date.fromisoformat(parts[0])
+                end = date.fromisoformat(parts[1])
+                return (start, end) if start <= end else None
+    except Exception:
+        return None
+
+    upper = normalized_range.upper()
+    if upper == "LAST_7_DAYS":
+        end = today - timedelta(days=1)
+        start = end - timedelta(days=6)
+        return start, end
+    if upper == "LAST_30_DAYS":
+        end = today - timedelta(days=1)
+        start = end - timedelta(days=29)
+        return start, end
+    if upper == "LAST_MONTH":
+        first_this_month = date(today.year, today.month, 1)
+        end = first_this_month - timedelta(days=1)
+        start = date(end.year, end.month, 1)
+        return start, end
+    if upper == "THIS_MONTH":
+        start = date(today.year, today.month, 1)
+        return start, today
+    if upper == "YESTERDAY":
+        d = today - timedelta(days=1)
+        return d, d
+    if upper == "TODAY":
+        return today, today
+    return None
+
+
+def _is_cacheable_sa360_range(normalized_range: str | None) -> bool:
+    if not SA360_CACHE_ENABLED or not normalized_range:
+        return False
+    bounds = _date_range_bounds(normalized_range)
+    if not bounds:
+        return False
+    _, end = bounds
+    freshness_cutoff = date.today() - timedelta(days=max(0, SA360_CACHE_FRESHNESS_DAYS))
+    return end <= freshness_cutoff
+
+
+def _sa360_cache_key(customer_ids: list[str], normalized_range: str) -> str:
+    norm_ids = sorted([(cid or "").replace("-", "") for cid in customer_ids if cid])
+    ids_slug = slugify_account_name("_".join(norm_ids) or "default") or "default"
+    safe_range = normalized_range.replace(",", "_").replace(" ", "_")
+    digest = hashlib.sha256(f"{','.join(norm_ids)}|{normalized_range}".encode()).hexdigest()[:12]
+    return f"{ids_slug}/{safe_range}-{digest}"
+
+
+def _cache_missing_spend(frames: dict[str, pd.DataFrame]) -> bool:
+    """
+    Detect a pathological cache entry where clicks > 0 but cost column is entirely null/zero-count.
+    If detected, the cache should be treated as a miss and refetched live.
+    """
+    if not frames:
+        return False
+    priority = ["keyword_performance", "campaign", "ad_group", "ad"]
+
+    def pick(df: pd.DataFrame, candidates: list[str]) -> str | None:
+        for c in candidates:
+            if c in df.columns:
+                return c
+        return None
+
+    for key in priority:
+        df = frames.get(key)
+        if df is None or df.empty:
+            continue
+        tmp = df.copy()
+        click_col = pick(tmp, ["metrics.clicks", "Clicks", "clicks"])
+        cost_col = pick(tmp, ["metrics.cost", "metrics.cost_micros", "Cost", "cost"])
+        if not click_col or not cost_col:
+            continue
+        clicks = pd.to_numeric(tmp[click_col], errors="coerce").sum(skipna=True)
+        cost_nonnull = pd.to_numeric(tmp[cost_col], errors="coerce").notna().sum()
+        if clicks > 0 and cost_nonnull == 0:
+            return True
+    return False
+
+
+def _load_sa360_cache(customer_ids: list[str], normalized_range: str | None) -> dict[str, pd.DataFrame] | None:
+    if not _is_cacheable_sa360_range(normalized_range):
+        return None
+    try:
+        container_client = _get_blob_client()
+    except Exception:
+        return None
+    cache_key = _sa360_cache_key(customer_ids, normalized_range)
+    frames: dict[str, pd.DataFrame] = {}
+    for report_name, cols in ADS_CSV_SCHEMAS.items():
+        blob_name = f"{SA360_CACHE_PREFIX}/{cache_key}/{report_name}.csv"
+        try:
+            data = container_client.download_blob(blob_name).readall()
+        except Exception:
+            return None  # Cache miss if any expected blob is absent
+        try:
+            frames[report_name] = pd.read_csv(io.BytesIO(data))
+        except Exception:
+            return None
+    # Treat as cache miss if cost column is empty while clicks exist
+    try:
+        if _cache_missing_spend(frames):
+            return None
+    except Exception:
+        pass
+    return frames if frames else None
+
+
+def _store_sa360_cache(customer_ids: list[str], normalized_range: str | None, frames: dict[str, pd.DataFrame]):
+    if not _is_cacheable_sa360_range(normalized_range):
+        return
+    try:
+        container_client = _get_blob_client()
+    except Exception:
+        return
+    cache_key = _sa360_cache_key(customer_ids, normalized_range)
+    for report_name, df in frames.items():
+        buf = io.StringIO()
+        try:
+            df.to_csv(buf, index=False)
+        except Exception:
+            continue
+        data = buf.getvalue().encode("utf-8")
+        blob_name = f"{SA360_CACHE_PREFIX}/{cache_key}/{report_name}.csv"
+        try:
+            container_client.upload_blob(name=blob_name, data=data, overwrite=True)
+        except Exception:
+            continue
+
+
+def _add_sa360_aliases(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add friendly aliases commonly expected by the audit engine (Campaign, Ad group, Impr., Clicks, Cost, Date, Device, Geo).
+    Does not drop original columns; only adds missing aliases when source columns exist.
+    """
+    if df is None or df.empty:
+        return df
+    alias_map = {
+        "campaign.name": "Campaign",
+        "campaign.id": "Campaign ID",
+        "ad_group.name": "Ad group",
+        "ad_group.id": "Ad group ID",
+        "metrics.impressions": "Impr.",
+        "metrics.clicks": "Clicks",
+        "metrics.cost": "Cost",
+        "metrics.cost_micros": "Cost",
+        "metrics.conversions": "Conversions",
+        "metrics.conversions_value": "Conversion value",
+        "segments.date": "Date",
+        "segments.device": "Device",
+        "segments.geo_target_region": "Geo",
+    }
+    for src, dst in alias_map.items():
+        if src in df.columns and dst not in df.columns:
+            df[dst] = df[src]
+    return df
+
+
+def _router_prompt(message: str, account_name: str | None) -> str:
+    """LLM prompt to classify intent/tool with strict JSON output."""
+    allowed_intents = [
+        "general_chat",
+        "audit",
+        "performance",
+        "pmax",
+        "serp",
+        "competitor",
+        "creative",
+        "seasonality",
+    ]
+    return f"""
+You are Kai's secure router. Classify the user's request and tell us which internal tool to call.
+Rules:
+- Only use these intents: {allowed_intents}.
+- Only use these tools: audit, pmax, serp, competitor, creative. Use null if general_chat.
+- Performance intent covers metrics/comparisons/deltas (“how did <account> perform...”). ONLY mark audit when the user explicitly asks for an audit/checkup/health review.
+- run_planner is true only for performance metrics/comparisons or explicit audit requests. run_trends is true only for seasonality/forecasting questions.
+- Never invent customer_ids; only include if explicitly provided. needs_ids = true if planner is needed but no customer_ids are provided.
+- If intent confidence is low, set needs_clarification=true and keep run_planner=false (do not default to audit).
+- Do NOT answer the user. DO NOT call external data. Stay within our system.
+
+Return ONLY JSON in this shape:
+{{
+  "intent": "...",
+  "tool": "... or null",
+  "run_planner": true|false,
+  "run_trends": true|false,
+  "customer_ids": ["..."],
+  "needs_ids": true|false,
+  "confidence": 0.0-1.0,
+  "needs_clarification": true|false,
+  "clarification": "short question if clarification is needed",
+  "notes": "short note if any"
+}}
+
+User message: "{message}"
+Account context: "{account_name or ''}"
+"""
+
+
+def _collect_sa360_frames(
+    customer_ids: list[str],
+    date_range: str | None,
+    bypass_cache: bool = False,
+    write_cache: bool = True,
+) -> dict[str, pd.DataFrame]:
+    frames: dict[str, list[dict]] = {k: [] for k in ADS_CSV_SCHEMAS.keys()}
+    ids = customer_ids or []
+    normalized_range = _coerce_date_range(date_range)
+
+    # Check cache for older, stable ranges unless explicitly bypassed
+    if not bypass_cache:
+        cached = _load_sa360_cache(ids, normalized_range)
+        if cached is not None:
+            return cached
+
+    date_clause: str | None = None
+    if normalized_range:
+        if "," in normalized_range and all(part.strip() for part in normalized_range.split(",")):
+            parts = normalized_range.split(",")
+            if len(parts) == 2:
+                date_clause = f"segments.date BETWEEN '{parts[0]}' AND '{parts[1]}'"
+        else:
+            date_clause = f"segments.date DURING {normalized_range}"
+
+    for cid in ids:
+        for report_name, query in SA360_QUERIES.items():
+            q = query
+            if date_clause:
+                if "WHERE" in q:
+                    q = q.replace("WHERE", f"WHERE {date_clause} AND", 1)
+                else:
+                    q = q + f" WHERE {date_clause}"
+            results = _sa360_search(cid, q)
+            for row in results:
+                payload = {}
+                for col in ADS_CSV_SCHEMAS.get(report_name, []):
+                    payload[col] = _get_nested_value(row, col)
+                    if col.endswith("cost_micros") and payload[col] is not None:
+                        try:
+                            payload[col] = float(payload[col]) / 1_000_000.0
+                        except Exception:
+                            pass
+                frames[report_name].append(payload)
+
+    out_frames = {k: pd.DataFrame(v) if v else pd.DataFrame(columns=ADS_CSV_SCHEMAS[k]) for k, v in frames.items()}
+
+    # Add friendly aliases to reduce downstream KeyErrors (Campaign, Ad group, Impr., etc.)
+    for key, df in out_frames.items():
+        out_frames[key] = _add_sa360_aliases(df)
+
+    # Store cache for non-recent ranges (best-effort; ignore failures)
+    if write_cache and not bypass_cache:
+        _store_sa360_cache(ids, normalized_range, out_frames)
+
+    return out_frames
+
+
+def _summarize_numeric(metrics: dict) -> dict:
+    """Compute derived metrics safely."""
+    def as_float(val, default=0.0):
+        try:
+            if val is None:
+                return default
+            return float(val)
+        except Exception:
+            try:
+                return float(str(val).replace(",", "")) if val != "" else default
+            except Exception:
+                return default
+
+    numeric_metrics = {k: as_float(v) for k, v in metrics.items()}
+    clicks = numeric_metrics.get("clicks", 0.0)
+    impressions = numeric_metrics.get("impressions", 0.0)
+    cost = numeric_metrics.get("cost", 0.0)
+    conversions = numeric_metrics.get("conversions", 0.0)
+    conv_value = numeric_metrics.get("conversions_value", 0.0)
+
+    summary = dict(numeric_metrics)
+    summary["ctr"] = (clicks / impressions) * 100 if impressions else None
+    summary["cpc"] = cost / clicks if clicks else None
+    summary["cvr"] = conversions / clicks if clicks else None
+    summary["cpa"] = cost / conversions if conversions else None
+    summary["roas"] = conv_value / cost if cost else None
+    return summary
+
+
+def _aggregate_frame(df: pd.DataFrame, key_col: str, device_filter: str | None = None) -> dict[str, dict]:
+    """
+    Aggregate metrics by key column (optionally device-filtered). Returns dict[key] -> metric dict.
+    """
+    if df is None or df.empty:
+        return {}
+    tmp = df.copy()
+    if device_filter and "segments.device" in tmp.columns:
+        tmp = tmp[tmp["segments.device"].str.upper() == device_filter.upper()]
+    if tmp.empty:
+        return {}
+    metrics_cols = {
+        "impressions": "metrics.impressions",
+        "clicks": "metrics.clicks",
+        "cost": "metrics.cost_micros",
+        "conversions": "metrics.conversions",
+        "conversions_value": "metrics.conversions_value",
+    }
+    # Coerce numerics
+    for col in metrics_cols.values():
+        if col in tmp.columns:
+            tmp[col] = pd.to_numeric(tmp[col], errors="coerce")
+
+    grouped = {}
+    for key, group in tmp.groupby(key_col):
+        metrics = {}
+        for mk, col in metrics_cols.items():
+            if col in group.columns:
+                metrics[mk] = group[col].sum(skipna=True)
+        grouped[key] = _summarize_numeric(metrics)
+    return grouped
+
+
+def _aggregate_account_performance(frames: dict[str, pd.DataFrame]) -> dict:
+    """
+    Aggregate account-level metrics using the richest available SA360 frame.
+    Priority: keyword_performance -> campaign -> ad_group -> ad.
+    Chooses the first frame that has non-zero cost data; otherwise falls back to the
+    first available frame in priority order.
+    """
+    if not frames:
+        return {}
+
+    priority = ["keyword_performance", "campaign", "ad_group", "ad"]
+
+    def pick_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
+        for c in candidates:
+            if c in df.columns:
+                return c
+        return None
+
+    best_with_cost = None
+    fallback = None
+
+    for key in priority:
+        df = frames.get(key)
+        if df is None or df.empty:
+            continue
+        tmp = df.copy()
+        metrics = {}
+        imp_col = pick_col(tmp, ["metrics.impressions", "Impr.", "impressions"])
+        if imp_col:
+            metrics["impressions"] = pd.to_numeric(tmp[imp_col], errors="coerce").sum(skipna=True)
+        click_col = pick_col(tmp, ["metrics.clicks", "Clicks", "clicks"])
+        if click_col:
+            metrics["clicks"] = pd.to_numeric(tmp[click_col], errors="coerce").sum(skipna=True)
+        cost_col = pick_col(tmp, ["metrics.cost", "metrics.cost_micros", "Cost", "cost"])
+        cost_nonnull = 0
+        if cost_col:
+            series = pd.to_numeric(tmp[cost_col], errors="coerce")
+            cost_nonnull = int(series.notna().sum())
+            metrics["cost"] = series.sum(skipna=True)
+        conv_col = pick_col(tmp, ["metrics.conversions", "Conversions", "conversions"])
+        if conv_col:
+            metrics["conversions"] = pd.to_numeric(tmp[conv_col], errors="coerce").sum(skipna=True)
+        conv_val_col = pick_col(tmp, ["metrics.conversions_value", "Conversion value", "conversions_value"])
+        if conv_val_col:
+            metrics["conversions_value"] = pd.to_numeric(tmp[conv_val_col], errors="coerce").sum(skipna=True)
+
+        summarized = _summarize_numeric(metrics)
+        # If we have any non-null cost entries, prefer this frame and stop
+        if cost_nonnull > 0 and best_with_cost is None:
+            best_with_cost = summarized
+            break
+        # Track first available as fallback
+        if fallback is None:
+            fallback = summarized
+
+    return best_with_cost or fallback or {}
+
+
+def _get_perf_frame_debug(frames: dict[str, pd.DataFrame]) -> dict:
+    """
+    Return a small debug payload about the frame chosen for performance aggregation.
+    Includes which frame was used, presence of cost columns, and a tiny sample of values.
+    """
+    priority = [
+        "keyword_performance",
+        "campaign",
+        "ad_group",
+        "ad",
+    ]
+    for key in priority:
+        df = frames.get(key)
+        if df is None or df.empty:
+            continue
+        cols = list(df.columns)
+        candidates = ["metrics.cost", "metrics.cost_micros", "Cost", "cost"]
+        cost_col = next((c for c in candidates if c in df.columns), None)
+        sample = []
+        nonnull = 0
+        if cost_col:
+            try:
+                series = pd.to_numeric(df[cost_col], errors="coerce")
+                nonnull = int(series.notna().sum())
+                sample = series.dropna().head(5).tolist()
+            except Exception:
+                pass
+        return {
+            "frame": key,
+            "columns": cols[:80],
+            "cost_column": cost_col,
+            "cost_nonnull": nonnull,
+            "cost_sample": sample,
+            "row_count": int(len(df)),
+        }
+    return {"frame": None, "columns": [], "cost_column": None, "cost_nonnull": 0, "cost_sample": [], "row_count": 0}
+
+
+def _build_perf_snapshot(frames: dict[str, pd.DataFrame]) -> dict:
+    """
+    Build a compact snapshot of performance metrics + debug + data quality flags.
+    Useful for diagnostics without altering the main aggregation flow.
+    """
+    metrics = _aggregate_account_performance(frames)
+    debug = _get_perf_frame_debug(frames)
+    missing_spend = (
+        (metrics.get("cost") in (None, 0, 0.0))
+        and (metrics.get("clicks") or 0) > 0
+        and (debug.get("cost_nonnull") or 0) == 0
+    )
+    return {
+        "metrics": _to_primitive(metrics),
+        "debug": _to_primitive(debug),
+        "data_quality": {"missing_spend": missing_spend},
+    }
+
+
+def _compute_perf_deltas(current: dict, previous: dict) -> dict:
+    """
+    Build delta dict between two metric snapshots.
+    """
+    keys = [
+        "impressions",
+        "clicks",
+        "cost",
+        "conversions",
+        "conversions_value",
+        "ctr",
+        "cpc",
+        "cvr",
+        "cpa",
+        "roas",
+    ]
+
+    def num(val):
+        try:
+            if val is None:
+                return 0.0
+            return float(val)
+        except Exception:
+            try:
+                return float(str(val).replace(",", ""))
+            except Exception:
+                return 0.0
+
+    deltas = {}
+    for k in keys:
+        cur = num(current.get(k)) if current else 0.0
+        prev = num(previous.get(k)) if previous else 0.0
+        change = cur - prev
+        pct = (change / prev * 100) if prev else None
+        deltas[k] = {"current": cur, "previous": prev, "change": change, "pct_change": pct}
+    return deltas
+
+
+def _to_primitive(obj):
+    """
+    Convert numpy/pandas scalars to Python primitives for safe JSON serialization.
+    """
+    try:
+        import numpy as np  # type: ignore
+    except Exception:
+        np = None
+
+    if np and isinstance(obj, np.generic):
+        try:
+            return obj.item()
+        except Exception:
+            return float(obj)
+    if isinstance(obj, dict):
+        return {k: _to_primitive(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_to_primitive(v) for v in obj]
+    return obj
+
+
+# ------------------ Trends / Seasonality Helpers ------------------ #
+
+
+def _normalize_trends_timeframe(tf: str | None) -> str:
+    if not tf:
+        return "LAST_30_DAYS"
+    t = tf.strip()
+    if "," in t and all(part.strip() for part in t.split(",")):
+        # ISO range passthrough
+        return t
+    upper = t.upper()
+    presets = {"NOW 7-D": "LAST_7_DAYS", "NOW 30-D": "LAST_30_DAYS", "NOW 3-M": "LAST_90_DAYS", "NOW 6-M": "LAST_180_DAYS", "NOW 12-M": "LAST_365_DAYS", "LAST_7_DAYS": "LAST_7_DAYS", "LAST_30_DAYS": "LAST_30_DAYS"}
+    if upper in presets:
+        if presets[upper].startswith("LAST_"):
+            # turn LAST_X_DAYS into explicit range for SA360
+            try:
+                days = int(presets[upper].split("_")[1])
+            except Exception:
+                days = 30
+            end = date.today() - timedelta(days=1)
+            start = end - timedelta(days=days - 1)
+            return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+        return presets[upper]
+    return "LAST_30_DAYS"
+
+
+def _derive_themes(themes: list[str], account_name: str | None) -> list[str]:
+    out = [t.strip() for t in (themes or []) if t and t.strip()]
+    if out:
+        return out[:5]
+    if account_name:
+        words = [w.strip() for w in re.split(r"[^a-zA-Z0-9]+", account_name) if len(w.strip()) > 2]
+        if words:
+            return [" ".join(words[:3])]
+    return []
+
+
+def _collect_keyword_perf_weights(customer_ids: list[str], date_range: str | None) -> dict:
+    """
+    Return a weight map by keyword text using SA360 keyword_performance frame.
+    Uses cost if present, else clicks.
+    """
+    weights = {}
+    frames = _collect_sa360_frames(customer_ids, date_range)
+    kw = frames.get("keyword_performance")
+    if kw is None or kw.empty:
+        return {}
+    kw = kw.copy()
+    if "ad_group_criterion.keyword.text" not in kw.columns:
+        return {}
+    kw["__key"] = kw["ad_group_criterion.keyword.text"].astype(str).str.lower()
+    cost_col = next((c for c in ["metrics.cost_micros", "Cost"] if c in kw.columns), None)
+    click_col = next((c for c in ["metrics.clicks", "Clicks"] if c in kw.columns), None)
+    kw[cost_col] = pd.to_numeric(kw[cost_col], errors="coerce") if cost_col else None
+    kw[click_col] = pd.to_numeric(kw[click_col], errors="coerce") if click_col else None
+    for key, group in kw.groupby("__key"):
+        cost = group[cost_col].sum(skipna=True) if cost_col else 0
+        clicks = group[click_col].sum(skipna=True) if click_col else 0
+        weight = cost if cost and cost > 0 else clicks
+        if weight and weight > 0:
+            weights[key] = float(weight)
+    return weights
+
+
+def _performance_seasonality(frames: dict[str, pd.DataFrame]) -> dict:
+    """
+    Build a basic seasonality profile from performance frames (keyword_performance preferred).
+    Returns similar shape as summarize_seasonality: peaks/shoulders/lows/month_scores.
+    """
+    df = frames.get("keyword_performance")
+    if df is None or df.empty:
+        return {}
+    if "segments.date" not in df.columns:
+        return {}
+    tmp = df.copy()
+    tmp["date"] = pd.to_datetime(tmp["segments.date"], errors="coerce")
+    tmp = tmp.dropna(subset=["date"])
+    if tmp.empty:
+        return {}
+    # derive month period
+    tmp["month"] = tmp["date"].dt.to_period("M")
+    cost_col = next((c for c in ["metrics.cost_micros", "Cost"] if c in tmp.columns), None)
+    click_col = next((c for c in ["metrics.clicks", "Clicks"] if c in tmp.columns), None)
+    month_scores = []
+    for m, g in tmp.groupby("month"):
+        score = 0.0
+        if cost_col:
+            score += pd.to_numeric(g[cost_col], errors="coerce").sum(skipna=True)
+        elif click_col:
+            score += pd.to_numeric(g[click_col], errors="coerce").sum(skipna=True)
+        month_scores.append({"month": str(m), "score": float(score)})
+    if not month_scores:
+        return {}
+    month_scores_sorted = sorted(month_scores, key=lambda x: x["score"], reverse=True)
+    peaks = month_scores_sorted[:3]
+    lows = month_scores_sorted[-2:] if len(month_scores_sorted) >= 2 else month_scores_sorted[-1:]
+    n = len(month_scores_sorted)
+    mid_start = max(0, n // 3)
+    mid_end = min(n, 2 * n // 3 + 1)
+    shoulders = month_scores_sorted[mid_start:mid_end]
+    return {
+        "peaks": peaks,
+        "shoulders": shoulders,
+        "lows": lows,
+        "month_scores": month_scores_sorted,
+    }
+
+
+def _seasonality_fallback_with_range(customer_ids: list[str], normalized_range: str | None) -> dict:
+    """
+    Try to build a performance seasonality profile using the requested range; if empty,
+    back off to shorter ranges to avoid empty summaries.
+    """
+    ranges = [normalized_range] if normalized_range else []
+    # add fallbacks: last 180 days, last 90 days
+    today = date.today()
+    def span(days):
+        end = today - timedelta(days=1)
+        start = end - timedelta(days=days - 1)
+        return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+    ranges += [span(180), span(90)]
+    for r in ranges:
+        frames = _collect_sa360_frames(customer_ids, r, bypass_cache=True, write_cache=False)
+        perf_seasonality = _performance_seasonality(frames)
+        if perf_seasonality:
+            return perf_seasonality
+    return {}
+
+
+def _allocate_budget(themes: list[str], multipliers: dict, perf_weights: dict, budget: float | None) -> list[dict]:
+    out = []
+    base_weights = {}
+    for t in themes:
+        k = t.lower()
+        base_weights[t] = perf_weights.get(k, 1.0)
+    # apply multipliers
+    weighted = {}
+    for t, w in base_weights.items():
+        mult = multipliers.get(t, {}).get("multiplier") or multipliers.get(t.lower(), {}).get("multiplier") or 1.0
+        weighted[t] = w * mult
+    total = sum(weighted.values()) or len(weighted) or 1.0
+    for t, w in weighted.items():
+        pct = w / total
+        alloc = budget * pct if budget is not None else None
+        m = multipliers.get(t) or multipliers.get(t.lower()) or {}
+        out.append({
+            "theme": t,
+            "weight_pct": pct * 100.0,
+            "suggested_budget": alloc,
+            "trend_multiplier": m.get("multiplier"),
+            "interest_recent": m.get("recent"),
+            "interest_avg": m.get("avg"),
+        })
+    # sort descending by weight
+    out.sort(key=lambda x: x.get("weight_pct", 0), reverse=True)
+    return out
+
+
+def _aggregate_entity(df: pd.DataFrame, key_col: str, match: str) -> dict | None:
+    if df is None or df.empty:
+        return None
+    if match is None:
+        return None
+    m = match.lower()
+    def match_row(val: Any) -> bool:
+        if val is None:
+            return False
+        txt = str(val).lower()
+        return m in txt or txt == m
+    tmp = df.copy()
+    # Coerce numerics
+    for col in ["metrics.impressions", "metrics.clicks", "metrics.cost_micros", "metrics.conversions", "metrics.conversions_value"]:
+        if col in tmp.columns:
+            tmp[col] = pd.to_numeric(tmp[col], errors="coerce")
+
+    matched = tmp[tmp[key_col].apply(match_row)]
+    if matched.empty:
+        return None
+    metrics = {
+        "impressions": matched["metrics.impressions"].sum(skipna=True) if "metrics.impressions" in matched else 0,
+        "clicks": matched["metrics.clicks"].sum(skipna=True) if "metrics.clicks" in matched else 0,
+        "cost": matched["metrics.cost_micros"].sum(skipna=True) if "metrics.cost_micros" in matched else 0,
+        "conversions": matched["metrics.conversions"].sum(skipna=True) if "metrics.conversions" in matched else 0,
+        "conversions_value": matched["metrics.conversions_value"].sum(skipna=True) if "metrics.conversions_value" in matched else 0,
+    }
+    return _summarize_numeric(metrics)
+
+
+def _analyze_entity_performance(entity: dict, customer_ids: list[str], date_range: str | None) -> dict | None:
+    """
+    Fetch current and prior spans for the entity and compute deltas.
+    Only runs for ad/keyword asks; returns dict or None.
+    """
+    if not entity or not entity.get("entity_type"):
+        return None
+    span = _date_span_from_range(_coerce_date_range(date_range))
+    prev_span = _previous_span(span)
+    if not span or not prev_span:
+        return {"note": "Could not derive comparison window.", "entity": entity}
+
+    def span_to_range(sp: tuple[date, date]) -> str:
+        return f"{sp[0]:%Y-%m-%d},{sp[1]:%Y-%m-%d}"
+
+    current_frames = _collect_sa360_frames(customer_ids, span_to_range(span))
+    previous_frames = _collect_sa360_frames(customer_ids, span_to_range(prev_span))
+
+    etype = entity.get("entity_type")
+    identifier = entity.get("identifier")
+    metric_pref = (entity.get("metric") or "").lower()
+
+    if etype == "ad":
+        df_key = "ad"
+        key_cols = ["ad_group_ad.ad.id", "ad_group_ad.ad.responsive_search_ad.headlines", "ad_group_ad.ad.responsive_search_ad.descriptions", "ad_group_ad.ad.final_urls"]
+    elif etype == "keyword":
+        df_key = "keyword_performance"
+        key_cols = ["ad_group_criterion.criterion_id", "ad_group_criterion.keyword.text"]
+    else:
+        return None
+
+    def best_match(df: pd.DataFrame) -> dict | None:
+        if df is None or df.empty:
+            return None
+        if identifier:
+            for col in key_cols:
+                agg = _aggregate_entity(df.assign(_match=df[col]), "_match", identifier)
+                if agg:
+                    return agg
+        # fallback: top by clicks
+        if "metrics.clicks" in df.columns:
+            top = df.sort_values("metrics.clicks", ascending=False).head(1)
+        else:
+            top = df
+        metrics = {
+            "impressions": top["metrics.impressions"].sum(skipna=True) if "metrics.impressions" in top else 0,
+            "clicks": top["metrics.clicks"].sum(skipna=True) if "metrics.clicks" in top else 0,
+            "cost": top["metrics.cost_micros"].sum(skipna=True) if "metrics.cost_micros" in top else 0,
+            "conversions": top["metrics.conversions"].sum(skipna=True) if "metrics.conversions" in top else 0,
+            "conversions_value": top["metrics.conversions_value"].sum(skipna=True) if "metrics.conversions_value" in top else 0,
+        }
+        return _summarize_numeric(metrics)
+
+    curr_df = current_frames.get(df_key)
+    prev_df = previous_frames.get(df_key)
+    curr = best_match(curr_df)
+    prev = best_match(prev_df)
+    if not curr:
+        return {"note": "No matching entity found in current window.", "entity": entity}
+
+    def num(val):
+        try:
+            if val is None:
+                return 0.0
+            return float(val)
+        except Exception:
+            try:
+                return float(str(val).replace(",", ""))
+            except Exception:
+                return 0.0
+
+    def delta(cur, old, key):
+        c = num(cur.get(key))
+        p = num(old.get(key)) if old else 0.0
+        abs_diff = c - p
+        pct = (abs_diff / p * 100) if p else None
+        return c, p, abs_diff, pct
+
+    keys = ["impressions", "clicks", "conversions", "cost", "ctr", "cpc", "cvr", "cpa", "roas"]
+    deltas = {}
+    for k in keys:
+        c, p, d, pct = delta(curr, prev or {}, k)
+        deltas[k] = {"current": c, "previous": p, "change": d, "pct_change": pct}
+
+    drivers = []
+    if deltas["clicks"]["pct_change"] is not None:
+        drivers.append(f"Clicks {deltas['clicks']['pct_change']:+.1f}% (Δ {deltas['clicks']['change']:+.0f})")
+    if deltas["impressions"]["pct_change"] is not None:
+        drivers.append(f"Impr {deltas['impressions']['pct_change']:+.1f}%")
+    if deltas["ctr"]["pct_change"] is not None:
+        drivers.append(f"CTR {deltas['ctr']['pct_change']:+.1f}%")
+    if deltas["cpc"]["pct_change"] is not None:
+        drivers.append(f"CPC {deltas['cpc']['pct_change']:+.1f}%")
+
+    focus_metric = metric_pref or "conversions"
+    if focus_metric not in keys:
+        focus_metric = "clicks"
+
+    return {
+        "entity": entity,
+        "date_range_current": span_to_range(span),
+        "date_range_previous": span_to_range(prev_span),
+        "metric_focus": focus_metric,
+        "deltas": deltas,
+        "drivers": drivers[:4],
+    }
+
+
+def _analyze_top_movers(customer_ids: list[str], date_range: str | None, entity_type: str | None, metric: str | None, device: str | None, limit: int = 5) -> dict | None:
+    """
+    Compute top movers for the chosen entity type between current window and the previous same-length window.
+    """
+    span = _date_span_from_range(_coerce_date_range(date_range))
+    prev_span = _previous_span(span)
+    if not span or not prev_span:
+        return {"note": "Could not derive comparison window for top movers."}
+
+    def span_to_range(sp: tuple[date, date]) -> str:
+        return f"{sp[0]:%Y-%m-%d},{sp[1]:%Y-%m-%d}"
+
+    cur_frames = _collect_sa360_frames(customer_ids, span_to_range(span))
+    prev_frames = _collect_sa360_frames(customer_ids, span_to_range(prev_span))
+
+    etype = entity_type or "keyword"
+    if etype == "keyword":
+        frame_key = "keyword_performance"
+        key_col = "ad_group_criterion.keyword.text"
+    elif etype == "ad":
+        frame_key = "ad"
+        key_col = "ad_group_ad.ad.id"
+    elif etype == "campaign":
+        frame_key = "campaign"
+        key_col = "campaign.name"
+    else:
+        return {"note": "Unsupported entity type for top movers."}
+
+    cur_grouped = _aggregate_frame(cur_frames.get(frame_key), key_col, device_filter=device)
+    prev_grouped = _aggregate_frame(prev_frames.get(frame_key), key_col, device_filter=device)
+
+    metric_focus = (metric or "conversions").lower()
+    # If metric not present for this entity type, fall back to clicks, then impressions
+    def pick_metric(grouped: dict) -> str:
+        if not grouped:
+            return "clicks"
+        sample = next(iter(grouped.values()))
+        if metric_focus in sample and sample.get(metric_focus) is not None:
+            return metric_focus
+        if "clicks" in sample:
+            return "clicks"
+        if "impressions" in sample:
+            return "impressions"
+        return "clicks"
+
+    focus = pick_metric(cur_grouped)
+
+    def num(val):
+        try:
+            if val is None:
+                return 0.0
+            return float(val)
+        except Exception:
+            try:
+                return float(str(val).replace(",", ""))
+            except Exception:
+                return 0.0
+
+    items = []
+    all_keys = set(cur_grouped.keys()) | set(prev_grouped.keys())
+    for k in all_keys:
+        cur = cur_grouped.get(k, {})
+        prev = prev_grouped.get(k, {})
+        cval = num(cur.get(focus))
+        pval = num(prev.get(focus))
+        delta = cval - pval
+        pct = (delta / pval * 100) if pval else None
+        items.append({
+            "name": str(k),
+            "metric": focus,
+            "current": cval,
+            "previous": pval,
+            "change": delta,
+            "pct_change": pct,
+            "metrics_current": cur,
+            "metrics_previous": prev,
+        })
+
+    items = [i for i in items if i["change"] != 0 or (i["pct_change"] is not None and i["pct_change"] != 0)]
+    items.sort(key=lambda x: abs(x["change"]), reverse=True)
+    movers = items[:limit]
+
+    return {
+        "type": "top_movers",
+        "entity_type": etype,
+        "metric_focus": focus,
+        "date_range_current": span_to_range(span),
+        "date_range_previous": span_to_range(prev_span),
+        "device_filter": device,
+        "items": movers,
+    }
+
+
+def _has_performance_intent(message: str) -> bool:
+    """
+    Detect when the user is asking for performance metrics (cost/conv/roas etc.) or comparisons,
+    and NOT explicitly requesting an audit.
+    """
+    t = (message or "").lower()
+    if any(word in t for word in ["audit", "score", "klaudit"]):
+        return False
+    # Strategy/plan questions should not trigger performance planner by default
+    if any(word in t for word in ["strategy", "plan", "planning", "budget strategy", "next quarter", "q1", "q2", "q3", "q4"]):
+        return False
+    perf_keywords = {
+        "conversion",
+        "conversions",
+        "conv",
+        "cost",
+        "spend",
+        "roas",
+        "cpa",
+        "ctr",
+        "cpc",
+        "performance",
+        "perform",
+        "performing",
+        "compare",
+        "versus",
+        "vs",
+        "week over week",
+        "wow",
+        "last weekend",
+        "weekend",
+        "trend",
+        "did it do",
+        "did they do",
+        "did the account do",
+    }
+    if "how did" in t and ("perform" in t or "do" in t):
+        return True
+    return any(k in t for k in perf_keywords)
+
+
+def _write_frames_to_blob(account_name: str, frames: dict[str, pd.DataFrame]):
+    container_client = _get_blob_client()
+    slug = slugify_account_name(account_name or "General")
+    prefix_template_env = os.environ.get("PPC_DATA_BLOB_PREFIX")
+    prefix_template = "{account_slug}/" if prefix_template_env is None else prefix_template_env
+    prefix = prefix_template.format(account=account_name, account_slug=slug).strip("/")
+    prefix = f"{prefix}/" if prefix and not prefix.endswith("/") else prefix
+
+    filenames = {
+        "campaign": f"Campaign Report - {account_name}.csv",
+        "ad_group": f"Ad group Report - {account_name}.csv",
+        "ad": f"Ad Report - {account_name}.csv",
+        "keyword_performance": f"Keyword Report - {account_name}.csv",
+        "landing_page": f"Landing page Report - {account_name}.csv",
+        "account": f"Account Report - {account_name}.csv",
+    }
+
+    uploaded = []
+    for key, df in frames.items():
+        if df is None or df.empty:
+            continue
+        buf = io.StringIO()
+        df.to_csv(buf, index=False)
+        data = buf.getvalue().encode("utf-8")
+        blob_name = f"{prefix}{filenames.get(key, key + '.csv')}"
+        container_client.upload_blob(name=blob_name, data=data, overwrite=True)
+        uploaded.append(blob_name)
+    if not uploaded:
+        raise HTTPException(status_code=404, detail="No data returned from Ads API; nothing uploaded.")
+    return uploaded
+
+
+def _get_blob_client():
+    conn = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
+    container = os.environ.get("PPC_DATA_BLOB_CONTAINER")
+    if not conn or not container:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Storage is not configured (missing AZURE_STORAGE_CONNECTION_STRING or PPC_DATA_BLOB_CONTAINER).",
+        )
+    return BlobServiceClient.from_connection_string(conn).get_container_client(container)
+
+
+def _download_account_data(account_name: str) -> Path | None:
+    """Download CSVs for the given account from blob storage into a temp folder."""
+    try:
+        container_client = _get_blob_client()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Storage error: {str(exc)[:100]}")
+
+    prefix_template_env = os.environ.get("PPC_DATA_BLOB_PREFIX")
+    prefix_template = "{account_slug}/" if prefix_template_env is None else prefix_template_env
+    slug = slugify_account_name(account_name or "General")
+    prefix = prefix_template.format(account=account_name, account_slug=slug).strip("/") if prefix_template else ""
+    prefix = f"{prefix}/" if prefix and not prefix.endswith("/") else prefix
+
+    cache_dir = Path(tempfile.gettempdir()) / "kai_blob_data" / (slug or "default")
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    # Clear existing cache for this account to ensure latest files
+    for f in cache_dir.glob("*.csv"):
+        f.unlink(missing_ok=True)
+
+    downloaded = 0
+    try:
+        for blob in container_client.list_blobs(name_starts_with=prefix or None):
+            if not blob.name.lower().endswith(".csv"):
+                continue
+            dest = cache_dir / Path(blob.name).name
+            with open(dest, "wb") as handle:
+                container_client.download_blob(blob).readinto(handle)
+            downloaded += 1
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to download data: {str(exc)[:200]}")
+
+    if downloaded == 0:
+        raise HTTPException(status_code=404, detail=f"No CSV blobs found for account '{account_name}' (prefix '{prefix or '<root>'}').")
+
+    return cache_dir
+
+
+@app.post("/api/data/upload")
+async def upload_data(
+    account_name: str = Form(...),
+    files: list[UploadFile] = File(...),
+):
+    """
+    Upload CSV files to blob storage under the account-specific prefix.
+    Prefix uses PPC_DATA_BLOB_PREFIX template (format keys: account, account_slug), default '{account_slug}/'.
+    """
+    if not files:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No files uploaded.")
+    prefix_template_env = os.environ.get("PPC_DATA_BLOB_PREFIX")
+    prefix_template = "{account_slug}/" if prefix_template_env is None else prefix_template_env
+    slug = slugify_account_name(account_name or "General")
+    prefix = prefix_template.format(account=account_name, account_slug=slug).strip("/") if prefix_template else ""
+    prefix = f"{prefix}/" if prefix and not prefix.endswith("/") else prefix
+
+    try:
+        container_client = _get_blob_client()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Storage error: {str(exc)[:100]}")
+
+    uploaded = []
+    for f in files:
+        name = os.path.basename(f.filename)
+        blob_name = f"{prefix}{name}" if prefix else name
+        try:
+            data = await f.read()
+            container_client.upload_blob(name=blob_name, data=data, overwrite=True)
+            uploaded.append(blob_name)
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=f"Failed to upload {name}: {str(exc)[:200]}")
+
+    return {"status": "success", "uploaded": uploaded, "account": account_name, "prefix": prefix or "<root>"}
+
+class UploadDataRequest(BaseModel):
+    account_name: str
+
+
+async def _perform_web_search(query: str, count: int = 3) -> list[dict]:
+    """Call the internal /api/search/web logic (SerpAPI/Bing via env vars)."""
+    api_key = os.environ.get("SERPAPI_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="SERPAPI_KEY is not configured on the server.",
+        )
+
+    search_endpoint = "https://serpapi.com/search"
+    params = {
+        "engine": "bing",
+        "q": query,
+        "api_key": api_key,
+        "num": max(1, min(count, 10)),
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(search_endpoint, params=params)
+            if resp.status_code != 200:
+                raise HTTPException(status_code=resp.status_code, detail=resp.text)
+            data = resp.json()
+            web_pages = data.get("organic_results", []) or data.get("webPages", {}).get("value", [])
+            results = [
+                {
+                  "name": item.get("title") or item.get("name"),
+                  "snippet": item.get("snippet"),
+                  "url": item.get("link") or item.get("url"),
+                  "displayUrl": item.get("displayed_link") or item.get("displayUrl"),
+                }
+                for item in web_pages
+            ]
+            return [r for r in results if r.get("url")]
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Search failed: {str(exc)}",
+        )
+
+
+# Health check
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy", "service": "Kai Platform API"}
+
+
+# Authentication endpoint - password stored in environment variable
+@app.post("/api/auth/verify")
+async def verify_password(req: AuthRequest):
+    """Verify access password - password is stored server-side in env var"""
+    # Get password from environment variable (set in Azure Container Apps)
+    correct_password = os.environ.get("KAI_ACCESS_PASSWORD", "kelvinkai")
+
+    if req.password == correct_password:
+        return {"status": "success", "authenticated": True}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid password")
+
+
+# Chat endpoints
+@app.get("/api/chat/history")
+async def get_chat_history(limit: int = 200):
+    """Get chat history from database"""
+    history = db_manager.fetch_chat_history(limit=limit)
+    return {"messages": history}
+
+
+@app.post("/api/chat/send", response_model=ChatResponse)
+async def send_chat_message(chat: ChatMessage):
+    """Send a chat message and get AI response"""
+    # Save user message
+    db_manager.save_chat_message("user", chat.message)
+
+    # Explicit web lookup intent (only fire SerpAPI when clearly asked or LLM is unsure)
+    def is_lookup_intent(text: str) -> bool:
+        t = (text or "").lower()
+        keywords = [
+            "search the web",
+            "search online",
+            "web search",
+            "look up",
+            "lookup",
+            "find sources",
+            "google it",
+            "bing it",
+            "latest news",
+            "recent news",
+            "breaking news",
+            "trending",
+        ]
+        return any(k in t for k in keywords)
+
+    def is_metric_or_account_intent(text: str) -> bool:
+        t = (text or "").lower()
+        metric_terms = [
+            "impression",
+            "impressions",
+            "click",
+            "clicks",
+            "cpc",
+            "cpm",
+            "ctr",
+            "roas",
+            "cpa",
+            "cost",
+            "spend",
+            "conversions",
+            "conversion",
+            "budget",
+            "performance",
+        ]
+        account_terms = ["my account", "my campaign", "our account", "our campaign", "pmax", "performance max"]
+        has_metric = any(k in t for k in metric_terms)
+        has_account = any(k in t for k in account_terms)
+        return has_metric or has_account
+
+    def is_market_volume_intent(text: str) -> bool:
+        t = (text or "").lower()
+        market_terms = [
+            "search volume",
+            "keyword volume",
+            "search demand",
+            "volume estimates",
+            "market volume",
+            "query volume",
+            "google trends",
+            "trend",
+            "trends",
+        ]
+        return any(k in t for k in market_terms)
+
+    def is_audit_intent(text: str) -> bool:
+        t = (text or "").lower()
+        keywords = [
+            "audit",
+            "run audit",
+            "generate audit",
+            "upload data",
+            "upload csv",
+            "upload files",
+            "ppc audit",
+        ]
+        return any(k in t for k in keywords)
+
+    def is_affirmative(text: str) -> bool:
+        t = (text or "").strip().lower()
+        affirmations = [
+            "yes",
+            "yeah",
+            "yep",
+            "sure",
+            "ok",
+            "okay",
+            "please do",
+            "do it",
+            "go ahead",
+            "sounds good",
+            "please",
+            "yup",
+            "absolutely",
+            "sure thing",
+        ]
+        return any(t == a or t.startswith(a + " ") for a in affirmations)
+
+    def is_market_choice(text: str) -> bool:
+        t = (text or "").strip().lower()
+        keywords = [
+            "market",
+            "market volume",
+            "search volume",
+            "public",
+            "estimate",
+            "benchmarks",
+            "industry",
+            "general",
+            "trends",
+        ]
+        return any(k in t for k in keywords)
+
+    def is_account_choice(text: str) -> bool:
+        t = (text or "").strip().lower()
+        keywords = [
+            "account",
+            "my account",
+            "my campaign",
+            "campaign",
+            "impressions from my",
+            "my data",
+            "our data",
+            "exact impressions",
+        ]
+        return any(k in t for k in keywords)
+
+    def rewrite_lookup_query(text: str) -> str:
+        """Rewrite user ask into a higher-signal search query for volume/benchmarks."""
+        t = text or ""
+        lower = t.lower()
+        import re
+
+        m = re.search(r'"([^"]+)"', t)
+        keyword = m.group(1) if m else t.strip()
+        keyword = keyword if keyword else "ppc keyword"
+
+        time_hint = ""
+        if "last month" in lower:
+            time_hint = "last month"
+        elif "november" in lower:
+            time_hint = "november"
+        elif "2025" in lower:
+            time_hint = "2025"
+        elif "2024" in lower:
+            time_hint = "2024"
+
+        return f"{keyword} keyword search volume {time_hint} US google ads keyword planner estimate"
+
+    def filter_sources(raw_sources: list[dict]) -> list[dict]:
+        """Drop low-value sources like dictionary results or off-topic finance links."""
+        bad_domains = [
+            "merriam-webster.com",
+            "dictionary.com",
+            "cambridge.org",
+            "thefreedictionary.com",
+            "wordreference.com",
+            "vocabulary.com",
+            "collinsdictionary.com",
+            "marketwatch.com",
+            "finance.yahoo.com",
+            "cnbc.com",
+            "reuters.com",
+            "bloomberg.com",
+            "cnn.com/markets",
+            "tripadvisor.com",
+            "yelp.com",
+            "facebook.com",
+            "pinterest.com",
+            "instagram.com",
+            "reddit.com",
+        ]
+        keywords = ["search", "volume", "keyword", "ppc", "sem", "adwords", "ads", "impressions", "planner", "trend"]
+        focus_phrases = [
+            "search volume",
+            "keyword planner",
+            "keyword volume",
+            "search demand",
+            "search impressions",
+            "google ads",
+            "adwords",
+            "ppc",
+            "semrush",
+            "ahrefs",
+            "moz",
+            "google trends",
+        ]
+        filtered = []
+        for s in raw_sources or []:
+            url = (s.get("url") or "").lower()
+            if any(bad in url for bad in bad_domains):
+                continue
+            name = (s.get("name") or "").lower()
+            snippet = (s.get("snippet") or "").lower()
+            if not snippet and not name:
+                continue
+            if not any(k in name or k in snippet for k in keywords):
+                continue
+            text_blob = f"{name} {snippet}"
+            if not any(phrase in text_blob for phrase in focus_phrases):
+                continue
+            filtered.append(s)
+        return filtered
+
+    def has_numeric_evidence(sources: list[dict]) -> bool:
+        """Return True if any source contains numeric tokens (e.g., ranges, counts)."""
+        import re
+        for s in sources or []:
+            text = f"{s.get('name','')} {s.get('snippet','')}"
+            if re.search(r"\d", text):
+                return True
+        return False
+
+    def fallback_market_estimate(keyword: str) -> str:
+        """Provide a conservative, clearly labeled market estimate template with disclaimers."""
+        kw = keyword.strip('"').strip() if keyword else "the keyword"
+        return (
+            f"I don't have exact impression counts for {kw} without platform access. "
+            "Here is a market-level estimate approach using public signals:\n\n"
+            "- Treat this as search volume (how many people search), not ad impressions (how often your ad showed).\n"
+            "- Public tools: Google Keyword Planner ranges, Google Trends for seasonality, and third-party volume aggregators.\n"
+            "- Actual ranges vary by geo, match type, and seasonality; validate in Keyword Planner for your targeting.\n"
+            "- Expect spikes around relevant events/holidays; post-spike drop-offs are normal.\n\n"
+            "Next steps: 1) Run Keyword Planner for your geo/date range, 2) Use Google Trends to map peaks, 3) Align with your ads data to distinguish search volume from ad impressions. "
+            "I won't provide numeric ranges unless a source explicitly contains them."
+        )
+
+    def needs_web_lookup(text: str, draft_reply: str) -> bool:
+        """Only escalate to web search if explicitly requested or the draft reply signals missing data."""
+        reply = (draft_reply or "").lower()
+        uncertainty_markers = [
+            "i don't have real-time data",
+            "i do not have real-time data",
+            "i don't have realtime data",
+            "i do not have realtime data",
+            "i can't browse",
+            "i cannot browse",
+            "i don't have browsing",
+            "not enough information",
+            "need more information",
+            "couldn't find information",
+            "cannot find information",
+            "no source available",
+        ]
+        return is_lookup_intent(text) or any(marker in reply for marker in uncertainty_markers)
+
+    sources: list[dict] = []
+
+    # Generate AI response
+    if chat.ai_enabled:
+        try:
+            history = db_manager.fetch_chat_history(limit=10)
+            base_system = {
+                "role": "system",
+                "content": (
+                    "You are Kai, a PPC (Pay-Per-Click) marketing expert assistant. "
+                    "Answer from your PPC expertise and prior context. "
+                    "Only ask for web lookup when the user explicitly requests web results or you truly need fresh information."
+                ),
+            }
+            recent_messages = []
+            for msg in history[-5:]:
+                recent_messages.append({"role": msg["role"], "content": msg["message"]})
+
+            # Tool-specific fast paths (serp/pmax/competitor)
+            tool = (chat.context or {}).get("tool") if isinstance(chat.context, dict) else None
+
+            def _extract_urls(text: str) -> list[str]:
+                import re
+                return re.findall(r"https?://[\w\-.]+[^\s,;>\)]*", text or "")
+
+            def _extract_domain(text: str) -> str | None:
+                import re
+                t = (text or "").lower()
+                if "home depot" in t:
+                    return "homedepot.com"
+                domains = re.findall(r"\b([a-z0-9.-]+\.[a-z]{2,})\b", text or "", flags=re.IGNORECASE)
+                return domains[0].lower() if domains else None
+
+            def _parse_number_after(text: str, keywords: list[str]) -> float | None:
+                import re
+                t = text or ""
+                for kw in keywords:
+                    m = re.search(kw + r"[^\d\-]*([0-9]+(?:\.[0-9]+)?)", t, flags=re.IGNORECASE)
+                    if m:
+                        try:
+                            return float(m.group(1))
+                        except Exception:
+                            continue
+                return None
+
+            def _try_parse_json_payload(raw: str):
+                import json
+                try:
+                    return json.loads(raw)
+                except Exception:
+                    pass
+                if "[" in raw and "]" in raw:
+                    try:
+                        start = raw.index("[")
+                        end = raw.rindex("]") + 1
+                        return json.loads(raw[start:end])
+                    except Exception:
+                        return None
+                return None
+
+            def _try_parse_csv_placements(raw: str):
+                """
+                Best-effort CSV parser for PMax placements pasted into chat.
+                Accepts headers like asset_group, placement, cost, conversions, impressions, clicks.
+                """
+                import csv
+                from io import StringIO
+                try:
+                    reader = csv.DictReader(StringIO(raw))
+                    rows = [dict(row) for row in reader if any(row.values())]
+                    if not rows:
+                        return None
+                    # normalize numeric fields
+                    numeric_fields = {"cost", "conversions", "clicks", "impressions"}
+                    for r in rows:
+                        for k in list(r.keys()):
+                            v = r[k]
+                            if v is None:
+                                continue
+                            if k.lower() in numeric_fields:
+                                try:
+                                    r[k] = float(str(v).replace(",", "")) if v != "" else 0.0
+                                except Exception:
+                                    pass
+                    return rows
+                except Exception:
+                    return None
+
+            if tool == "serp":
+                urls = _extract_urls(chat.message)
+                if not urls:
+                    reply = "Share the URLs you want checked (one or more) and I’ll run a quick health check."
+                    db_manager.save_chat_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=[])
+                try:
+                    serp_results = check_url_health(urls)
+                    lines = []
+                    for r in serp_results or []:
+                        status = r.get("status") or r.get("http_status")
+                        issue = r.get("issue") or r.get("message") or ""
+                        lines.append(f"{r.get('url')}: {status} {('- ' + issue) if issue else ''}".strip())
+                    reply = "URL health check:\n" + "\n".join(lines) if lines else "URLs processed, no issues found."
+                    db_manager.save_chat_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=[])
+                except Exception as exc:
+                    reply = f"URL health check failed: {str(exc)[:120]}"
+                    db_manager.save_chat_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=[])
+
+            if tool == "pmax":
+                placements = _try_parse_json_payload(chat.message)
+                if placements is None and "," in (chat.message or "") and "\n" in (chat.message or ""):
+                    placements = _try_parse_csv_placements(chat.message)
+                if isinstance(placements, list) and placements:
+                    try:
+                        analyzer = PMaxAnalyzer()
+                        result = analyzer.analyze(placements=placements, total_cost=0.0)
+                        # optional channel breakout if cost exists
+                        try:
+                            import pandas as pd
+                            df = pd.DataFrame(placements)
+                            if "cost" in df.columns:
+                                splitter = PMaxChannelSplitter(df_campaign=df)
+                                breakout = splitter.infer()
+                                result["channel_breakout"] = breakout.__dict__
+                        except Exception:
+                            pass
+                        reply = "PMax analysis completed:\n"
+                        if "channel_breakout" in result:
+                            cb = result["channel_breakout"]
+                            reply += f"- Channel breakout: {cb}\n"
+                        if "placements_ranked" in result:
+                            tops = result["placements_ranked"][:5]
+                            summary = "; ".join(
+                                [f"{p.get('asset_group','?')}: {p.get('cost',0)} spend" for p in tops]
+                            )
+                            reply += f"- Top placements: {summary}"
+                        db_manager.save_chat_message("assistant", reply)
+                        return ChatResponse(reply=reply, sources=[])
+                    except Exception as exc:
+                        reply = f"PMax analysis failed to parse placements: {str(exc)[:120]}"
+                        db_manager.save_chat_message("assistant", reply)
+                        return ChatResponse(reply=reply, sources=[])
+                reply = (
+                    "To analyze PMax spend by placement, paste a placements JSON/CSV (with cost/conversions). "
+                    "I'll break down spend by channel/network and rank top placements once I have the data."
+                )
+                db_manager.save_chat_message("assistant", reply)
+                return ChatResponse(reply=reply, sources=[])
+
+            if tool == "competitor":
+                domain = _extract_domain(chat.message) or "competitor"
+                is_current = _parse_number_after(chat.message, ["impression share current", "current impression share", "current is", "is now"])
+                is_prev = _parse_number_after(chat.message, ["impression share previous", "previous impression share", "last month", "prior is", "was"])
+                outranking = _parse_number_after(chat.message, ["outranking rate", "outranking", "outrank"])
+                top_of_page = _parse_number_after(chat.message, ["top of page rate", "top-of-page", "top of page"])
+                if any(v is not None for v in [is_current, is_prev, outranking, top_of_page]):
+                    try:
+                        comp_result = analyze_competitor(
+                            competitor_domain=domain,
+                            impression_share_current=is_current,
+                            impression_share_previous=is_prev,
+                            outranking_rate=outranking,
+                            top_of_page_rate=top_of_page,
+                            position_above_rate=None,
+                            raw_description=chat.message,
+                        )
+                        signal = comp_result.get("signal") or "unknown"
+                        confidence = comp_result.get("confidence")
+                        reasoning = comp_result.get("reasoning") or ""
+                        interpretation = comp_result.get("interpretation") or ""
+                        conf_text = f"{confidence:.2f}" if isinstance(confidence, (int, float)) else "n/a"
+                        reply = f"Competitor signal for {domain}: {signal} (confidence {conf_text})."
+                        if reasoning:
+                            reply += f"\n{reasoning}"
+                        if interpretation:
+                            reply += f"\n{interpretation}"
+                        db_manager.save_chat_message("assistant", reply)
+                        return ChatResponse(reply=reply, sources=[])
+                    except Exception as exc:
+                        reply = f"Competitor inference failed: {str(exc)[:120]}"
+                        db_manager.save_chat_message("assistant", reply)
+                        return ChatResponse(reply=reply, sources=[])
+                reply = (
+                    "Share metrics to infer competitor investment: impression share current vs previous, outranking rate, top-of-page rate. "
+                    "If you provide them, I’ll calculate the signal; otherwise I can pull public market volume instead."
+                )
+                db_manager.save_chat_message("assistant", reply)
+                return ChatResponse(reply=reply, sources=[])
+
+            # Search volume / market volume intent -> pull SA360 keyword data
+            if is_market_volume_intent(chat.message):
+                ctx = chat.context or {}
+                ctx_ids = []
+                if isinstance(ctx, dict):
+                    ctx_ids = ctx.get("customer_ids") or []
+                ids, acct, resolution_notes = _resolve_account_context(chat.message, ctx_ids or _default_customer_ids(), chat.account_name)
+                if not ids:
+                    reply = "To pull search volume, tell me the account name or provide a customer ID (SA360)."
+                    db_manager.save_chat_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=[])
+                kw = _extract_keyword_from_text(chat.message)
+                if not kw:
+                    reply = "Tell me the keyword you want search volume for (e.g., \"shell gas stations\")."
+                    db_manager.save_chat_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=[])
+                date_range = None
+                if isinstance(ctx, dict):
+                    date_range = ctx.get("date_range") or None
+                date_range = date_range or "LAST_30_DAYS"
+                exact, close_matches = _keyword_volume_snapshot(kw, ids, date_range, include_previous=True)
+                reply = _format_volume_reply(kw, exact, close_matches, date_range)
+                if resolution_notes:
+                    reply = f"{resolution_notes} {reply}"
+                db_manager.save_chat_message("assistant", reply)
+                return ChatResponse(reply=reply, sources=[])
+
+            # If audit intent without clear account context, prompt for account/upload and stop
+            if is_audit_intent(chat.message):
+                reply = (
+                    "I can run an audit. Which account should I use? If you have CSVs, upload them and tell me the account name. "
+                    "I'll pull the latest files for that account."
+                )
+                db_manager.save_chat_message("assistant", reply)
+                return ChatResponse(reply=reply, sources=sources)
+
+            # If the user said yes to the prior prompt, override gate and perform web lookup on the previous query
+            last_assistant_message = next((msg["message"] for msg in reversed(history) if msg["role"] == "assistant"), "")
+            user_messages = [msg["message"] for msg in history if msg["role"] == "user"]
+            prev_user_query = user_messages[-2] if len(user_messages) >= 2 else ""
+
+            # If the user said yes to the prior prompt, override gate and perform web lookup on the previous query
+            force_lookup_from_affirmation = (
+                is_affirmative(chat.message)
+                and "find the answer from outside my immediate sources" in (last_assistant_message or "").lower()
+                and prev_user_query
+            )
+
+            # If the user chose market vs account after prompt
+            market_followup = (
+                ("market search volume" in (last_assistant_message or "").lower()
+                 or "account impressions" in (last_assistant_message or "").lower())
+                and is_market_choice(chat.message)
+            )
+            account_followup = (
+                ("market search volume" in (last_assistant_message or "").lower()
+                 or "account impressions" in (last_assistant_message or "").lower())
+                and is_account_choice(chat.message)
+            )
+
+            lookup_text = prev_user_query if (force_lookup_from_affirmation or market_followup) else chat.message
+
+            if force_lookup_from_affirmation or market_followup:
+                search_query = rewrite_lookup_query(lookup_text)
+                try:
+                    raw_sources = await _perform_web_search(search_query, count=chat.top_k or 3)
+                    filtered_sources = filter_sources(raw_sources)
+                    sources = filtered_sources
+                    if not sources or not has_numeric_evidence(sources):
+                        second_query = f"{search_query} keyword planner benchmarks"
+                        raw_sources = await _perform_web_search(second_query, count=chat.top_k or 3)
+                        second_filtered = filter_sources(raw_sources)
+                        sources = second_filtered
+                except Exception as exc:
+                    reply = f"I'm having trouble connecting to web search. Error: {str(exc)[:100]}"
+                else:
+                    if sources:
+                        snippets = "\n".join(
+                            [
+                                f"{idx+1}. {s.get('name')}: {s.get('snippet')} ({s.get('url')})"
+                                for idx, s in enumerate(sources)
+                            ]
+                        )
+                        grounded_messages = [
+                            base_system,
+                            {
+                                "role": "system",
+                                "content": (
+                                    "You have live web results. Use them to answer concisely, distinguish impressions vs search volume, "
+                                    "and include caveats. Only include numeric ranges if the sources explicitly provide them. "
+                                    "If data is insufficient, say so briefly and provide a market-level estimate without inventing numbers."
+                                ),
+                            },
+                            *recent_messages,
+                            {
+                                "role": "user",
+                                "content": f"User question: {lookup_text}\n\nWeb results:\n{snippets}",
+                            },
+                        ]
+                        reply = call_azure_openai(grounded_messages, session_id=None, intent=None, tenant_id=None)
+                    else:
+                        reply = fallback_market_estimate(lookup_text)
+
+            # If account/metric intent and no connected data, provide a clear gate with choices
+            elif is_metric_or_account_intent(chat.message):
+                if account_followup:
+                    reply = (
+                        "To provide account impressions, connect your Google Ads or Search Console data. "
+                        "I won't run a web search because that won't contain your account metrics."
+                    )
+                elif is_market_choice(chat.message) or is_market_volume_intent(chat.message):
+                    search_query = rewrite_lookup_query(chat.message)
+                    try:
+                        raw_sources = await _perform_web_search(search_query, count=chat.top_k or 3)
+                        filtered_sources = filter_sources(raw_sources)
+                        sources = filtered_sources
+                        if not sources or not has_numeric_evidence(sources):
+                            second_query = f"{search_query} keyword planner benchmarks"
+                            raw_sources = await _perform_web_search(second_query, count=chat.top_k or 3)
+                            second_filtered = filter_sources(raw_sources)
+                            sources = second_filtered
+                    except Exception:
+                        sources = []
+                    if sources:
+                        snippets = "\n".join(
+                            [
+                                f"{idx+1}. {s.get('name')}: {s.get('snippet')} ({s.get('url')})"
+                                for idx, s in enumerate(sources)
+                            ]
+                        )
+                        grounded_messages = [
+                            base_system,
+                            {
+                                "role": "system",
+                                "content": (
+                                    "You have live web results. Provide market-level search volume estimates, "
+                                    "differentiate impressions vs search volume, and include caveats. "
+                                    "Only include numeric ranges if the sources explicitly provide them; otherwise stay qualitative."
+                                ),
+                            },
+                            *recent_messages,
+                            {
+                                "role": "user",
+                                "content": f"User question: {chat.message}\n\nWeb results:\n{snippets}",
+                            },
+                        ]
+                        reply = call_azure_openai(grounded_messages, session_id=None, intent=None, tenant_id=None)
+                    else:
+                        reply = fallback_market_estimate(chat.message)
+                else:
+                    reply = (
+                        "I need connected data to answer that if it's specific to your account or campaigns, so I won't run a web search here. "
+                        "If it's general (e.g., market search volume or public info), tell me and I can look it up. "
+                        "Do you want market search volume estimates, or your account impressions?"
+                    )
+            else:
+                # First pass: answer without web search to avoid unnecessary SerpAPI calls
+                messages = [base_system, *recent_messages, {"role": "user", "content": lookup_text}]
+                draft_reply = call_azure_openai(messages, session_id=None, intent=None, tenant_id=None)
+
+                lookup_needed = needs_web_lookup(lookup_text, draft_reply)
+                consent_needed = lookup_needed and not force_lookup_from_affirmation and not is_lookup_intent(chat.message)
+
+                if consent_needed:
+                    prompt = (
+                        "Do you want me to find the answer from outside my immediate sources? "
+                        "If yes, I'll run a quick grounded lookup; otherwise I'll stick with my current answer."
+                    )
+                    reply = f"{draft_reply.strip()} {prompt}".strip() if draft_reply else prompt
+                # Only call web search if explicitly requested or the draft reply signals missing data
+                elif lookup_needed:
+                    search_query = rewrite_lookup_query(lookup_text)
+                    try:
+                        raw_sources = await _perform_web_search(search_query, count=chat.top_k or 3)
+                        filtered_sources = filter_sources(raw_sources)
+                        sources = filtered_sources
+                        if not sources or not has_numeric_evidence(sources):
+                            second_query = f"{search_query} keyword planner benchmarks"
+                            raw_sources = await _perform_web_search(second_query, count=chat.top_k or 3)
+                            second_filtered = filter_sources(raw_sources)
+                            sources = second_filtered
+                    except Exception as exc:
+                        reply = draft_reply or f"I'm having trouble connecting to web search. Error: {str(exc)[:100]}"
+                    else:
+                        if sources:
+                            snippets = "\n".join(
+                                [
+                                    f"{idx+1}. {s.get('name')}: {s.get('snippet')} ({s.get('url')})"
+                                    for idx, s in enumerate(sources)
+                                ]
+                            )
+                            grounded_messages = [
+                                base_system,
+                                {
+                                    "role": "system",
+                                    "content": (
+                                        "You have live web results. Use them to answer concisely and cite key findings. "
+                                        "Only include numeric ranges if the sources explicitly provide them; otherwise stay qualitative and add caveats."
+                                    ),
+                                },
+                                *recent_messages,
+                                {
+                                    "role": "user",
+                                    "content": f"User question: {lookup_text}\n\nWeb results:\n{snippets}",
+                                },
+                            ]
+                            reply = call_azure_openai(grounded_messages, session_id=None, intent=None, tenant_id=None)
+                        else:
+                            reply = fallback_market_estimate(chat.message) if is_market_volume_intent(chat.message) else draft_reply
+                else:
+                    reply = draft_reply
+
+        except Exception as exc:
+            print(f"[chat] exception: {exc}", file=sys.stderr, flush=True)
+            try:
+                print(traceback.format_exc(), file=sys.stderr, flush=True)
+            except Exception:
+                pass
+            reply = f"I'm having trouble connecting to AI services. Error: {str(exc)[:100]}"
+    else:
+        reply = "AI chat is currently disabled. Enable AI in settings to use intelligent responses."
+
+    # Save assistant message
+    db_manager.save_chat_message("assistant", reply)
+
+    return ChatResponse(reply=reply, sources=sources)
+
+
+@app.delete("/api/chat/clear")
+async def clear_chat_history():
+    """Clear all chat history"""
+    db_manager.clear_chat_history()
+    return {"status": "success", "message": "Chat history cleared"}
+
+
+# Ads integration (feature-flagged scaffolding)
+def _ensure_ads_enabled():
+    if not ADS_FETCH_ENABLED:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Ads integration is disabled (ADS_FETCH_ENABLED=false).",
+        )
+
+
+@app.post("/api/integrations/ads/connect")
+async def ads_connect(req: AdsConnectRequest):
+    """
+    Store Ads OAuth credentials. This is a placeholder; secure storage (e.g., Key Vault) should be wired here.
+    """
+    _ensure_ads_enabled()
+    # NOTE: For security, do not log secrets. Here we simply acknowledge receipt.
+    # In production, persist to a secure secret store and associate with the tenant/account.
+    return {"status": "received", "customer_ids": req.customer_ids}
+
+
+@app.post("/api/integrations/ads/fetch")
+async def ads_fetch(req: AdsFetchRequest):
+    """
+    Google Ads fetch -> CSV -> blob (feature-flagged). Uses GAQL templates and writes CSVs matching audit schemas.
+    """
+    _ensure_ads_enabled()
+    try:
+        access_token = _exchange_google_access_token(
+            os.environ.get("ADS_CLIENT_ID", ""),
+            os.environ.get("ADS_CLIENT_SECRET", ""),
+            os.environ.get("ADS_REFRESH_TOKEN", ""),
+        )
+        developer_token = os.environ.get("ADS_DEVELOPER_TOKEN", "")
+        if not developer_token:
+            raise HTTPException(status_code=500, detail="ADS_DEVELOPER_TOKEN is missing.")
+
+        frames = {} if req.dry_run else _collect_ads_frames(
+            customer_ids=req.customer_ids or [],
+            developer_token=developer_token,
+            access_token=access_token,
+            date_range=req.date_range,
+        )
+        if req.dry_run:
+            return {"status": "dry-run", "schemas": ADS_CSV_SCHEMAS}
+        uploaded = _write_frames_to_blob(req.account_name, frames)
+        return {"status": "success", "uploaded": uploaded}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/api/integrations/ads/fetch-and-audit")
+async def ads_fetch_and_audit(req: AdsFetchAuditRequest):
+    """
+    Fetch Ads data and run audit. Leaves audit engine untouched; feature-flagged.
+    """
+    _ensure_ads_enabled()
+    fetch_resp = await ads_fetch(req)  # will raise if failure or dry-run
+    if fetch_resp.get("status") != "success":
+        raise HTTPException(status_code=500, detail="Ads fetch did not complete successfully.")
+    audit_request = AuditRequest(
+        business_unit=req.business_unit,
+        account_name=req.account_name,
+        use_mock_data=False,
+    )
+    return await generate_audit(audit_request)
+
+
+# SA360 integration (feature-flagged, funnel.io-like ingest)
+def _ensure_sa360_feature():
+    if not SA360_FETCH_ENABLED:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="SA360 integration is disabled (SA360_FETCH_ENABLED=false).",
+        )
+
+
+@app.post("/api/integrations/sa360/fetch")
+async def sa360_fetch(req: Sa360FetchRequest):
+    """
+    Search Ads 360 fetch -> CSV -> blob (feature-flagged). Writes CSVs matching existing audit schemas.
+    """
+    _ensure_sa360_feature()
+    _ensure_sa360_enabled()
+    try:
+        frames = {} if req.dry_run else _collect_sa360_frames(
+            customer_ids=req.customer_ids or [],
+            date_range=req.date_range,
+        )
+        if req.dry_run:
+            return {"status": "dry-run", "schemas": ADS_CSV_SCHEMAS}
+        resolved_account = req.account_name
+        if resolved_account is None or resolved_account == "":
+            acct_df = frames.get("account")
+            if acct_df is not None and not acct_df.empty:
+                # Prefer descriptive name from SA360
+                resolved_account = (
+                    acct_df.iloc[0].get("customer.descriptive_name")
+                    or acct_df.iloc[0].get("descriptive_name")
+                    or ""
+                )
+            if not resolved_account and req.customer_ids:
+                resolved_account = req.customer_ids[0]
+        if not resolved_account:
+            resolved_account = "Unknown Account"
+
+        uploaded = _write_frames_to_blob(resolved_account, frames)
+        return {"status": "success", "uploaded": uploaded, "account_name": resolved_account}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        print(f"[sa360_fetch] Exception: {exc}\n{traceback.format_exc()}", file=sys.stderr, flush=True)
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/api/integrations/sa360/fetch-and-audit")
+async def sa360_fetch_and_audit(req: Sa360FetchRequest):
+    """
+    Fetch SA360 data and run audit. Leaves audit engine untouched; feature-flagged.
+    """
+    _ensure_sa360_feature()
+    try:
+        fetch_resp = await sa360_fetch(req)  # will raise if failure or dry-run
+    except Exception as exc:
+        print(f"[sa360_fetch_and_audit] Fetch failure: {exc}\n{traceback.format_exc()}", file=sys.stderr, flush=True)
+        raise
+    if fetch_resp.get("status") != "success":
+        raise HTTPException(status_code=500, detail="SA360 fetch did not complete successfully.")
+    resolved_account = fetch_resp.get("account_name") or req.account_name
+    if not resolved_account:
+        resolved_account = "Unknown Account"
+    audit_request = AuditRequest(
+        business_unit=req.business_unit,
+        account_name=resolved_account,
+        use_mock_data=False,
+    )
+    try:
+        return await generate_audit(audit_request)
+    except Exception as exc:
+        print(f"[sa360_fetch_and_audit] Audit failure: {exc}\n{traceback.format_exc()}", file=sys.stderr, flush=True)
+        raise
+
+
+@app.post("/api/diagnostics/sa360/perf-window")
+async def sa360_performance_diagnostics(req: Sa360DiagnosticsRequest):
+    """
+    Compare cached vs live SA360 pulls for a date window (and prior window if requested).
+    Helps detect cache cutoff issues (e.g., missing spend with clicks present).
+    """
+    _ensure_sa360_feature()
+    _ensure_sa360_enabled()
+    if not req.customer_ids:
+        raise HTTPException(status_code=400, detail="customer_ids are required for diagnostics.")
+
+    normalized_range = _coerce_date_range(req.date_range)
+    if not normalized_range:
+        normalized_range = "LAST_7_DAYS"
+    span = _date_span_from_range(normalized_range)
+    if not span:
+        span = _date_span_from_range("LAST_7_DAYS")
+
+    def span_to_range(sp: tuple[date, date]) -> str:
+        return f"{sp[0]:%Y-%m-%d},{sp[1]:%Y-%m-%d}"
+
+    current_range = span_to_range(span) if span else normalized_range
+    prev_span = _previous_span(span) if (req.include_previous and span) else None
+    previous_range = span_to_range(prev_span) if prev_span else None
+
+    snapshots: dict[str, dict] = {}
+    # Cached vs live (bypassing cache + skipping write) for current window
+    frames_cached = _collect_sa360_frames(req.customer_ids, current_range, bypass_cache=False)
+    frames_live = _collect_sa360_frames(req.customer_ids, current_range, bypass_cache=True, write_cache=False)
+    snapshots["current_cached"] = _build_perf_snapshot(frames_cached)
+    snapshots["current_live"] = _build_perf_snapshot(frames_live)
+
+    if previous_range:
+        frames_prev_cached = _collect_sa360_frames(req.customer_ids, previous_range, bypass_cache=False)
+        frames_prev_live = _collect_sa360_frames(req.customer_ids, previous_range, bypass_cache=True, write_cache=False)
+        snapshots["previous_cached"] = _build_perf_snapshot(frames_prev_cached)
+        snapshots["previous_live"] = _build_perf_snapshot(frames_prev_live)
+
+    def _num(val: Any) -> float | None:
+        try:
+            if val is None:
+                return None
+            return float(val)
+        except Exception:
+            try:
+                return float(str(val).replace(",", ""))
+            except Exception:
+                return None
+
+    def _cost_diff(a: dict, b: dict) -> dict:
+        ca = _num((a or {}).get("metrics", {}).get("cost"))
+        cb = _num((b or {}).get("metrics", {}).get("cost"))
+        diff = {"cached": ca, "live": cb}
+        if ca is not None and cb is not None:
+            diff["delta"] = cb - ca
+        return diff
+
+    comparisons = {
+        "current_cost_gap": _cost_diff(snapshots.get("current_cached"), snapshots.get("current_live")),
+    }
+    if previous_range:
+        comparisons["previous_cost_gap"] = _cost_diff(snapshots.get("previous_cached"), snapshots.get("previous_live"))
+
+    return {
+        "status": "success",
+        "date_range_current": current_range,
+        "date_range_previous": previous_range,
+        "snapshots": snapshots,
+        "comparisons": comparisons,
+        "notes": "missing_spend flags trigger when cost is 0/null but clicks exist and cost column is empty.",
+    }
+
+
+@app.post("/api/trends/seasonality")
+async def trends_seasonality(req: TrendsRequest):
+    """
+    Combine Google Trends seasonality with recent SA360 performance to suggest budget allocation.
+    Feature-flagged by ENABLE_TRENDS.
+    """
+    if not ENABLE_TRENDS:
+        raise HTTPException(status_code=503, detail="Trends integration is disabled (ENABLE_TRENDS=false).")
+    themes = _derive_themes(req.themes, req.account_name)
+    if not themes:
+        raise HTTPException(status_code=400, detail="No themes provided or inferred.")
+
+    # Normalize timeframe for SA360; trends uses its own string
+    perf_range = _normalize_trends_timeframe(req.timeframe)
+    perf_weights = {}
+    perf_seasonality = {}
+    if req.use_performance and req.customer_ids:
+        try:
+            perf_weights = _collect_keyword_perf_weights(req.customer_ids, perf_range)
+            perf_seasonality = _seasonality_fallback_with_range(req.customer_ids, perf_range)
+        except Exception:
+            perf_weights = {}
+            perf_seasonality = {}
+
+    # Fetch trends
+    iot, related = fetch_trends(themes, timeframe=req.timeframe, geo=req.geo)
+    multipliers = seasonality_multipliers(iot, themes)
+    allocations = _allocate_budget(themes, multipliers, perf_weights, req.budget)
+    seasonality = summarize_seasonality(iot, themes)
+    trends_status = "trends_ok" if (iot is not None and not iot.empty) else ("trends_empty" if ENABLE_TRENDS else "trends_disabled")
+
+    def _seasonality_summary(seasonality: dict) -> str | None:
+        if not seasonality:
+            return None
+        def fmt(entries):
+            return ", ".join([f"{e['month']} (~{e['score']:.0f})" for e in entries]) if entries else None
+        peaks = fmt(seasonality.get("peaks", []))
+        lows = fmt(seasonality.get("lows", []))
+        shoulders = fmt(seasonality.get("shoulders", []))
+        parts = []
+        if peaks:
+            parts.append(f"Peaks: {peaks}")
+        if shoulders:
+            parts.append(f"Steady: {shoulders}")
+        if lows:
+            parts.append(f"Lows: {lows}")
+        return " | ".join(parts) if parts else None
+
+    seasonality_text = _seasonality_summary(seasonality) if seasonality else None
+    seasonality_source = "trends" if seasonality_text else None
+    if not seasonality_text and perf_seasonality:
+        seasonality_text = _seasonality_summary(perf_seasonality)
+        seasonality_source = "performance" if seasonality_text else seasonality_source
+    # Final fallback: describe allocations if no seasonality text
+    if not seasonality_text and allocations:
+        top = allocations[0]
+        second = allocations[1] if len(allocations) > 1 else None
+        parts = [f"Top theme: {top.get('theme')} ~{top.get('weight_pct',0):.1f}%"]
+        if second:
+            parts.append(f"Next: {second.get('theme')} ~{second.get('weight_pct',0):.1f}%")
+        seasonality_text = "; ".join(parts)
+        seasonality_source = seasonality_source or "performance_fallback"
+
+    notes = "Budget is allocated proportional to (performance weight * trend multiplier). Multipliers are capped to avoid extreme swings."
+    if trends_status != "trends_ok":
+        notes += f" trends_status={trends_status}."
+    if seasonality_source == "performance_fallback":
+        notes += " seasonality derived from performance allocations only."
+
+    return {
+        "status": "success",
+        "themes": themes,
+        "timeframe": req.timeframe,
+        "geo": req.geo,
+        "allocations": _to_primitive(allocations),
+        "multipliers": _to_primitive(multipliers),
+        "perf_weight_keys": list(perf_weights.keys()) if perf_weights else [],
+        "related": related,
+        "seasonality": _to_primitive(seasonality),
+        "seasonality_perf": _to_primitive(perf_seasonality),
+        "seasonality_summary": seasonality_text,
+        "seasonality_source": seasonality_source,
+        "notes": notes,
+        "trends_status": trends_status,
+    }
+
+
+# Audit endpoints
+@app.post("/api/audit/generate")
+async def generate_audit(request: AuditRequest):
+    """Generate a Klaudit audit report with ML-enhanced insights"""
+    try:
+        # Prefer blob storage if configured; only fall back to demo if explicitly requested
+        data_dir = None
+        try:
+            data_dir = _download_account_data(request.account_name)
+        except HTTPException as exc:
+            if exc.status_code == 404 and request.use_mock_data:
+                data_dir = ROOT / "demo_for_testing" / "kelvin_co_demo_data"
+            else:
+                raise
+        except Exception:
+            if request.use_mock_data:
+                data_dir = ROOT / "demo_for_testing" / "kelvin_co_demo_data"
+            else:
+                raise
+        if data_dir is None and request.use_mock_data:
+            data_dir = ROOT / "demo_for_testing" / "kelvin_co_demo_data"
+
+        override_template = os.environ.get("AUDIT_TEMPLATE_PATH")
+        if override_template and Path(override_template).exists():
+            template_path = Path(override_template)
+        else:
+            template_path = ROOT / "kai_core" / "GenerateAudit" / "template.xlsx"
+
+        # Use system temp directory for Azure
+        output_dir = Path(tempfile.gettempdir()) / "kai_reports"
+        output_dir.mkdir(exist_ok=True)
+
+        # Create audit engine
+        engine = UnifiedAuditEngine(
+            template_path=template_path,
+            data_directory=data_dir,
+            business_unit=request.business_unit,
+            business_context={},
+        )
+
+        # Generate audit
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_file = output_dir / f"Audit_{request.account_name}_{timestamp}.xlsx"
+
+        result = engine.generate_audit(
+            account_name=request.account_name,
+            output_path=output_file,
+        )
+
+        # Initialize ML reasoning engine and generate enhanced insights
+        ml_engine = get_ml_reasoning_engine()
+        ml_insights = ml_engine.generate_insights(
+            audit_results=result,
+            historical_data=None  # Could add historical audit data here
+        )
+
+        # Add ML insights to result
+        result["ml_insights"] = ml_insights
+
+        return {
+            "status": "success",
+            "file_path": str(output_file),
+            "file_name": output_file.name,
+            "result": result,
+            "ml_insights": ml_insights,
+        }
+    except Exception as exc:
+        print(f"[generate_audit] Exception: {exc}\n{traceback.format_exc()}", file=sys.stderr, flush=True)
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/api/audit/upload")
+async def upload_audit(
+    files: List[UploadFile] = File(...),
+    business_unit: str = "Brand",
+    account_name: str = "Uploaded",
+):
+    """Deprecated: use /api/data/upload to store CSVs in blob, then /api/audit/generate to run."""
+    raise HTTPException(status_code=410, detail="Use /api/data/upload then /api/audit/generate.")
+
+
+@app.get("/api/audit/download/{filename}")
+async def download_audit(filename: str):
+    """Download a generated audit file"""
+    from fastapi.responses import FileResponse
+    import tempfile
+
+    temp_dir = Path(tempfile.gettempdir()) / "kai_reports"
+    file_path = temp_dir / filename
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+
+    return FileResponse(
+        path=str(file_path),
+        filename=filename,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+@app.get("/api/audit/business-units")
+async def get_business_units():
+    """Get available business units for audit"""
+    return {
+        "business_units": [
+            {"id": "Brand", "name": "Brand", "description": "Brand campaigns"},
+            {"id": "NonBrand", "name": "Non-Brand", "description": "Non-brand campaigns"},
+            {"id": "PMax", "name": "Performance Max", "description": "PMax campaigns"},
+        ]
+    }
+
+
+# Settings endpoints
+@app.get("/api/settings")
+async def get_settings():
+    """Get current user settings"""
+    # In a real app, this would fetch from database per user
+    return {
+        "ai_chat_enabled": True,
+        "ai_insights_enabled": True,
+        "theme": "light",
+    }
+
+
+@app.post("/api/settings")
+async def update_settings(settings: dict[str, Any]):
+    """Update user settings"""
+    # In a real app, this would save to database per user
+    return {"status": "success", "settings": settings}
+
+
+# Creative Studio
+@app.post("/api/creative/generate")
+async def generate_creative(req: CreativeRequest):
+    """
+    Generate RSA headlines/descriptions using CreativeFactory
+    """
+    try:
+        # Create CreativeContext from request
+        context = CreativeContext(
+            final_url=req.url or "",
+            keywords=req.keywords or [],
+            business_name=req.business_name,
+            usp_list=req.usps or [],
+        )
+        result = CreativeFactory.generate_ad_copy(context)
+        return {"status": "success", "result": result}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+# PMax Deep Dive
+@app.post("/api/pmax/analyze")
+async def analyze_pmax(req: PMaxRequest):
+    """
+    Analyze PMax placements/spend/conversions
+    """
+    try:
+        analyzer = PMaxAnalyzer()
+        result = analyzer.analyze(
+            placements=req.placements,
+            total_cost=(req.total_cost if req.total_cost is not None else req.spend) or 0.0,
+        )
+
+        # Optional channel split inference if placements contain ad_network_type and cost
+        try:
+            df = None
+            if req.placements:
+                import pandas as pd  # local import to avoid overhead if unused
+                df = pd.DataFrame(req.placements)
+            if df is not None and "cost" in df.columns:
+                splitter = PMaxChannelSplitter(df_campaign=df)
+                breakout = splitter.infer()
+                result["channel_breakout"] = breakout.__dict__
+        except Exception:
+            pass
+
+        return {"status": "success", "result": result}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+# SERP Monitor
+@app.post("/api/serp/check")
+async def serp_check(req: SerpRequest):
+    """
+    Check URL health / soft 404 using SerpScanner
+    """
+    try:
+        # For now, use URL health checks only; SerpScanner requires keywords and is optional here
+        urls = [u for u in (req.urls or []) if u]
+        results = check_url_health(urls)
+        return {"status": "success", "results": results}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/api/serp/competitor-signal")
+async def analyze_competitor_signal(obs: CompetitorObservation):
+    """
+    Infer investment signal from conversational observations.
+    Uses fuzzy inference from natural language or precise metrics.
+
+    This endpoint supports the intelligent mapping pattern where data
+    is extracted from conversation rather than requiring file uploads.
+    """
+    try:
+        result = analyze_competitor(
+            competitor_domain=obs.competitor_domain,
+            impression_share_current=obs.impression_share_current,
+            impression_share_previous=obs.impression_share_previous,
+            outranking_rate=obs.outranking_rate,
+            top_of_page_rate=obs.top_of_page_rate,
+            position_above_rate=obs.position_above_rate,
+            raw_description=obs.raw_description
+        )
+        return {"status": "success", "result": result}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/api/intel/diagnose")
+async def diagnose_intelligence(req: IntelRequest):
+    """
+    Agentic root-cause analysis across Market, Execution, and Creative pillars.
+    This is additive and does not change existing flows.
+    """
+
+    def _sanitize_numbers(obj):
+        """Recursively replace non-finite floats (nan/inf) with None for JSON safety."""
+        import math
+        if isinstance(obj, float) and not math.isfinite(obj):
+            return None
+        if isinstance(obj, dict):
+            return {k: _sanitize_numbers(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [_sanitize_numbers(v) for v in obj]
+        return obj
+
+    try:
+        pmax_df = pd.DataFrame(req.pmax) if req.pmax else None
+        creative_df = pd.DataFrame(req.creative) if req.creative else None
+        market_df = pd.DataFrame(req.market) if req.market else None
+
+        agent = MarketingReasoningAgent()
+        result = agent.analyze(
+            query=req.query,
+            pmax_df=pmax_df if pmax_df is not None and not pmax_df.empty else None,
+            creative_df=creative_df if creative_df is not None and not creative_df.empty else None,
+            market_df=market_df if market_df is not None and not market_df.empty else None,
+            brand_terms=req.brand_terms or [],
+        )
+        safe_result = _sanitize_numbers(result)
+        return {"status": "success", "result": safe_result}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/api/search/web")
+async def web_search(payload: SearchQuery):
+    """
+    Lightweight web search via Bing Web Search API.
+    Requires env vars: BING_SEARCH_KEY (and optionally BING_SEARCH_ENDPOINT).
+    """
+    api_key = os.environ.get("BING_SEARCH_KEY")
+    endpoint = os.environ.get("BING_SEARCH_ENDPOINT", "https://api.bing.microsoft.com/v7.0/search")
+    if not api_key:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="BING_SEARCH_KEY is not configured on the server.",
+        )
+
+    headers = {"Ocp-Apim-Subscription-Key": api_key}
+    params = {"q": payload.query, "count": max(1, min(payload.count, 10))}
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(endpoint, params=params, headers=headers)
+            if resp.status_code != 200:
+                raise HTTPException(status_code=resp.status_code, detail=resp.text)
+            data = resp.json()
+            web_pages = data.get("webPages", {}).get("value", [])
+            results = [
+                {
+                    "name": item.get("name"),
+                    "snippet": item.get("snippet"),
+                    "url": item.get("url"),
+                    "displayUrl": item.get("displayUrl"),
+                }
+                for item in web_pages
+            ]
+            return {"status": "success", "results": results}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Search failed: {str(exc)}",
+        )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

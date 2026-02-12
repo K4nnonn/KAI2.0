@@ -1,0 +1,24 @@
+{
+  "id": "ROUTE_PERF_MISSING_IDS_CONNECTED",
+  "pillar": "intent",
+  "kind": "route",
+  "request": {
+    "message": "How did performance look in the last 7 days?",
+    "customer_ids": [],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "intent": "performance",
+    "tool": "performance",
+    "needs_ids": false,
+    "run_planner": true,
+    "customer_ids.0": "${TARGET_CUSTOMER_ID}"
+  },
+  "metamorphic": [
+    {
+      "name": "whitespace",
+      "message": "  How did performance look in the last 7 days?  ",
+      "expect_same": ["intent", "tool", "needs_ids", "run_planner"]
+    }
+  ]
+}

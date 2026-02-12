@@ -1,0 +1,33 @@
+{
+  "id": "ROUTE_PERF_CONNECTED",
+  "pillar": "intent",
+  "kind": "route",
+  "capabilities": ["routing", "performance", "account_context"],
+  "request": {
+    "message": "How did performance look in the last 7 days?",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "intent": "performance",
+    "tool": "performance",
+    "needs_ids": false,
+    "run_planner": true
+  },
+  "intent_goal": {
+    "intent_path": "intent",
+    "allowed_intents": ["performance"]
+  },
+  "metamorphic": [
+    {
+      "name": "greeting",
+      "message": "Hey - How did performance look in the last 7 days?",
+      "expect_same": ["intent", "tool", "needs_ids", "run_planner"]
+    },
+    {
+      "name": "punctuation",
+      "message": "How did performance look in the last 7 days??",
+      "expect_same": ["intent", "tool", "needs_ids", "run_planner"]
+    }
+  ]
+}

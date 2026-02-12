@@ -1,0 +1,129 @@
+--- C:\Software Builds\kai-backend-complete\kai_core\core_logic\audit_verbalizer.py
++++ C:\Software Builds\repo_shadow\repo\services\api\kai_core\core_logic\audit_verbalizer.py
+@@ -10,6 +10,7 @@
+ 
+ _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+ _NON_ASCII_RE = re.compile(r"[^\x00-\x7F]")
++_CODE_FENCE_RE = re.compile(r"```(?:json)?\s*(.*?)```", flags=re.DOTALL | re.IGNORECASE)
+ 
+ 
+ def _normalize_sentence(sentence: str) -> str:
+@@ -19,16 +20,43 @@
+     return s.strip()
+ 
+ 
++def _try_load_json(text: str) -> Optional[Dict[str, str]]:
++    try:
++        return json.loads(text)
++    except json.JSONDecodeError:
++        return None
++
++
++def _extract_balanced_json(text: str) -> Optional[str]:
++    start = None
++    depth = 0
++    for idx, ch in enumerate(text):
++        if ch == "{":
++            if start is None:
++                start = idx
++            depth += 1
++        elif ch == "}" and start is not None:
++            depth -= 1
++            if depth == 0:
++                return text[start : idx + 1]
++    return None
++
++
+ def _extract_json(text: str) -> Optional[Dict[str, str]]:
+     if not text:
+         return None
+-    match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+-    if not match:
++    cleaned = text.strip()
++    for block in _CODE_FENCE_RE.findall(cleaned):
++        data = _try_load_json(block.strip())
++        if data:
++            return data
++    data = _try_load_json(cleaned)
++    if data:
++        return data
++    candidate = _extract_balanced_json(cleaned)
++    if not candidate:
+         return None
+-    try:
+-        return json.loads(match.group(0))
+-    except json.JSONDecodeError:
+-        return None
++    return _try_load_json(candidate.strip())
+ 
+ 
+ class AuditNarrativeHumanizer:
+@@ -196,8 +224,10 @@
+             system_prompt = (
+                 "Rewrite audit text into concise, professional, human language. "
+                 "Use only facts from the payload. Do not add new metrics or assumptions. "
++                "If where_to_look is present, keep the exact line starting with 'Where to look:' "
++                "as the final sentence in details. "
+                 "Return only a single JSON object with keys: details, actions, rationale. "
+-                "No markdown, no extra text."
++                "No markdown, no code fences, no extra text."
+             )
+             user_prompt = (
+                 "Return a single JSON object with double-quoted keys/values only.\n"
+@@ -208,7 +238,9 @@
+             system_prompt = (
+                 "You rewrite audit text into a concise, professional, human response. "
+                 "Only use facts in the payload. Do not add new metrics or assumptions. "
+-                "Avoid repeating prior sentences. Return JSON only."
++                "If where_to_look is present, keep the exact line starting with 'Where to look:' "
++                "as the final sentence in details. "
++                "Avoid repeating prior sentences. Return JSON only and do not wrap in code fences."
+             )
+             user_prompt = (
+                 "Rewrite these fields as a human professional. Keep each field 1-2 sentences.\n"
+@@ -242,6 +274,7 @@
+         calculation: str,
+         data_needed: Optional[str],
+         context_summary: Optional[Dict[str, Dict]] = None,
++        where_to_look: Optional[str] = None,
+     ) -> Tuple[str, str, str]:
+         self.stats["rows_total"] += 1
+         texts = [detail_text or "", action_text or "", rationale_text or ""]
+@@ -251,6 +284,8 @@
+             return detail_text, action_text, rationale_text
+ 
+         needs_rewrite = self._needs_rewrite(texts)
++        if where_to_look:
++            needs_rewrite = True
+         if not needs_rewrite:
+             self._update_seen(texts)
+             return detail_text, action_text, rationale_text
+@@ -273,12 +308,17 @@
+             "context": context_summary or {},
+             "avoid_sentences": avoid_sentences[:80],
+         }
++        if where_to_look:
++            payload["where_to_look"] = where_to_look
+ 
+         data = None
+         for attempt in range(self.max_retries + 1):
+             messages = self._build_messages(payload, strict=attempt > 0)
+-            response_text = self._call_local(messages) or self._call_azure(messages)
++            response_text = self._call_local(messages)
+             data = _extract_json(response_text)
++            if not data:
++                response_text = self._call_azure(messages)
++                data = _extract_json(response_text)
+             if data:
+                 break
+ 
+@@ -295,6 +335,9 @@
+         new_actions = str(data.get("actions", "")).strip() or action_text
+         new_rationale = str(data.get("rationale", "")).strip() or rationale_text
+ 
++        if where_to_look and "where to look:" not in (new_details or "").lower():
++            new_details = f"{new_details}\n{where_to_look}".strip()
++
+         if data_needed and data_needed.lower() not in new_actions.lower():
+             new_actions = action_text
+ 

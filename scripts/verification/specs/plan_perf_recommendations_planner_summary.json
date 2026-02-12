@@ -1,0 +1,40 @@
+{
+  "id": "PLAN_PERF_RECOMMENDATIONS_PLANNER_SUMMARY",
+  "pillar": "purpose",
+  "kind": "plan_and_run",
+  "capabilities": ["planner", "performance", "advisor_decision_support"],
+  "request": {
+    "message": "Give me last week performance and recommendations to improve performance.",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "executed": true,
+    "result.mode": "performance"
+  },
+  "intent_goal": {
+    "target": "followup_chat_send",
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["option", "strategy", "recommend", "path", "approach"],
+    "min_any_matches": 2,
+    "must_include_all": ["monitor"],
+    "must_not_include": ["LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS", "No date specified"]
+  },
+  "followup": {
+    "chat_send": {
+      "message": "Give me last week performance and recommendations to improve performance.",
+      "tool": "performance",
+      "prompt_kind": "planner_summary",
+      "assert": {
+        "reply_min_len": 180,
+        "reply_not_contains": ["LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS", "No date specified; defaulting to"],
+        "reply_regex_not_match": {
+          "reply": "(?i)\\bX%?\\b"
+        },
+        "regex_match": {
+          "reply": "(?is)(option|approach|path|strategy)\\s+[a-d1-4].*(option|approach|path|strategy)\\s+[a-d1-4].*(recommend|recommendation|start with).*(monitor|watch|track|keep an eye)"
+        }
+      }
+    }
+  }
+}

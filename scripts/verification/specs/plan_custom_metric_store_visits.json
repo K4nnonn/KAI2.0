@@ -1,0 +1,39 @@
+{
+  "id": "PLAN_CUSTOM_METRIC_STORE_VISITS",
+  "pillar": "quality",
+  "kind": "plan_and_run",
+  "request": {
+    "message": "Why did Store visits change week over week? Which campaigns drove it?",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "executed": true,
+    "result.mode": "performance",
+    "result.data_quality.custom_metric_inferred": true,
+    "result.data_quality.custom_metric_key": "custom:store_visits"
+  },
+  "assert": {
+    "drivers_min": 1,
+    "sa360_parity": {
+      "source": "current_live",
+      "compare_previous": true,
+      "metrics": ["cost", "conversions", "custom:store_visits", "ctr", "cpc"],
+      "abs_tolerance": {
+        "cost": 1.0,
+        "conversions": 1,
+        "custom:store_visits": 2.0,
+        "ctr": 0.05,
+        "cpc": 0.05
+      }
+    },
+    "sa360_accuracy": {
+      "source": "current_live",
+      "compare_previous": true,
+      "metrics": ["cost", "conversions", "custom:store_visits", "ctr", "cpc"],
+      "require_report_names_echo": true,
+      "require_source_frame_in_reports": true,
+      "require_metric_presence": true
+    }
+  }
+}

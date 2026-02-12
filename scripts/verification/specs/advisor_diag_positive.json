@@ -1,0 +1,14 @@
+{
+  "id": "ADVISOR_DIAG_POSITIVE",
+  "pillar": "purpose",
+  "kind": "advisor_diag",
+  "request": {
+    "text": "My CPA is up 20% week over week. What should I do next?",
+    "use_case": "performance"
+  },
+  "expect": {
+    "status": "ok",
+    "pass": true
+  }
+}
+

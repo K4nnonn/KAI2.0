@@ -1,0 +1,259 @@
+--- C:\Software Builds\kai-backend-complete\kai_core\core_logic\engine.py
++++ C:\Software Builds\repo_shadow\repo\services\api\kai_core\core_logic\engine.py
+@@ -526,6 +526,8 @@
+             'Fidelity - 529 AZ': r'(?:Fidelity - 529 AZ|529 AZ -)',
+             'Fidelity - 529 NH': r'(?:Fidelity - 529 NH|529 NH -)',
+             'Fidelity - 529 DE': r'(?:Fidelity - 529 DE|529 DE -)',
++            '529 States': r'(?:Fidelity - 529 (?:AZ|CT|DE|MA|NH)|529 (?:AZ|CT|DE|MA|NH) -|529 States|Fidelity - 529 States)',
++            'Fidelity - 529 States': r'(?:Fidelity - 529 (?:AZ|CT|DE|MA|NH)|529 (?:AZ|CT|DE|MA|NH) -|529 States|Fidelity - 529 States)',
+             'Fidelity - Youth': r'(?:Fidelity - Youth|Youth -|Youth Account -)',
+             'Fidelity - TEM': r'(?:Fidelity - TEM|TEM -)',
+             'Fidelity - ABLE': r'(?:Fidelity - ABLE|ABLE -)',
+@@ -553,6 +555,8 @@
+             'Fidelity - 529 AZ': r'^529 AZ -',
+             'Fidelity - 529 NH': r'^529 NH -',
+             'Fidelity - 529 DE': r'^529 DE -',
++            '529 States': r'^(?:529 (?:AZ|CT|DE|MA|NH) -|529 States -)',
++            'Fidelity - 529 States': r'^(?:529 (?:AZ|CT|DE|MA|NH) -|529 States -)',
+             'Fidelity - Youth': r'^Youth Account -',
+             'Fidelity - TEM': r'^TEM -',
+             'Fidelity - ABLE': r'^ABLE -',
+@@ -937,10 +941,16 @@
+             return None
+ 
+         lowered = {col.lower(): col for col in df.columns}
++        alias_map = {
++            "account name": ["account", "account_name", "accountname"],
++        }
+         for name in possible_names:
+             candidate = name.lower()
+             if candidate in lowered:
+                 return lowered[candidate]
++            for alt in alias_map.get(candidate, []):
++                if alt in lowered:
++                    return lowered[alt]
+ 
+         if not allow_partial:
+             return None
+@@ -960,6 +970,22 @@
+             col_lower = col.lower()
+             if all(sub.lower() in col_lower for sub in substrings):
+                 return col
++        return None
++
++    def _pick_campaign_source(self, required_cols: List[str]) -> Optional[pd.DataFrame]:
++        """Pick a campaign-like dataset that contains required columns."""
++        candidates = ["campaign", "campaign_details", "account"]
++        for key in candidates:
++            df = self.data.get(key)
++            if df is None or not isinstance(df, pd.DataFrame) or df.empty:
++                continue
++            if all(self._find_column(df, [col], allow_partial=True) for col in required_cols):
++                return df
++        for _, df in self.data.items():
++            if df is None or not isinstance(df, pd.DataFrame) or df.empty:
++                continue
++            if all(self._find_column(df, [col], allow_partial=True) for col in required_cols):
++                return df
+         return None
+ 
+     def _extract_match_type_series(self) -> Tuple[Optional[pd.Series], Optional[str]]:
+@@ -1965,6 +1991,72 @@
+         if float(value).is_integer():
+             return f"{int(value)}"
+         return f"{value:.1f}"
++
++    @staticmethod
++    def _format_metric_value(value: Optional[float], metric_label: str) -> str:
++        if value is None:
++            return ""
++        label = (metric_label or "").lower()
++        prefix = "$" if ("cost" in label or "spend" in label) else ""
++        if abs(value) >= 100:
++            return f"{prefix}{value:,.0f}"
++        return f"{prefix}{value:,.2f}"
++
++    def _build_where_clause(self, result: ScoringResult) -> str:
++        if not result.is_scored():
++            return ""
++        if not isinstance(self.source_info, dict):
++            return ""
++        context = self.source_info.get("context") or {}
++        if not isinstance(context, dict):
++            return ""
++
++        parts: List[str] = []
++        top_campaigns = context.get("top_campaigns")
++        if isinstance(top_campaigns, dict):
++            metric = top_campaigns.get("metric") or "Cost"
++            entries = top_campaigns.get("top") or []
++            if entries:
++                items = []
++                for entry in entries:
++                    name = entry.get("name")
++                    value = self._format_metric_value(entry.get("value"), metric)
++                    if name:
++                        items.append(f"{name} ({value})" if value else f"{name}")
++                if items:
++                    parts.append(f"top campaigns by {metric.lower()}: {', '.join(items[:3])}")
++
++        top_adgroups = context.get("top_ad_groups")
++        if isinstance(top_adgroups, dict):
++            metric = top_adgroups.get("metric") or "Cost"
++            entries = top_adgroups.get("top") or []
++            if entries:
++                items = []
++                for entry in entries:
++                    name = entry.get("name")
++                    value = self._format_metric_value(entry.get("value"), metric)
++                    if name:
++                        items.append(f"{name} ({value})" if value else f"{name}")
++                if items:
++                    parts.append(f"top ad groups by {metric.lower()}: {', '.join(items[:3])}")
++
++        state_breakdown = context.get("state_breakdown")
++        if isinstance(state_breakdown, dict):
++            metric = state_breakdown.get("metric") or "Cost"
++            states = state_breakdown.get("states") or []
++            if states:
++                items = []
++                for entry in states:
++                    state = entry.get("state")
++                    value = self._format_metric_value(entry.get("value"), metric)
++                    if state:
++                        items.append(f"{state} {value}".strip())
++                if items:
++                    parts.append(f"state mix by {metric.lower()}: {', '.join(items[:5])}")
++
++        if not parts:
++            return ""
++        return f"Where to look: {'; '.join(parts)}."
+ 
+     def _compose_detail_with_defense(self, result: ScoringResult) -> str:
+         """Append risk, benchmark, and binary-gap context directly into Column E."""
+@@ -2991,8 +3083,8 @@
+ 
+     def _score_google_presence(self) -> ScoringResult:
+         """Row 15: Account active in all engines - Google"""
+-        campaign_data = self.source_info.get('campaign_source')
+-        if campaign_data is None or 'Account name' not in campaign_data.columns:
++        campaign_data = self._pick_campaign_source(["Account name", "Campaign"])
++        if campaign_data is None:
+             return ScoringResult(
+                 score=None,
+                 details="Data needed: Campaign report with account names",
+@@ -3000,28 +3092,43 @@
+                 data_needed="Campaign report"
+             )
+ 
++        account_col = self._find_column(campaign_data, ["Account name"], allow_partial=True)
++        if not account_col:
++            return ScoringResult(
++                score=None,
++                details="Data needed: Campaign report with account names",
++                recommendations="Export campaign report",
++                data_needed="Campaign report"
++            )
++
+         filtered_campaigns = campaign_data.copy()
++        if account_col != "Account name":
++            filtered_campaigns["Account name"] = filtered_campaigns[account_col]
+ 
+         customer_ids = self.BU_CUSTOMER_IDS.get(self.business_unit)
+-        if customer_ids and 'Customer ID' in filtered_campaigns.columns:
++        customer_col = self._find_column(filtered_campaigns, ["Customer ID"], allow_partial=True)
++        if customer_ids and customer_col:
+             normalized_ids = {str(cid).replace(" ", "") for cid in customer_ids}
+-            col_values = filtered_campaigns['Customer ID'].astype(str).str.replace(" ", "", regex=False)
++            col_values = filtered_campaigns[customer_col].astype(str).str.replace(" ", "", regex=False)
+             filtered_campaigns = filtered_campaigns[col_values.isin(normalized_ids)]
+ 
++        campaign_col = self._find_column(filtered_campaigns, ["Campaign", "Campaign name"], allow_partial=True)
+         name_mask = filtered_campaigns['Account name'].str.contains('Fidelity|Google', case=False, na=False)
+-        if 'Campaign' in filtered_campaigns.columns:
+-            name_mask |= filtered_campaigns['Campaign'].str.contains('Medicare|Fidelity|Google', case=False, na=False)
++        if campaign_col:
++            name_mask |= filtered_campaigns[campaign_col].str.contains('Medicare|Fidelity|Google', case=False, na=False)
+         filtered_campaigns = filtered_campaigns[name_mask]
+ 
+-        if 'Campaign state' in filtered_campaigns.columns:
+-            state_mask = filtered_campaigns['Campaign state'].str.contains('Enabled|Eligible', case=False, na=False)
++        state_col = self._find_column(filtered_campaigns, ["Campaign state", "Campaign Status"], allow_partial=True)
++        if state_col:
++            state_mask = filtered_campaigns[state_col].str.contains('Enabled|Eligible', case=False, na=False)
+             google_campaigns = filtered_campaigns[state_mask]
+         else:
+             google_campaigns = filtered_campaigns
+         score = 5 if len(google_campaigns) > 0 else 0
+ 
+-        if 'Impressions' in campaign_data.columns:
+-            google_impr = to_numeric_safe(google_campaigns['Impressions']).sum()
++        impr_col = self._find_column(filtered_campaigns, ["Impressions", "Impr."], allow_partial=True)
++        if impr_col:
++            google_impr = to_numeric_safe(google_campaigns[impr_col]).sum()
+             details = f"Google: {len(google_campaigns)} campaigns, {google_impr:,.0f} impressions"
+         else:
+             details = f"Google: {len(google_campaigns)} campaigns active"
+@@ -3038,8 +3145,8 @@
+ 
+     def _score_microsoft_presence(self) -> ScoringResult:
+         """Row 16: Account active in all engines - BING"""
+-        campaign_data = self.source_info.get('campaign_source')
+-        if campaign_data is None or 'Account name' not in campaign_data.columns:
++        campaign_data = self._pick_campaign_source(["Account name", "Campaign"])
++        if campaign_data is None:
+             return ScoringResult(
+                 score=None,
+                 details="Data needed: Campaign report with account names",
+@@ -3047,11 +3154,24 @@
+                 data_needed="Campaign report"
+             )
+ 
++        account_col = self._find_column(campaign_data, ["Account name"], allow_partial=True)
++        if not account_col:
++            return ScoringResult(
++                score=None,
++                details="Data needed: Campaign report with account names",
++                recommendations="Export campaign report",
++                data_needed="Campaign report"
++            )
++        if account_col != "Account name":
++            campaign_data = campaign_data.copy()
++            campaign_data["Account name"] = campaign_data[account_col]
++
+         ms_campaigns = campaign_data[campaign_data['Account name'].str.contains('Bing|Yahoo|Microsoft', case=False, na=False)]
+         score = 5 if len(ms_campaigns) > 0 else 0
+ 
+-        if 'Impressions' in campaign_data.columns:
+-            ms_impr = to_numeric_safe(ms_campaigns['Impressions']).sum()
++        impr_col = self._find_column(campaign_data, ["Impressions", "Impr."], allow_partial=True)
++        if impr_col:
++            ms_impr = to_numeric_safe(ms_campaigns[impr_col]).sum()
+             details = f"Microsoft: {len(ms_campaigns)} campaigns, {ms_impr:,.0f} impressions"
+         else:
+             details = f"Microsoft: {len(ms_campaigns)} campaigns active"
+@@ -7127,6 +7247,12 @@
+ 
+             # Write results to template
+             detail_text = self._compose_detail_with_defense(result)
++            where_clause = self._build_where_clause(result)
++            if where_clause and "where to look" not in (detail_text or "").lower():
++                detail_text = f"{detail_text}\n{where_clause}".strip()
++            where_clause = self._build_where_clause(result)
++            if where_clause and "where to look" not in (detail_text or "").lower():
++                detail_text = f"{detail_text}\n{where_clause}".strip()
+             rationale_text = result.bp_rationale or self._build_default_rationale(criterion_name, category, result)
+             if result.needs_data():
+                 action_text = self._build_missing_data_action(criterion_name, result)
+@@ -7144,7 +7270,10 @@
+                 calculation=result.calculation or "",
+                 data_needed=result.data_needed,
+                 context_summary=self.source_info.get("context") if isinstance(self.source_info, dict) else None,
+-            )
++                where_to_look=where_clause,
++            )
++            if where_clause and "where to look" not in (detail_text or "").lower():
++                detail_text = f"{detail_text}\n{where_clause}".strip()
+ 
+             if result.is_scored():
+                 ws.cell(excel_row, self.COL_RATING).value = result.score

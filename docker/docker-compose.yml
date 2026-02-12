@@ -1,0 +1,57 @@
+﻿version: "3.9"
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: infra/docker/Dockerfile.api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - worker
+      - ollama
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/docker/Dockerfile.api
+    env_file:
+      - .env
+    command: ["python", "-m", "services.worker.jobs_worker"]
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_MODEL=${LOCAL_LLM_MODEL:-qwen2.5:14b}
+    volumes:
+      - ollama:/root/.ollama
+    command:
+      - sh
+      - -lc
+      - |
+        ollama serve &
+        sleep 2
+        ollama pull "${OLLAMA_MODEL}"
+        wait -n
+    restart: unless-stopped
+
+volumes:
+  ollama:

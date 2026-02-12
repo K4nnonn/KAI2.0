@@ -1,0 +1,22 @@
+{
+  "id": "GET_SA360_CONVERSION_ACTIONS_MIN",
+  "pillar": "functionality",
+  "kind": "get",
+  "request": {
+    "url": "/api/sa360/conversion-actions?session_id=${SESSION_ID}&customer_id=${TARGET_CUSTOMER_ID}&date_range=LAST_30_DAYS"
+  },
+  "expect": {
+    "__status": 200,
+    "__ok": true
+  },
+  "assert": {
+    "array_min_len": {
+      "actions": 1
+    },
+    "paths_exist": ["actions.0.name", "actions.0.metric_key"],
+    "regex_match": {
+      "actions.0.metric_key": "^custom:"
+    }
+  }
+}
+

@@ -1,0 +1,16 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+  /* Let the global page background show through for a less-generic, premium feel. */
+  background: transparent;
+  color: var(--kai-text);
+  font-family: 'Manrope', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.shell-main {
+  margin-left: 16rem;
+  padding: 2rem;
+  width: calc(100% - 16rem);
+  min-height: 100vh;
+  background: transparent;
+}

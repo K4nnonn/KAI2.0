@@ -1,0 +1,12 @@
+FROM ollama/ollama:latest
+
+# Allow external access inside Container Apps
+ENV OLLAMA_HOST=0.0.0.0
+ENV OLLAMA_KEEP_ALIVE=24h
+
+# Default model (override via env in Container App)
+ENV OLLAMA_MODEL=qwen2.5:7b
+
+# Override entrypoint so we can pull model on startup
+ENTRYPOINT ["sh", "-c"]
+CMD ["ollama serve & sleep 2 && ollama pull \"${OLLAMA_MODEL}\" && wait"]

@@ -1,0 +1,47 @@
+{
+  "id": "SEND_PMAX_ACCOUNT_CONTEXT_ADAPTIVE",
+  "pillar": "purpose",
+  "kind": "send",
+  "capabilities": ["chat_send", "pmax", "advisor_response"],
+  "request": {
+    "message": "Analyze my PMax placements",
+    "ai_enabled": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["pmax", "placement", "campaign", "optimiz", "performance"],
+    "min_any_matches": 2,
+    "must_not_include": ["pick an account", "paste an id", "confirm the account", "LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS"]
+  },
+  "budgets": {
+    "p95_latency_ms": 2500,
+    "samples": 5
+  },
+  "assert": {
+    "reply_min_len": 80,
+    "reply_not_contains": [
+      "save mcc",
+      "manager id",
+      "sa360 account",
+      "click connect sa360",
+      "pick an account",
+      "paste an id",
+      "confirm the account",
+      "LAST_7_DAYS",
+      "LAST_14_DAYS",
+      "LAST_30_DAYS"
+    ],
+    "reply_regex_not_match": {
+      "placeholder": "\\bX%?\\b",
+      "placements_prompt": "(?is)(paste|upload)\\s+(?:a\\s+)?(?:placements?|placement)\\b",
+      "account_prompt": "(?is)(confirm|select|pick).*(account|customer id)"
+    },
+    "regex_match": {
+      "reply": "(?is)(performance|placement|campaign|cost|ctr|cpc|conversion)"
+    }
+  }
+}

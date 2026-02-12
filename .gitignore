@@ -1,0 +1,33 @@
+# --- Kai repo ignores ---
+verification_runs/
+**/verification_runs/
+playwright-report/
+test-results/
+**/test-results/
+node_modules/
+**/node_modules/
+.venv/
+venv/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+*.pyc
+.env
+.env.*
+*.env
+*.local
+*.key
+*secret*
+*credentials*
+*.pem
+*.pfx
+*.p12
+dist/
+build/
+.next/
+.DS_Store
+
+# Codex / local tooling artifacts
+._codex_*
+$out
+$out/

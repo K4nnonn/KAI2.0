@@ -1,0 +1,33 @@
+{
+  "id": "ROUTE_HELP_FASTPATH",
+  "pillar": "functionality",
+  "kind": "route",
+  "request": {
+    "message": "What can you do?",
+    "customer_ids": [],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "intent": "general_chat",
+    "tool": null,
+    "needs_ids": false,
+    "run_planner": false
+  },
+  "budgets": {
+    "p95_latency_ms": 1000,
+    "samples": 7
+  },
+  "metamorphic": [
+    {
+      "name": "help_word",
+      "message": "help",
+      "expect_same": ["intent", "tool", "needs_ids", "run_planner"]
+    },
+    {
+      "name": "greeting",
+      "message": "hi",
+      "expect_same": ["intent", "tool", "needs_ids", "run_planner"]
+    }
+  ]
+}
+

@@ -1,0 +1,29 @@
+{
+  "id": "PLAN_PERF_RECOMMENDATIONS_PLANNER_SUMMARY",
+  "pillar": "purpose",
+  "kind": "plan_and_run",
+  "request": {
+    "message": "Give me last week performance and recommendations to improve performance.",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "executed": true,
+    "result.mode": "performance"
+  },
+  "followup": {
+    "chat_send": {
+      "message": "Give me last week performance and recommendations to improve performance.",
+      "tool": "performance",
+      "prompt_kind": "planner_summary",
+      "assert": {
+        "reply_min_len": 180,
+        "reply_not_contains": ["LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS"],
+        "regex_match": {
+          "reply": "(?is)Option\\s+A.*Option\\s+B.*(monitor|watch)"
+        }
+      }
+    }
+  }
+}
+

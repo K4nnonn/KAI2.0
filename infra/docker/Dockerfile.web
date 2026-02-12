@@ -1,0 +1,25 @@
+﻿# Build and serve the Kai web UI
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY apps/web/package.json apps/web/package-lock.json ./
+# Use npm install (not npm ci) so build doesn't break if package-lock lags behind package.json.
+# This avoids forcing large local lockfile/node_modules churn on shared machines.
+RUN npm install --no-audit --no-fund
+COPY apps/web/ ./
+# Build-time envs for Vite (optional)
+ARG VITE_BACKEND_URL
+ARG VITE_FRONTEND_URL
+ARG VITE_ENTRA_TENANT_ID
+ARG VITE_ENTRA_CLIENT_ID
+ARG VITE_SSO_MODE
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+ENV VITE_FRONTEND_URL=$VITE_FRONTEND_URL
+ENV VITE_ENTRA_TENANT_ID=$VITE_ENTRA_TENANT_ID
+ENV VITE_ENTRA_CLIENT_ID=$VITE_ENTRA_CLIENT_ID
+ENV VITE_SSO_MODE=$VITE_SSO_MODE
+RUN npm run build
+
+FROM nginx:alpine
+COPY infra/docker/nginx-web.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80

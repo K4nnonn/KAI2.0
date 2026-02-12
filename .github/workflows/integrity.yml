@@ -1,0 +1,41 @@
+name: Integrity Gates
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  integrity:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install web deps
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Install e2e deps
+        working-directory: tests/e2e
+        if: ${{ hashFiles('tests/e2e/package-lock.json') != '' }}
+        run: npm ci
+
+      - name: Run integrity gates
+        shell: pwsh
+        run: .\\scripts\\run_build_and_integrity.ps1
+        env:
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          KAI_ACCESS_PASSWORD: ${{ secrets.KAI_ACCESS_PASSWORD }}
+          REQUIRE_ENV: ${{ secrets.FRONTEND_URL != '' && secrets.BACKEND_URL != '' && secrets.KAI_ACCESS_PASSWORD != '' }}
+          REQUIRE_VERSION_MATCH: ${{ secrets.EXPECTED_FRONTEND_BUILD_SHA != '' && secrets.EXPECTED_BACKEND_BUILD_SHA != '' }}
+          EXPECTED_FRONTEND_BUILD_SHA: ${{ secrets.EXPECTED_FRONTEND_BUILD_SHA }}
+          EXPECTED_BACKEND_BUILD_SHA: ${{ secrets.EXPECTED_BACKEND_BUILD_SHA }}
+          ALLOW_WRITE_SMOKE: "false"
+          ALLOW_PROD_WRITE_SMOKE: "false"

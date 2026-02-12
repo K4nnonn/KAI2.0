@@ -1,0 +1,20 @@
+{
+  "id": "GET_HEALTH",
+  "pillar": "functionality",
+  "kind": "get",
+  "request": {
+    "url": "/api/health"
+  },
+  "expect": {
+    "__status": 200,
+    "__ok": true,
+    "status": "healthy"
+  },
+  "budgets": {
+    "max_latency_ms": 800
+  },
+  "assert": {
+    "paths_exist": ["service"]
+  }
+}
+

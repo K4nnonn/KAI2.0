@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake curl && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN mkdir -p /app/models && curl -L "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf" -o /app/models/llama-3.2-1b-instruct-q4_k_m.gguf
+COPY app.py .
+ENV MODEL_PATH=/app/models/llama-3.2-1b-instruct-q4_k_m.gguf
+ENV MAX_TOKENS=256
+ENV TEMPERATURE=0.2
+ENV N_THREADS=1
+ENV N_BATCH=128
+ENV N_CTX=2048
+EXPOSE 8000
+CMD ["uvicorn","app:app","--host","0.0.0.0","--port","8000","--workers","1"]

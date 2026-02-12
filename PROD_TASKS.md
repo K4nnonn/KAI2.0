@@ -1,0 +1,50 @@
+﻿# Production Tasks (Compilation + Completion)
+
+- [x] Deploy backend build with budget guard + advisor fallback (tag 20260120_154221)
+  - Evidence: /api/version git_sha=20260120_154221
+- [x] Deploy backend build with relational follow-ups + summary enhancer (tag 20260120_183119)
+  - Evidence: /api/version git_sha=20260120_183119
+- [x] Deploy backend build with concept + missing-data rewrites (tag 20260120_230747)
+  - Evidence: /api/version git_sha=20260120_230747
+- [x] Add Azure budget guardrails (caps + block reason)
+  - Evidence: /api/diagnostics/llm-usage includes azure_budget snapshot
+- [x] Add persona variety gate (5 prompts + uniqueness check)
+  - Evidence: integrity_runs/20260120_161340 -> persona.variation.uniqueness pass
+- [x] Run integrity suite and archive evidence
+  - Evidence: C:\Software Builds\repo_shadow\repo\integrity_runs\20260120_183713
+- [x] Validate /api/diagnostics/llm-usage includes azure_budget snapshot
+  - Evidence: integrity_runs/20260120_161340 -> api.llm.usage.snapshot
+- [x] Run integrity suite with TEST_CUSTOMER_IDS to enable performance grounding + advisor checks
+  - Evidence: integrity_runs/20260120_231215 -> api.chat.performance.grounded + api.diagnostics.advisor.performance pass
+- [x] Fix performance follow-up repetition + guardrail fallback loop (conversation_flow evidence)
+  - Evidence: integrity_runs/20260120_183713 -> gate_04_conversation_flow stdout
+- [x] Fix UI summary mismatch in performance follow-up (\"current account not set\" message)
+  - Evidence: integrity_runs/20260120_231215 -> gate_04_conversation_flow stdout (no match)
+- [x] Re-run conversation_flow after fixes (no repetition, metric-specific follow-ups)
+  - Evidence: integrity_runs/20260120_183713 -> gate_04_conversation_flow stdout
+- [x] Make missing-data replies deterministic + schema-driven (no Azure fallback)
+  - Evidence: services/api/main.py (missing-data rewrite + deterministic list)
+- [x] Improve software map legibility + add font/contrast gate to UI smoke
+  - Evidence: integrity_runs/20260121_103800/gate_03_ui_smoke/stdout.txt (min font/contrast OK)
+- [x] Redeploy backend with missing-data updates
+  - Evidence: /api/version git_sha=20260121_100618
+- [x] Redeploy frontend with software map updates
+  - Evidence: ui_smoke frontend_build.buildSha=20260121_102604
+- [x] Run integrity suite after deployments
+  - Evidence: C:\Software Builds\repo_shadow\repo\integrity_runs\20260121_103800
+- [x] Fix presence scoring to avoid "0 impressions" with score 5
+  - Evidence: verification_runs/engine_presence_rounding_20260121_140128/engine_presence_rounding.txt
+- [x] Deploy backend with presence rounding fix (tag 20260121_140506)
+  - Evidence: /api/version git_sha=20260121_140506
+- [x] Re-check verbalizer output on live backend (local LLM only)
+  - Evidence: verification_runs/verbalizer_check_20260121_141348/diagnostics_verbalizer.json
+- [x] Add low-content guard for local LLM actions/rationale when data is present
+  - Evidence: services/api/kai_core/core_logic/audit_verbalizer.py (_is_low_content)
+- [x] Deploy backend with low-content guard (tag 20260121_142234)
+  - Evidence: /api/version git_sha=20260121_142234
+- [x] Re-check verbalizer after low-content guard deploy
+  - Evidence: verification_runs/verbalizer_check_20260121_142707/diagnostics_verbalizer.json
+
+Notes
+- All work remains in repo_shadow only.
+- Azure calls must be gated; do not run billable checks without explicit approval.

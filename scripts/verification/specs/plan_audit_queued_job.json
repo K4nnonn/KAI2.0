@@ -1,0 +1,22 @@
+{
+  "id": "PLAN_AUDIT_QUEUED_JOB",
+  "pillar": "functionality",
+  "kind": "plan_and_run",
+  "request": {
+    "message": "Run a PPC audit for this account.",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "session_id": "${SESSION_ID}",
+    "intent_hint": "audit",
+    "async_mode": false,
+    "generate_report": false
+  },
+  "expect": {
+    "status": "queued",
+    "executed": false
+  },
+  "followup": {
+    "poll_job_result": true,
+    "job_timeout_sec": 180
+  }
+}
+
