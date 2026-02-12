@@ -39,3 +39,7 @@ jobs:
           EXPECTED_BACKEND_BUILD_SHA: ${{ secrets.EXPECTED_BACKEND_BUILD_SHA }}
           ALLOW_WRITE_SMOKE: "false"
           ALLOW_PROD_WRITE_SMOKE: "false"
+
+      - name: License guardrail checks
+        shell: pwsh
+        run: python .\\scripts\\check_license_guardrails.py

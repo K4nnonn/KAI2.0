@@ -25,6 +25,7 @@ import json
 import io
 import re
 import traceback
+import importlib
 import hashlib
 import requests
 import logging
@@ -42,6 +43,59 @@ else:
     ROOT = ROOT.parent  # Go up one level (local dev)
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
+
+
+_BRAIN_GATE_MODULE: Any | None = None
+_BRAIN_GATE_USE_OBFUSCATED = os.environ.get("BRAIN_GATE_USE_OBFUSCATED", "false").lower() == "true"
+
+
+def _load_brain_gate_module() -> Any:
+    global _BRAIN_GATE_MODULE
+    if _BRAIN_GATE_MODULE is not None:
+        return _BRAIN_GATE_MODULE
+
+    if not _BRAIN_GATE_USE_OBFUSCATED:
+        from kai_core.shared import brain_gate as source_brain_gate
+        _BRAIN_GATE_MODULE = source_brain_gate
+        return _BRAIN_GATE_MODULE
+
+    candidate_dirs = [ROOT / "build" / "obf", ROOT.parent.parent / "build" / "obf"]
+    obf_dir = None
+    artifacts: list[Path] = []
+    for candidate in candidate_dirs:
+        found = sorted(candidate.glob("brain_gate*.pyd")) + sorted(candidate.glob("brain_gate*.so"))
+        if found:
+            obf_dir = candidate
+            artifacts = found
+            break
+    if not artifacts or obf_dir is None:
+        raise RuntimeError(
+            "BRAIN_GATE_USE_OBFUSCATED=true but no compiled brain_gate artifact was found in build/obf."
+        )
+
+    if str(obf_dir) not in sys.path:
+        sys.path.insert(0, str(obf_dir))
+
+    try:
+        _BRAIN_GATE_MODULE = importlib.import_module("brain_gate")
+    except Exception as exc:
+        raise RuntimeError(f"Failed to load obfuscated brain_gate module: {exc}") from exc
+    return _BRAIN_GATE_MODULE
+
+
+def _brain_gate_refresh(force: bool = False) -> dict[str, Any]:
+    module = _load_brain_gate_module()
+    return module.refresh_license(force=force)
+
+
+def _brain_gate_status() -> dict[str, Any]:
+    module = _load_brain_gate_module()
+    return module.license_status()
+
+
+def _brain_gate_allows_request(path: str) -> tuple[bool, str | None]:
+    module = _load_brain_gate_module()
+    return module.license_allows_request(path)
 
 
 # In-memory backoff for local LLM (avoid repeated 404/connection errors)
@@ -340,6 +394,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def _startup_local_warmup():
+    _brain_gate_refresh(force=True)
     _start_local_llm_warmup()
 
 
@@ -347,6 +402,25 @@ async def _startup_local_warmup():
 async def request_telemetry_and_rate_limit(request: Request, call_next):
     start = time.perf_counter()
     path = request.url.path
+    exempt_exact = {
+        "/api/health",
+        "/api/diagnostics/health",
+        "/api/auth/verify",
+        "/openapi.json",
+    }
+    exempt_prefixes = ("/docs",)
+    license_warn: str | None = None
+
+    if path not in exempt_exact and not any(path.startswith(prefix) for prefix in exempt_prefixes):
+        allowed, reason = _brain_gate_allows_request(path)
+        if not allowed:
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content={"status": "license_blocked", "reason": reason or "license_invalid"},
+            )
+        if reason:
+            license_warn = reason
+
     session_id = request.headers.get("x-session-id") or request.query_params.get("session_id")
     client_ip = request.client.host if request.client else "unknown"
     rate_key = (session_id or client_ip or "anon").strip()
@@ -373,6 +447,8 @@ async def request_telemetry_and_rate_limit(request: Request, call_next):
         response = await call_next(request)
         if response is not None:
             response.headers["X-Request-ID"] = request_id
+            if license_warn:
+                response.headers["X-License-Warn"] = license_warn
         return response
     finally:
         duration_ms = (time.perf_counter() - start) * 1000
@@ -6821,6 +6897,20 @@ async def diagnostics_llm_usage(reset: bool = False, admin_password: str | None 
     return {"usage": usage, "config": config, "azure_budget": _azure_budget_snapshot()}
 
 
+@app.get("/api/diagnostics/license")
+async def diagnostics_license():
+    status_payload = _brain_gate_status()
+    return {
+        "mode": status_payload.get("mode"),
+        "valid": bool(status_payload.get("valid")),
+        "reason": status_payload.get("reason"),
+        "exp": status_payload.get("exp"),
+        "cache_present": bool(status_payload.get("cache_present")),
+        "last_check": status_payload.get("last_check"),
+        "next_check": status_payload.get("next_check"),
+    }
+
+
 @app.get("/api/settings/env")
 async def env_list(admin_password: str | None = None):
     """
@@ -6831,7 +6921,7 @@ async def env_list(admin_password: str | None = None):
         raise HTTPException(status_code=403, detail="Invalid admin password.")
     try:
         data = []
-        for key in _env_allowlist():
+        for key in _env_exposure_allowlist():
             raw_value = os.environ.get(key)
             item = {"key": key, "value": _mask_value(raw_value)}
             if key in _ENV_BOOL_KEYS:
@@ -6839,8 +6929,7 @@ async def env_list(admin_password: str | None = None):
             data.append(item)
         return {"env": data}
     except Exception as exc:
-        tb = traceback.format_exc()
-        return JSONResponse(status_code=500, content={"error": f"Env list failed: {exc}", "traceback": tb})
+        return JSONResponse(status_code=500, content={"error": f"Env list failed: {exc}"})
 
 
 @app.post("/api/settings/env/update")
@@ -6852,7 +6941,9 @@ async def env_update(req: EnvUpdateRequest):
     admin_pwd = os.environ.get("KAI_ACCESS_PASSWORD")
     if not admin_pwd or req.admin_password != admin_pwd:
         raise HTTPException(status_code=403, detail="Invalid admin password.")
-    if req.key not in _env_allowlist():
+    if req.key not in _env_update_allowlist():
+        raise HTTPException(status_code=400, detail="Key not allowed.")
+    if _is_forbidden_env_key(req.key):
         raise HTTPException(status_code=400, detail="Key not allowed.")
     os.environ[req.key] = req.value
     return {"updated": req.key, "value_masked": _mask_value(req.value)}
@@ -8322,92 +8413,86 @@ _ENV_BOOL_KEYS = {
 }
 
 
-def _env_allowlist() -> list[str]:
-    return [
-        "AZURE_OPENAI_ENDPOINT",
-        "AZURE_OPENAI_API_KEY",
-        "AZURE_OPENAI_DEPLOYMENT",
-        "AZURE_OPENAI_API_VERSION",
-        "AZURE_OPENAI_EMBEDDING_DEPLOYMENT",
-        "AZURE_OPENAI_EMBEDDING_API_VERSION",
-        "AZURE_OPENAI_EMBEDDING_DIMENSIONS",
-        "AZURE_OPENAI_EMBEDDING_TIMEOUT_SECONDS",
-        "SERPAPI_KEY",
-        "CONCIERGE_SEARCH_ENDPOINT",
-        "CONCIERGE_SEARCH_KEY",
-        "CONCIERGE_SEARCH_INDEX",
-        "CONCIERGE_SEARCH_VECTOR_FIELD",
-        "CONCIERGE_SEARCH_VECTOR_K",
-        "CONCIERGE_SEARCH_HYBRID",
-        "CONCIERGE_SEARCH_VECTOR_FILTER_MODE",
-        "ENABLE_VECTOR_INDEXING",
-        "SA360_CLIENT_ID",
-        "SA360_CLIENT_SECRET",
-        "SA360_REFRESH_TOKEN",
-        "SA360_LOGIN_CUSTOMER_ID",
-        "SA360_OAUTH_REDIRECT_URI",
-        "SA360_OAUTH_STATE_SECRET",
-        "KAI_SA360_TOKEN_TABLE",
-        "KAI_SA360_TOKEN_TABLE_ENABLED",
-        "SA360_PLAN_MAX_SYNC_ACCOUNTS",
-        "SA360_DIAGNOSTICS_MAX_SYNC_ACCOUNTS",
-        "SA360_PLAN_CONCURRENCY",
-        "SA360_PLAN_CHUNK_SIZE",
-        "SA360_DIAGNOSTICS_CONCURRENCY",
-        "SA360_DIAGNOSTICS_CHUNK_SIZE",
-        "SA360_PERF_REPORTS",
-        "SA360_DIAGNOSTICS_REPORTS",
-        "ADS_CLIENT_ID",
-        "ADS_CLIENT_SECRET",
-        "ADS_REFRESH_TOKEN",
-        "ADS_DEVELOPER_TOKEN",
-        "ENABLE_ML_REASONING",
-        "ENABLE_SUMMARY_ENHANCER",
-        "ADS_FETCH_ENABLED",
-        "SA360_FETCH_ENABLED",
-        "ENABLE_TRENDS",
-        "REQUIRE_LOCAL_LLM",
-        "DEFAULT_CUSTOMER_IDS",
-        "JOB_QUEUE_ENABLED",
-        "JOB_QUEUE_FORCE",
-        "JOB_QUEUE_NAME",
-        "JOB_TABLE_NAME",
-        "JOB_RESULT_CONTAINER",
-        "JOB_QUEUE_POLL_SECONDS",
-        "JOB_QUEUE_VISIBILITY_TIMEOUT",
-        "JOB_MAX_ATTEMPTS",
-        "RATE_LIMIT_ENABLED",
-        "RATE_LIMIT_PER_MINUTE",
-        "RATE_LIMIT_BURST",
-        "RATE_LIMIT_HEAVY_PER_MINUTE",
-        "RATE_LIMIT_HEAVY_BURST",
-        "CIRCUIT_BREAKER_ENABLED",
-        "SA360_BREAKER_FAILURES",
-        "SA360_BREAKER_COOLDOWN_SECONDS",
-        "SERP_BREAKER_FAILURES",
-        "SERP_BREAKER_COOLDOWN_SECONDS",
-        "TRENDS_CACHE_TTL_SECONDS",
-        "TRENDS_CACHE_MAX_ITEMS",
-        "SA360_PERF_WEIGHT_CACHE_TTL_SECONDS",
-        "SA360_PERF_WEIGHT_CACHE_MAX_ITEMS",
-        "SA360_PERF_SEASONALITY_CACHE_TTL_SECONDS",
-        "SA360_PERF_SEASONALITY_CACHE_MAX_ITEMS",
-        "TRENDS_TOTAL_TIMEOUT_SECONDS",
-        "TRENDS_CONNECT_TIMEOUT_SECONDS",
-        "TRENDS_READ_TIMEOUT_SECONDS",
-        "TRENDS_SERP_TIMEOUT_SECONDS",
-        "TRENDS_MAX_SYNC_SECONDS",
-        "TRENDS_QUEUE_ON_TIMEOUT",
-        "TRENDS_PERF_TIMEOUT_SECONDS",
-        "AUDIT_BLOB_CONTAINER",
-        "AUDIT_BLOB_PREFIX",
-        "AUDIT_SAS_EXPIRY_HOURS",
-        "LOCAL_LLM_ROUTER_TIMEOUT_SECONDS",
-        "LOCAL_LLM_ROUTER_MAX_CONCURRENCY",
-        "ROUTER_PRIMARY",
-        "ROUTER_VERIFY_MODE",
-        "ROUTER_VERIFY_CONFIDENCE",
-    ]
+_ENV_FORBIDDEN_KEY_PATTERNS = (
+    "KEY",
+    "SECRET",
+    "TOKEN",
+    "PASSWORD",
+    "CONNECTION_STRING",
+    "CLIENT_SECRET",
+    "REFRESH_TOKEN",
+)
+
+_ENV_EXPOSURE_ALLOWLIST = [
+    "ENABLE_VECTOR_INDEXING",
+    "ENABLE_ML_REASONING",
+    "ENABLE_SUMMARY_ENHANCER",
+    "ADS_FETCH_ENABLED",
+    "SA360_FETCH_ENABLED",
+    "ENABLE_TRENDS",
+    "REQUIRE_LOCAL_LLM",
+    "JOB_QUEUE_ENABLED",
+    "JOB_QUEUE_FORCE",
+    "JOB_QUEUE_NAME",
+    "JOB_TABLE_NAME",
+    "JOB_RESULT_CONTAINER",
+    "JOB_QUEUE_POLL_SECONDS",
+    "JOB_QUEUE_VISIBILITY_TIMEOUT",
+    "JOB_MAX_ATTEMPTS",
+    "RATE_LIMIT_ENABLED",
+    "RATE_LIMIT_PER_MINUTE",
+    "RATE_LIMIT_BURST",
+    "RATE_LIMIT_HEAVY_PER_MINUTE",
+    "RATE_LIMIT_HEAVY_BURST",
+    "CIRCUIT_BREAKER_ENABLED",
+    "SA360_BREAKER_FAILURES",
+    "SA360_BREAKER_COOLDOWN_SECONDS",
+    "SERP_BREAKER_FAILURES",
+    "SERP_BREAKER_COOLDOWN_SECONDS",
+    "TRENDS_CACHE_TTL_SECONDS",
+    "TRENDS_CACHE_MAX_ITEMS",
+    "SA360_PERF_WEIGHT_CACHE_TTL_SECONDS",
+    "SA360_PERF_WEIGHT_CACHE_MAX_ITEMS",
+    "SA360_PERF_SEASONALITY_CACHE_TTL_SECONDS",
+    "SA360_PERF_SEASONALITY_CACHE_MAX_ITEMS",
+    "TRENDS_TOTAL_TIMEOUT_SECONDS",
+    "TRENDS_CONNECT_TIMEOUT_SECONDS",
+    "TRENDS_READ_TIMEOUT_SECONDS",
+    "TRENDS_SERP_TIMEOUT_SECONDS",
+    "TRENDS_MAX_SYNC_SECONDS",
+    "TRENDS_QUEUE_ON_TIMEOUT",
+    "TRENDS_PERF_TIMEOUT_SECONDS",
+    "AUDIT_BLOB_CONTAINER",
+    "AUDIT_BLOB_PREFIX",
+    "AUDIT_SAS_EXPIRY_HOURS",
+    "LOCAL_LLM_ROUTER_TIMEOUT_SECONDS",
+    "LOCAL_LLM_ROUTER_MAX_CONCURRENCY",
+    "ROUTER_PRIMARY",
+    "ROUTER_VERIFY_MODE",
+    "ROUTER_VERIFY_CONFIDENCE",
+    "LICENSE_ENFORCEMENT_MODE",
+    "LICENSE_REFRESH_INTERVAL_HOURS",
+    "LICENSE_RENEW_DAYS_BEFORE_EXP",
+    "LICENSE_GRACE_DAYS",
+    "LICENSE_REQUEST_TIMEOUT_SECONDS",
+    "LICENSE_CACHE_PATH",
+    "BRAIN_GATE_USE_OBFUSCATED",
+]
+
+
+def _is_forbidden_env_key(key: str) -> bool:
+    upper = str(key or "").upper()
+    return any(pattern in upper for pattern in _ENV_FORBIDDEN_KEY_PATTERNS)
+
+
+def _env_exposure_allowlist() -> list[str]:
+    return [key for key in _ENV_EXPOSURE_ALLOWLIST if not _is_forbidden_env_key(key)]
+
+
+def _env_update_allowlist() -> list[str]:
+    # Runtime updates are restricted to the same allowlist used for exposure.
+    # Secret-bearing env values must be changed at deployment/runtime secret stores, not API.
+    return _env_exposure_allowlist()
 
 
 def _should_enqueue(async_mode: bool) -> bool:

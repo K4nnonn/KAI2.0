@@ -145,11 +145,12 @@ if ($fullIntegrity) {
 }
 
 Invoke-Gate -Name "build_frontend" -Command "npm run build" -WorkDir $web -Order 1
+Invoke-Gate -Name "license_guardrails" -Command "python .\\scripts\\check_license_guardrails.py" -WorkDir $repoRoot -Order 2
 if ((Test-Path $e2e) -and -not $skipE2E) {
-    Invoke-Gate -Name "api_health" -Command "node .\\health_gate.js" -WorkDir $e2e -Order 2
-    Invoke-Gate -Name "ui_smoke" -Command "node .\\ui_smoke_gate.js" -WorkDir $e2e -Order 3
-    Invoke-Gate -Name "conversation_flow" -Command "set MAX_MESSAGES=9 && node .\\conversation_flow_test.js" -WorkDir $e2e -Order 4
-    Invoke-Gate -Name "integrity_suite" -Command "node .\\integrity_suite.js" -WorkDir $e2e -Order 5
+    Invoke-Gate -Name "api_health" -Command "node .\\health_gate.js" -WorkDir $e2e -Order 3
+    Invoke-Gate -Name "ui_smoke" -Command "node .\\ui_smoke_gate.js" -WorkDir $e2e -Order 4
+    Invoke-Gate -Name "conversation_flow" -Command "set MAX_MESSAGES=9 && node .\\conversation_flow_test.js" -WorkDir $e2e -Order 5
+    Invoke-Gate -Name "integrity_suite" -Command "node .\\integrity_suite.js" -WorkDir $e2e -Order 6
 } else {
     Write-Host "Skipping e2e gates: tests\\e2e not present."
 }

@@ -49,6 +49,29 @@ Key envs include:
 - Local LLM: `LOCAL_LLM_ENDPOINT`, `LOCAL_LLM_MODEL`
 - SA360 (OAuth-only): `SA360_CLIENT_ID`, `SA360_CLIENT_SECRET`, `SA360_REFRESH_TOKEN`, `SA360_LOGIN_CUSTOMER_ID`, `SA360_OAUTH_REDIRECT_URI`
 - Vector Search (if used): `CONCIERGE_SEARCH_ENDPOINT`, `CONCIERGE_SEARCH_KEY`, `CONCIERGE_SEARCH_INDEX`
+- License hardening: `LICENSE_SERVER_URL`, `LICENSE_INSTANCE_ID`, `LICENSE_ENFORCEMENT_MODE`, `LICENSE_REFRESH_INTERVAL_HOURS`, `LICENSE_RENEW_DAYS_BEFORE_EXP`, `LICENSE_GRACE_DAYS`, `LICENSE_REQUEST_TIMEOUT_SECONDS`, `LICENSE_CACHE_PATH`, `BRAIN_GATE_USE_OBFUSCATED`
+
+## License Enforcement Modes
+- `off`: no request blocking; behaves as current open mode.
+- `soft`: requests continue, but warning header may be attached (`X-License-Warn`).
+- `hard`: protected routes return HTTP `503` with `{"status":"license_blocked","reason":"..."}` when license is invalid and outside grace.
+
+Exempt routes in all modes:
+- `/api/health`
+- `/api/diagnostics/health`
+- `/api/auth/verify`
+- `/docs`
+- `/openapi.json`
+
+Diagnostics:
+- `/api/diagnostics/license` returns mode, validity, reason, expiration, cache status, and refresh timing.
+
+## Optional Obfuscation Build (brain_gate only)
+Build the licensing module to a compiled artifact:
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\build_brain_gate_obfuscated.ps1`
+
+Runtime toggle:
+- `BRAIN_GATE_USE_OBFUSCATED=true` requires a compiled `brain_gate*.pyd`/`brain_gate*.so` in `build/obf`.
 
 ## Local Run (App-First)
 1) Copy `.env.example` to `.env` and fill values for your environment.
