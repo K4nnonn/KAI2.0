@@ -266,6 +266,94 @@ test.describe('Kai Chat UI', () => {
     }, { timeout: 15000 }).toBe(true)
   })
 
+  test('SA360 connect falls back to same-tab redirect when popup navigation is blocked (blank window regression guard)', async ({ page }) => {
+    requireFrontend()
+
+    const ctx = page.context()
+    const newSession = `ui-${Date.now()}`
+    await page.addInitScript(({ key, value, accessKey }) => {
+      sessionStorage.setItem(accessKey, 'true')
+      sessionStorage.setItem(key, value)
+      // Simulate a popup that opens but cannot be navigated (some browsers/extensions/security settings).
+      window.open = () => ({
+        location: {
+          set href(_) {
+            throw new Error('blocked')
+          },
+        },
+        focus() {},
+        close() {},
+      })
+    }, { key: 'kai_chat_session_id', value: newSession, accessKey: 'kai_access_granted_v2' })
+
+    await ctx.route('**/api/sa360/oauth/status**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ connected: false, login_customer_id: null, default_customer_id: null }),
+      })
+    })
+    await ctx.route('**/api/sa360/oauth/start-url**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ url: `${frontendUrl}/oauth-fallback-test` }),
+      })
+    })
+    await ctx.route('**/oauth-fallback-test', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>oauth-fallback-ok</body></html>' })
+    })
+
+    await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
+    const connectBtn = page.getByRole('button', { name: /connect sa360/i })
+    await expect(connectBtn).toBeVisible({ timeout: 60000 })
+    const startReq = page.waitForRequest((req) => req.url().includes('/api/sa360/oauth/start-url') && req.method() === 'GET', { timeout: 15000 })
+    await connectBtn.click()
+    await startReq
+
+    await expect.poll(async () => {
+      const inFallbackUrl = /oauth-fallback-test/i.test(page.url())
+      const hasFallbackBanner = (await page.getByText(/continuing sign-in in this tab/i).count()) > 0
+      return inFallbackUrl || hasFallbackBanner
+    }, { timeout: 15000 }).toBe(true)
+  })
+
+  test('SA360 connect shows a clear error when start-url is missing/invalid (no blank popup)', async ({ page }) => {
+    requireFrontend()
+
+    const ctx = page.context()
+    const newSession = `ui-${Date.now()}`
+    await page.addInitScript(({ key, value, accessKey }) => {
+      sessionStorage.setItem(accessKey, 'true')
+      sessionStorage.setItem(key, value)
+      // Avoid creating popups for this failure-mode test.
+      window.open = () => null
+    }, { key: 'kai_chat_session_id', value: newSession, accessKey: 'kai_access_granted_v2' })
+
+    await ctx.route('**/api/sa360/oauth/status**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ connected: false, login_customer_id: null, default_customer_id: null }),
+      })
+    })
+    await ctx.route('**/api/sa360/oauth/start-url**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({}),
+      })
+    })
+
+    await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
+    const connectBtn = page.getByRole('button', { name: /connect sa360/i })
+    await expect(connectBtn).toBeVisible({ timeout: 60000 })
+
+    await connectBtn.click()
+
+    await expect(page.getByText(/No OAuth URL returned/i)).toBeVisible({ timeout: 15000 })
+  })
+
   test('SA360 not-connected blocks performance planner with clear CTA', async ({ page }) => {
     requireFrontend()
     test.skip(!backendUrl, 'BACKEND_URL not set; skipping planner block check')

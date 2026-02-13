@@ -157,6 +157,9 @@ try {
       @{ key = "diagnostics_ok"; label = "API diagnostics" },
       @{ key = "sa360_connected"; label = "SA360 connected" },
       @{ key = "sa360_conversion_actions_ok"; label = "SA360 conversion actions" },
+      @{ key = "spec_eval_status"; label = "Spec eval (runner)" },
+      @{ key = "sa360_parity_ok"; label = "SA360 parity (plan vs live)" },
+      @{ key = "sa360_accuracy_ok"; label = "SA360 accuracy (plan coverage)" },
       @{ key = "pmax_ok"; label = "PMax endpoint" },
       @{ key = "serp_ok"; label = "SERP endpoint" },
       @{ key = "competitor_ok"; label = "Competitor endpoint" },
@@ -168,8 +171,18 @@ try {
     $failed = @()
     foreach ($check in $hardChecks) {
       $val = $meta.full_qa.$($check.key)
+      if ($check.key -eq "spec_eval_status") {
+        if ($val -ne "ok") { $failed += ($check.label + " (" + $check.key + ")") }
+        continue
+      }
       if ($val -ne $true) { $failed += ($check.label + " (" + $check.key + ")") }
     }
+    # Spec suite must be fully green (no silent failures).
+    try {
+      if ($meta.full_qa.spec_eval_summary -and $meta.full_qa.spec_eval_summary.failed -gt 0) {
+        $failed += ("Spec eval assertions (" + [string]$meta.full_qa.spec_eval_summary.failed + " failed)")
+      }
+    } catch {}
     if ($failed.Count -gt 0) {
       throw ("Online gate failed: " + ($failed -join ", "))
     }

@@ -1,11 +1,11 @@
 {
   "id": "PLAN_PERF_LAST_30_DAYS",
-  "scenario": "Performance parity/accuracy (LAST_30_DAYS)",
+  "scenario": "Performance parity/accuracy (STABLE_LAST_30_DAYS)",
   "pillar": "quality",
   "kind": "plan_and_run",
   "capabilities": ["performance", "sa360_parity", "sa360_accuracy"],
   "request": {
-    "message": "give me last 30 days performance",
+    "message": "give me performance (use the default date range)",
     "customer_ids": ["${TARGET_CUSTOMER_ID}"],
     "default_date_range": "${STABLE_LAST_30_DAYS}",
     "session_id": "${SESSION_ID}"

@@ -68,4 +68,52 @@ test.describe('SA360 OAuth Live Smoke', () => {
       // ignore
     }
   })
+
+  test('Connect SA360 falls back to same-tab navigation when popup is blocked', async ({ page }) => {
+    requireFrontend()
+    test.skip(!liveSmoke, 'KAI_LIVE_OAUTH_SMOKE not enabled; skipping live OAuth smoke')
+    test.skip(!backendUrl, 'BACKEND_URL not set')
+
+    const sid = `ui-oauth-blocked-${Date.now()}`
+
+    const ctx = await request.newContext()
+    const startResp = await ctx.get(`${backendUrl}/api/sa360/oauth/start-url?session_id=${encodeURIComponent(sid)}`)
+    expect(startResp.ok()).toBeTruthy()
+    const startBody = await startResp.json()
+    const expectedUrl = String(startBody?.url || '')
+    expect(expectedUrl.startsWith('https://accounts.google.com/')).toBe(true)
+
+    const expected = new URL(expectedUrl)
+    const expectedClientId = expected.searchParams.get('client_id')
+    const expectedRedirect = expected.searchParams.get('redirect_uri')
+    expect(expectedClientId).toBeTruthy()
+    expect(expectedRedirect).toBeTruthy()
+
+    // Simulate a popup blocker: return null from window.open so the UI must navigate in the same tab.
+    await page.addInitScript(() => {
+      window.open = () => null
+    })
+    await seedSession(page, sid)
+
+    // Prevent flaky external navigation by fulfilling the OAuth URL request locally while preserving the URL.
+    await page.route('https://accounts.google.com/**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>oauth-ok</body></html>' })
+    })
+
+    await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
+
+    const connectBtn = page.getByRole('button', { name: /connect sa360/i })
+    await expect(connectBtn).toBeVisible({ timeout: 60000 })
+
+    await connectBtn.click()
+
+    await page.waitForURL('https://accounts.google.com/**', { timeout: 20000 })
+    const finalUrl = page.url()
+    expect(finalUrl.startsWith('https://accounts.google.com/')).toBe(true)
+
+    const final = new URL(finalUrl)
+    expect(final.searchParams.get('client_id')).toBe(expectedClientId)
+    expect(final.searchParams.get('redirect_uri')).toBe(expectedRedirect)
+    expect(String(final.searchParams.get('scope') || '')).toMatch(/doubleclicksearch/i)
+  })
 })
