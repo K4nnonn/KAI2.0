@@ -841,6 +841,96 @@ if (Test-Path $multisheetScript) {
 }
 Write-Json (Join-Path $RunDir "16_multisheet_upload.json") $multisheet
 
+# --- Audit success path via uploaded reports (XLSX multi-sheet) ---
+# This ensures the end-to-end "upload -> audit generate" workflow works (not just manifest discovery).
+$auditUpload = [ordered]@{
+  status = "skipped"
+  reason = $null
+  queued = $null
+  job = $null
+  result = $null
+  ok = $false
+}
+if ($multisheet.status -ne "ok" -or -not $multisheet.summary -or -not $multisheet.summary.ok) {
+  $auditUpload.reason = "multisheet_upload_not_ready"
+} else {
+  try {
+    $auditUploadReq = @{
+      business_unit = "QA MultiSheet"
+      account_name = "QA MultiSheet"
+      use_mock_data = $false
+      async_mode = $true
+      data_prefix = "qa"
+    }
+
+    # Prefer async mode to avoid long-running request timeouts; we still require the job to complete successfully.
+    $queued = Safe-Request "POST" "$Backend/api/audit/generate" $auditUploadReq
+    $auditUpload.queued = $queued
+    if (-not ($queued.ok -and $queued.body -and $queued.body.status -eq "queued" -and $queued.body.job_id)) {
+      throw "Expected queued audit job response."
+    }
+
+    $jobId = $queued.body.job_id
+    $job = [ordered]@{
+      job_id = $jobId
+      status = $null
+      result = $null
+      attempts = 0
+      timed_out = $false
+    }
+    $deadline = (Get-Date).AddMinutes(12)
+    while ((Get-Date) -lt $deadline) {
+      $job.attempts++
+      $jobStatus = Safe-Request "GET" "$Backend/api/jobs/$jobId"
+      $job.status = $jobStatus
+      $state = $null
+      if ($jobStatus.ok -and $jobStatus.body -and $jobStatus.body.job) {
+        $state = $jobStatus.body.job.status
+      }
+      if ($state -eq "succeeded" -or $state -eq "failed") {
+        break
+      }
+      Start-Sleep -Seconds 5
+    }
+    if (-not ($job.status.ok -and $job.status.body -and $job.status.body.job)) {
+      $job.timed_out = $true
+    } else {
+      $state = $job.status.body.job.status
+      if ($state -ne "succeeded" -and $state -ne "failed") {
+        $job.timed_out = $true
+      }
+    }
+    if (-not $job.timed_out) {
+      $jobResult = Safe-Request "GET" "$Backend/api/jobs/$jobId/result"
+      $job.result = $jobResult
+    }
+    $auditUpload.job = $job
+
+    $auditUploadOk = $false
+    try {
+      $auditUploadOk = (
+        -not $job.timed_out -and
+        $job.status.ok -and
+        $job.status.body.job.status -eq "succeeded" -and
+        $job.result.ok -and
+        $job.result.body -and
+        $job.result.body.result -and
+        $job.result.body.result.status -eq "success"
+      )
+    } catch {}
+
+    $auditUpload.status = "ok"
+    $auditUpload.ok = [bool]$auditUploadOk
+    if (-not $auditUpload.ok) {
+      throw "Audit job completed but did not return success result."
+    }
+  } catch {
+    $auditUpload.status = "error"
+    $auditUpload.error = $_.Exception.Message
+  }
+}
+Write-Json (Join-Path $RunDir "17_audit_uploaded_data.json") $auditUpload
+
 # --- Summary ---
 $summary = [ordered]@{
   run_id = $Stamp
@@ -851,6 +941,7 @@ $summary = [ordered]@{
   env_checked = (-not $envChecks.skipped)
   creative_ok = $creative.ok
   audit_expected_fail = ($audit.status -eq 400)
+  audit_uploaded_data_ok = $auditUpload.ok
   advisor_checked = $advisor.ok
   sa360_checked = (-not $sa360.skipped)
   sa360_connected = ($sa360.oauth_status -and $sa360.oauth_status.body -and $sa360.oauth_status.body.connected -eq $true)

@@ -12,15 +12,26 @@ def main() -> int:
     out_path = Path(sys.argv[1]).expanduser().resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Keep this tiny and deterministic: it exists only to validate that XLSX multi-sheet
-    # inputs are discovered and ingested (not to validate audit scoring correctness).
+    # Keep this tiny and deterministic: it exists to validate that XLSX multi-sheet
+    # inputs are discovered, ingested, and usable by the audit pipeline (not to validate
+    # audit scoring correctness).
+    #
+    # IMPORTANT: The IntelligentDataMapper expects Google Ads-style headers including
+    # "Impr.", "Clicks", and "Cost". If the campaigns sheet lacks impressions, the mapper
+    # may incorrectly select the keyword sheet as the performance source and later crash
+    # on missing campaign-level columns. This fixture therefore includes the minimal
+    # required performance columns on both sheets.
     df_campaigns = pd.DataFrame(
         {
             "Customer ID": ["7902313748", "7902313748"],
             "Account name": ["QA MultiSheet", "QA MultiSheet"],
             "Campaign": ["Campaign A", "Campaign B"],
+            "Impr.": [1000, 2000],
             "Clicks": [10, 20],
             "Cost": [12.34, 56.78],
+            "Conversions": [1, 2],
+            "Campaign Status": ["Enabled", "Enabled"],
+            "Campaign Type": ["Search", "Search"],
         }
     )
     df_keywords = pd.DataFrame(
@@ -30,7 +41,10 @@ def main() -> int:
             "Campaign": ["Campaign A", "Campaign A"],
             "Keyword": ["foo", "bar"],
             "Match type": ["Exact", "Phrase"],
-            "Impressions": [100, 200],
+            "Impr.": [100, 200],
+            "Clicks": [1, 2],
+            "Cost": [0.5, 1.25],
+            "Conversions": [0, 1],
         }
     )
 
@@ -44,4 +58,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
