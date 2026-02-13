@@ -1,0 +1,20 @@
+{
+  "id": "GET_SA360_OAUTH_START_URL",
+  "pillar": "functionality",
+  "kind": "get",
+  "request": {
+    "url": "/api/sa360/oauth/start-url?session_id=${SESSION_ID}"
+  },
+  "expect": {
+    "__status": 200,
+    "__ok": true
+  },
+  "assert": {
+    "paths_exist": [
+      "url"
+    ],
+    "regex_match": {
+      "url": "^https://accounts\\.google\\.com/o/oauth2/v2/auth\\?.*client_id=.*redirect_uri=.*state=.*$"
+    }
+  }
+}
