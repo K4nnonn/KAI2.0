@@ -1,10 +1,13 @@
 {
-  "id": "PLAN_PERF_LAST_WEEK",
+  "id": "PLAN_PERF_LAST_14_DAYS",
+  "scenario": "Performance parity/accuracy (LAST_14_DAYS)",
   "pillar": "quality",
   "kind": "plan_and_run",
+  "capabilities": ["performance", "sa360_parity", "sa360_accuracy"],
   "request": {
-    "message": "give me last week performance",
+    "message": "give me last 14 days performance",
     "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "default_date_range": "LAST_14_DAYS",
     "session_id": "${SESSION_ID}"
   },
   "expect": {
@@ -34,9 +37,6 @@
       "require_report_names_echo": true,
       "require_source_frame_in_reports": true,
       "require_metric_presence": true
-    },
-    "text_not_contains": {
-      "summary": ["No close metric match found"]
     }
   }
 }

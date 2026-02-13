@@ -762,8 +762,14 @@ function Assert-Sa360Parity($Resp, $RequestBody, $Cfg, [string]$BackendUrl, [str
     $delta = $null
     $tol = Get-ConfigTolerance $Cfg $m
 
-    try { $planVal = [double](Get-PathValue $result ("current." + $m)) } catch {}
-    try { $liveVal = [double](Get-PathValue $snapCurrent $m) } catch {}
+    $planRaw = $null
+    $liveRaw = $null
+    try { $planRaw = Get-PathValue $result ("current." + $m) } catch {}
+    try { $liveRaw = Get-PathValue $snapCurrent $m } catch {}
+    # Important: do NOT cast $null to [double] (PowerShell casts $null -> 0.0), which would create
+    # false-positive parity passes for missing metrics.
+    if ($planRaw -ne $null) { try { $planVal = [double]$planRaw } catch { $planVal = $null } }
+    if ($liveRaw -ne $null) { try { $liveVal = [double]$liveRaw } catch { $liveVal = $null } }
 
     if ($planVal -ne $null -and $liveVal -ne $null) {
       $delta = ($planVal - $liveVal)
@@ -796,8 +802,12 @@ function Assert-Sa360Parity($Resp, $RequestBody, $Cfg, [string]$BackendUrl, [str
         $delta = $null
         $tol = Get-ConfigTolerance $Cfg $m
 
-        try { $planVal = [double](Get-PathValue $result ("previous." + $m)) } catch {}
-        try { $liveVal = [double](Get-PathValue $snapPrev $m) } catch {}
+        $planRaw = $null
+        $liveRaw = $null
+        try { $planRaw = Get-PathValue $result ("previous." + $m) } catch {}
+        try { $liveRaw = Get-PathValue $snapPrev $m } catch {}
+        if ($planRaw -ne $null) { try { $planVal = [double]$planRaw } catch { $planVal = $null } }
+        if ($liveRaw -ne $null) { try { $liveVal = [double]$liveRaw } catch { $liveVal = $null } }
 
         if ($planVal -ne $null -and $liveVal -ne $null) {
           $delta = ($planVal - $liveVal)
@@ -1008,7 +1018,10 @@ $preconditions = [ordered]@{
   backend = $Backend
   session_id_present = (-not [string]::IsNullOrWhiteSpace($SessionId))
   target_customer_id = $TargetCustomerId
+  effective_customer_id = $null
+  effective_account = $null
   oauth_status = $null
+  accounts = $null
   default_account_set = $null
   timestamp = (Get-Date).ToString("o")
 }
@@ -1020,15 +1033,53 @@ try {
   $currentDefault = $null
   try { $connected = [bool]$statusResp.body.connected } catch {}
   try { $currentDefault = [string]$statusResp.body.default_customer_id } catch {}
-  if ($connected -and (-not $currentDefault -or $currentDefault -ne $TargetCustomerId)) {
-    $setUrl = "$Backend/api/sa360/default-account"
-    $setBody = [ordered]@{
-      session_id = $SessionId
-      customer_id = $TargetCustomerId
-      account_name = ""
+  if ($connected) {
+    # Prefer an advertiser (non-manager) account for specs that validate metrics. Manager/MCC IDs
+    # are valid inputs for account discovery but will correctly fail for metrics endpoints.
+    $accountsUrl = "$Backend/api/sa360/accounts?session_id=$([uri]::EscapeDataString($SessionId))"
+    $accountsResp = Safe-Get $accountsUrl
+    $preconditions.accounts = $accountsResp
+
+    $accounts = @()
+    try {
+      if ($accountsResp.ok -and $accountsResp.body) { $accounts = @($accountsResp.body) }
+    } catch { $accounts = @() }
+
+    $effective = $null
+    if ($accounts.Count -gt 0) {
+      if ($TargetCustomerId) {
+        $requested = ($accounts | Where-Object { $_.customer_id -eq $TargetCustomerId } | Select-Object -First 1)
+        # If the caller provided an MCC/manager ID, keep it for traceability but do not use it
+        # as the effective metrics target (SA360 metrics endpoints require a child account).
+        if ($requested -and $requested.manager -ne $true) { $effective = $requested }
+      }
+      if (-not $effective) {
+        $effective = ($accounts | Where-Object { $_.manager -ne $true } | Select-Object -First 1)
+        if (-not $effective -and $requested) { $effective = $requested }
+        if (-not $effective) { $effective = $accounts | Select-Object -First 1 }
+      }
     }
-    $setResp = Safe-Post $setUrl $setBody
-    $preconditions.default_account_set = $setResp
+
+    if ($effective) {
+      $effectiveId = [string]$effective.customer_id
+      $preconditions.effective_customer_id = $effectiveId
+      $preconditions.effective_account = [ordered]@{
+        customer_id = $effectiveId
+        name = $effective.name
+        manager = $effective.manager
+      }
+
+      if (-not $currentDefault -or $currentDefault -ne $effectiveId) {
+        $setUrl = "$Backend/api/sa360/default-account"
+        $setBody = [ordered]@{
+          session_id = $SessionId
+          customer_id = $effectiveId
+          account_name = $effective.name
+        }
+        $setResp = Safe-Post $setUrl $setBody
+        $preconditions.default_account_set = $setResp
+      }
+    }
   }
 } catch {
   $preconditions.default_account_set = [ordered]@{
@@ -1038,9 +1089,13 @@ try {
 }
 Write-Json (Join-Path $OutDir "preconditions.json") $preconditions
 
+$effectiveTargetForSpecs = $TargetCustomerId
+try {
+  if ($preconditions.effective_customer_id) { $effectiveTargetForSpecs = [string]$preconditions.effective_customer_id }
+} catch {}
 $vars = @{
   "SESSION_ID" = $SessionId
-  "TARGET_CUSTOMER_ID" = $TargetCustomerId
+  "TARGET_CUSTOMER_ID" = $effectiveTargetForSpecs
 }
 
 # Some SA360 metrics can drift minute-to-minute when the range includes very recent days. We observed
@@ -1064,15 +1119,27 @@ foreach ($f in $specFiles) {
   if ($validationErrors.Count -gt 0) {
     $specId = [string]$spec.id
     if ([string]::IsNullOrWhiteSpace($specId)) { $specId = [string]$f.BaseName }
+    # Ensure invalid specs still carry capability tags so summary aggregation and CI gates
+    # don't crash on null hashtable keys.
+    $pillarTag = [string]$spec.pillar
+    if ([string]::IsNullOrWhiteSpace($pillarTag)) { $pillarTag = "unknown" }
+    $kindTag = [string]$spec.kind
+    if ([string]::IsNullOrWhiteSpace($kindTag)) { $kindTag = "unknown" }
+    $invalidCaps = @("pillar:$pillarTag", "kind:$kindTag", "error:spec_validation") |
+      ForEach-Object { ([string]$_).Trim().ToLower() } |
+      Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+      Select-Object -Unique
     $results += [ordered]@{
       id = $specId
       scenario = [string]$spec.scenario
       pillar = [string]$spec.pillar
       kind = [string]$spec.kind
+      capabilities = $invalidCaps
       ok = $false
       latency_ms = 0
       checks = @()
       assertions = [ordered]@{}
+      evidence = [ordered]@{ total = 1; passed = 0 }
       failures = @(
         [ordered]@{ type = "spec_validation"; details = $validationErrors }
       )
@@ -1812,8 +1879,22 @@ $summary = [ordered]@{
 
 $capabilityRaw = @{}
 foreach ($r in @($results)) {
-  $caps = @($r.capabilities)
-  foreach ($cap in $caps) {
+  $caps = @()
+  try { $caps = @($r.capabilities) } catch { $caps = @() }
+  if ($caps.Count -eq 0) {
+    $pillarTag = "unknown"
+    $kindTag = "unknown"
+    try {
+      if (-not [string]::IsNullOrWhiteSpace([string]$r.pillar)) { $pillarTag = [string]$r.pillar }
+      if (-not [string]::IsNullOrWhiteSpace([string]$r.kind)) { $kindTag = [string]$r.kind }
+    } catch {}
+    $caps = @("pillar:$pillarTag", "kind:$kindTag", "error:missing_capabilities")
+  }
+
+  foreach ($capRaw in $caps) {
+    $cap = ([string]$capRaw).Trim().ToLower()
+    if ([string]::IsNullOrWhiteSpace($cap)) { continue }
+
     if (-not $capabilityRaw.ContainsKey($cap)) {
       $capabilityRaw[$cap] = [ordered]@{
         specs_total = 0

@@ -153,6 +153,10 @@ function Parse-Json($Text) {
   try { return ($Text | ConvertFrom-Json) } catch { return $null }
 }
 
+# --- LLM usage snapshot (cost/behavior evidence) ---
+$llmUsageBefore = Safe-Request "GET" "$Backend/api/diagnostics/llm-usage"
+Write-Json (Join-Path $RunDir "00_llm_usage_before.json") $llmUsageBefore
+
 # --- Run core integrity script ---
 $integrity = [ordered]@{ status = "skipped"; reason = "missing_script" }
 $integrityScript = Join-Path $PSScriptRoot "verify_system_integrity.ps1"
@@ -931,6 +935,10 @@ if ($multisheet.status -ne "ok" -or -not $multisheet.summary -or -not $multishee
 }
 Write-Json (Join-Path $RunDir "17_audit_uploaded_data.json") $auditUpload
 
+# --- LLM usage snapshot (after) ---
+$llmUsageAfter = Safe-Request "GET" "$Backend/api/diagnostics/llm-usage"
+Write-Json (Join-Path $RunDir "18_llm_usage_after.json") $llmUsageAfter
+
 # --- Summary ---
 $summary = [ordered]@{
   run_id = $Stamp
@@ -992,6 +1000,9 @@ $summary = [ordered]@{
   sa360_accuracy_total = $null
   sa360_accuracy_passed = $null
   sa360_accuracy_ok = $null
+  llm_config = $llmUsageAfter.body.config
+  azure_budget = $llmUsageAfter.body.azure_budget
+  llm_usage_delta = $null
 }
 if ($routerPerf.custom_metric_explicit_token) {
   $summary.custom_metric_explicit_token_blocked = $routerPerf.custom_metric_explicit_token.blocked
@@ -1047,6 +1058,19 @@ if ($specEval.status -eq "ok" -and $specEval.summary -and $specEval.summary.sa36
     $summary.sa360_accuracy_ok = ($summary.sa360_accuracy_passed -eq $summary.sa360_accuracy_total)
   }
 }
+
+try {
+  $before = $llmUsageBefore.body.usage
+  $after = $llmUsageAfter.body.usage
+  if ($before -and $after) {
+    $summary.llm_usage_delta = [ordered]@{
+      local_success = ([int]$after.local_success - [int]$before.local_success)
+      local_error = ([int]$after.local_error - [int]$before.local_error)
+      azure_success = ([int]$after.azure_success - [int]$before.azure_success)
+      azure_error = ([int]$after.azure_error - [int]$before.azure_error)
+    }
+  }
+} catch {}
 Write-Json (Join-Path $RunDir "summary.json") $summary
 
 Write-Host "Full QA run folder: $RunDir"
