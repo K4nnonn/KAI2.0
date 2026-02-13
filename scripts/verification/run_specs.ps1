@@ -1105,6 +1105,10 @@ $vars = @{
 $stableEnd = (Get-Date).Date.AddDays(-2)
 $stableStart = $stableEnd.AddDays(-6)
 $vars["STABLE_LAST_7_DAYS"] = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stableStart, $stableEnd)
+$stableStart14 = $stableEnd.AddDays(-13)
+$vars["STABLE_LAST_14_DAYS"] = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stableStart14, $stableEnd)
+$stableStart30 = $stableEnd.AddDays(-29)
+$vars["STABLE_LAST_30_DAYS"] = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stableStart30, $stableEnd)
 
 $specFiles = Get-ChildItem -Path $SpecDir -Filter *.json -Recurse | Sort-Object FullName
 if ($specFiles.Count -eq 0) {

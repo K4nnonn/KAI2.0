@@ -7,7 +7,7 @@
   "request": {
     "message": "give me last 14 days performance",
     "customer_ids": ["${TARGET_CUSTOMER_ID}"],
-    "default_date_range": "LAST_14_DAYS",
+    "default_date_range": "${STABLE_LAST_14_DAYS}",
     "session_id": "${SESSION_ID}"
   },
   "expect": {
