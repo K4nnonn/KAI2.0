@@ -3,6 +3,7 @@ param(
   [string]$SessionId = $env:KAI_QA_SESSION_ID,
   [string]$LoginCustomerId = $env:KAI_SA360_LOGIN_CUSTOMER_ID,
   [string]$EnvGuiPassword = $env:KAI_ENV_GUI_PASSWORD,
+  [string]$AccessPassword = $env:KAI_ACCESS_PASSWORD,
   [string]$TargetCustomerId = $env:KAI_QA_TARGET_CUSTOMER_ID,
   [int]$MaxChatLatencyMs = 20000,
   [int]$MaxPlanLatencyMs = 25000,
@@ -25,6 +26,14 @@ $RunBase = Join-Path $RepoRoot "verification_runs"
 New-Item -ItemType Directory -Force -Path $RunBase | Out-Null
 $RunDir = Join-Path $RunBase ("fullqa_" + $Stamp)
 New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
+
+# Deterministic windows: avoid flaky metrics when very recent days drift. Use a stable 7-day window
+# that ends 2 days ago (complete days), plus a longer stable window for driver-style prompts.
+$stableEnd = (Get-Date).Date.AddDays(-2)
+$stableStart7 = $stableEnd.AddDays(-6)
+$stableStart30 = $stableEnd.AddDays(-29)
+$STABLE_LAST_7_DAYS = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stableStart7, $stableEnd)
+$STABLE_LAST_30_DAYS = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stableStart30, $stableEnd)
 
 function Write-Json($Path, $Obj) {
   $json = $Obj | ConvertTo-Json -Depth 12
@@ -211,6 +220,30 @@ if ($SkipEnv -or [string]::IsNullOrWhiteSpace($EnvGuiPassword)) {
   $envChecks.with_password = Safe-Request "GET" "$Backend/api/settings/env?admin_password=$([uri]::EscapeDataString($EnvGuiPassword))"
 }
 Write-Json (Join-Path $RunDir "03_env_checks.json") $envChecks
+
+# Auth verify (UI password gate depends on this)
+$authChecks = [ordered]@{
+  wrong_rejected = $null
+  wrong_rejected_ok = $null
+  correct_ok = $null
+  correct_ok_ok = $null
+  correct_skipped = $false
+  reason = $null
+}
+$wrongReq = @{ password = ("invalid-" + [guid]::NewGuid().ToString("n")) }
+$wrongResp = Safe-Request "POST" "$Backend/api/auth/verify" $wrongReq
+$authChecks.wrong_rejected = $wrongResp
+$authChecks.wrong_rejected_ok = ($wrongResp.status -eq 401)
+if ([string]::IsNullOrWhiteSpace($AccessPassword)) {
+  $authChecks.correct_skipped = $true
+  $authChecks.reason = "missing_access_password"
+} else {
+  $okReq = @{ password = $AccessPassword }
+  $okResp = Safe-Request "POST" "$Backend/api/auth/verify" $okReq
+  $authChecks.correct_ok = $okResp
+  $authChecks.correct_ok_ok = ($okResp.ok -eq $true -and $okResp.body -and $okResp.body.authenticated -eq $true)
+}
+Write-Json (Join-Path $RunDir "03a_auth_verify.json") $authChecks
 
 # Creative
 $creativeReq = @{
@@ -440,9 +473,10 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
   $routerPerf.default_account_saved = $defaultSave.ok
 
   $emptyIdsReq = @{
-    message = "How did performance look in the last 7 days?"
+    message = "How did performance look recently?"
     customer_ids = @()
     session_id = $SessionId
+    default_date_range = $STABLE_LAST_7_DAYS
   }
   $emptyIdsResp = Safe-Request "POST" "$Backend/api/chat/plan-and-run" $emptyIdsReq
   $routerPerf.plan_empty_ids_response = $emptyIdsResp
@@ -460,9 +494,10 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
 
   # Router should be fast and must not leak local verification failures in a broad beta.
   $routeReq = @{
-    message = "How did performance look in the last 7 days?"
+    message = "How did performance look recently?"
     customer_ids = @($targetId)
     session_id = $SessionId
+    default_date_range = $STABLE_LAST_7_DAYS
   }
   $routeSamples = @()
   $routeNotes = @()
@@ -496,9 +531,10 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
   $routerPerf.route_latency_ok = ($routerPerf.route_latency_ms -ne $null -and $routerPerf.route_latency_ms -le $routerPerf.route_latency_budget_ms)
 
   $planReq = @{
-    message = "How did performance look in the last 7 days?"
+    message = "How did performance look recently?"
     customer_ids = @($targetId)
     session_id = $SessionId
+    default_date_range = $STABLE_LAST_7_DAYS
   }
   $timer = Measure-Command {
     $planResp = Safe-Request "POST" "$Backend/api/chat/plan-and-run" $planReq
@@ -511,9 +547,10 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
   }
   if ($CustomMetric) {
     $customReq = @{
-      message = "Show me $CustomMetric for the last 7 days."
+      message = "Show me $CustomMetric for the selected period."
       customer_ids = @($targetId)
       session_id = $SessionId
+      default_date_range = $STABLE_LAST_7_DAYS
     }
     $customResp = Safe-Request "POST" "$Backend/api/chat/plan-and-run" $customReq
     $routerPerf.custom_metric_present = $false
@@ -539,6 +576,7 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
     message = "Why did FR_Intent_Clicks change week over week? Which campaigns drove it?"
     customer_ids = @($targetId)
     session_id = $SessionId
+    default_date_range = $STABLE_LAST_30_DAYS
   }
   $explicitTimer = Measure-Command {
     $explicitResp = Safe-Request "POST" "$Backend/api/chat/plan-and-run" $explicitReq
@@ -568,6 +606,7 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
     message = "Why did Store visits change week over week? Which campaigns drove it?"
     customer_ids = @($targetId)
     session_id = $SessionId
+    default_date_range = $STABLE_LAST_30_DAYS
   }
   $storeTimer = Measure-Command {
     $storeResp = Safe-Request "POST" "$Backend/api/chat/plan-and-run" $storeReq
@@ -600,6 +639,7 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
     message = "Why is performance down week over week?"
     customer_ids = @($targetId)
     session_id = $SessionId
+    default_date_range = $STABLE_LAST_30_DAYS
   }
   $genericTimer = Measure-Command {
     $genericResp = Safe-Request "POST" "$Backend/api/chat/plan-and-run" $genericReq
@@ -634,6 +674,7 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
     intent_hint = "audit"
     async_mode = $false
     generate_report = $false
+    default_date_range = $STABLE_LAST_7_DAYS
   }
   $auditTimer = Measure-Command {
     $auditPlanResp = Safe-Request "POST" "$Backend/api/chat/plan-and-run" $auditPlanReq
@@ -669,6 +710,7 @@ if ($sa360.skipped -or -not $sa360.accounts -or $sa360.reason) {
       message = "Why did $exName change week over week? Which campaigns drove it?"
       customer_ids = @($targetId)
       session_id = $SessionId
+      default_date_range = $STABLE_LAST_30_DAYS
     }
     $exTimer = Measure-Command {
       $exResp = Safe-Request "POST" "$Backend/api/chat/plan-and-run" $exReq
@@ -946,6 +988,9 @@ $summary = [ordered]@{
   integrity_status = $integrity.status
   health_ok = $health.ok
   diagnostics_ok = $diag.ok
+  auth_wrong_rejected_ok = $authChecks.wrong_rejected_ok
+  auth_correct_ok = $authChecks.correct_ok_ok
+  auth_correct_skipped = $authChecks.correct_skipped
   env_checked = (-not $envChecks.skipped)
   creative_ok = $creative.ok
   audit_expected_fail = ($audit.status -eq 400)
@@ -1063,11 +1108,25 @@ try {
   $before = $llmUsageBefore.body.usage
   $after = $llmUsageAfter.body.usage
   if ($before -and $after) {
-    $summary.llm_usage_delta = [ordered]@{
-      local_success = ([int]$after.local_success - [int]$before.local_success)
-      local_error = ([int]$after.local_error - [int]$before.local_error)
-      azure_success = ([int]$after.azure_success - [int]$before.azure_success)
-      azure_error = ([int]$after.azure_error - [int]$before.azure_error)
+    $resetDetected = $false
+    foreach ($k in @("local_success", "local_error", "azure_success", "azure_error")) {
+      try {
+        if ([int]$after.$k -lt [int]$before.$k) { $resetDetected = $true }
+      } catch {}
+    }
+    if ($resetDetected) {
+      $summary.llm_usage_delta = [ordered]@{
+        reset_detected = $true
+        note = "LLM usage counters decreased during run (likely service restart); deltas are not comparable."
+      }
+    } else {
+      $summary.llm_usage_delta = [ordered]@{
+        reset_detected = $false
+        local_success = ([int]$after.local_success - [int]$before.local_success)
+        local_error = ([int]$after.local_error - [int]$before.local_error)
+        azure_success = ([int]$after.azure_success - [int]$before.azure_success)
+        azure_error = ([int]$after.azure_error - [int]$before.azure_error)
+      }
     }
   }
 } catch {}

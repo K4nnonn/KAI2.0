@@ -5,7 +5,8 @@ param(
   [int]$RouteBudgetSec = 3,
   [int]$SendBudgetSec = 15,
   [string]$Browser = "chromium",
-  [switch]$AllowNoSession
+  [switch]$AllowNoSession,
+  [switch]$LiveOauthSmoke
 )
 
 $ErrorActionPreference = "Stop"
@@ -58,6 +59,9 @@ $env:BACKEND_URL = $Backend
 $env:KAI_SESSION_ID = $SessionId
 $env:KAI_ROUTE_BUDGET_SEC = [string]$RouteBudgetSec
 $env:KAI_SEND_BUDGET_SEC = [string]$SendBudgetSec
+if ($LiveOauthSmoke -and [string]::IsNullOrWhiteSpace($env:KAI_LIVE_OAUTH_SMOKE)) {
+  $env:KAI_LIVE_OAUTH_SMOKE = "1"
+}
 
 # Keep artifacts inside the repo (share-safe). Avoid writing to random user folders on shared machines.
 $env:PLAYWRIGHT_REPORT_DIR = (Join-Path $RunDir "playwright-report")
