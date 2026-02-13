@@ -5,6 +5,7 @@
   "request": {
     "message": "Why did Store visits change week over week? Which campaigns drove it?",
     "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "default_date_range": "${STABLE_LAST_7_DAYS}",
     "session_id": "${SESSION_ID}"
   },
   "expect": {

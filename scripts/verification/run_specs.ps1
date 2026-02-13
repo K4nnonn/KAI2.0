@@ -1043,6 +1043,14 @@ $vars = @{
   "TARGET_CUSTOMER_ID" = $TargetCustomerId
 }
 
+# Some SA360 metrics can drift minute-to-minute when the range includes very recent days. We observed
+# parity deltas > tolerance even when excluding "today" (i.e., including "yesterday"), so for
+# deterministic parity/accuracy checks we use a stable "last 7 complete days" window that ends 2 days
+# ago to reduce the chance of intraday/backfill drift between the plan call and diagnostics snapshot.
+$stableEnd = (Get-Date).Date.AddDays(-2)
+$stableStart = $stableEnd.AddDays(-6)
+$vars["STABLE_LAST_7_DAYS"] = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stableStart, $stableEnd)
+
 $specFiles = Get-ChildItem -Path $SpecDir -Filter *.json -Recurse | Sort-Object FullName
 if ($specFiles.Count -eq 0) {
   throw "No spec files found in: $SpecDir"

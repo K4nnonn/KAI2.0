@@ -3267,6 +3267,7 @@ SA360_PLAN_CONCURRENCY = int(os.environ.get("SA360_PLAN_CONCURRENCY", "2") or "2
 SA360_PLAN_CHUNK_SIZE = int(os.environ.get("SA360_PLAN_CHUNK_SIZE", "1") or "1")
 SA360_DIAGNOSTICS_CONCURRENCY = int(os.environ.get("SA360_DIAGNOSTICS_CONCURRENCY", "2") or "2")
 SA360_DIAGNOSTICS_CHUNK_SIZE = int(os.environ.get("SA360_DIAGNOSTICS_CHUNK_SIZE", "1") or "1")
+SA360_PLAN_BYPASS_CACHE = os.environ.get("SA360_PLAN_BYPASS_CACHE", "true").lower() == "true"
 ENABLE_SUMMARY_ENHANCER = os.environ.get("ENABLE_SUMMARY_ENHANCER", "true").lower() == "true"
 
 # Router verification controls
@@ -3461,6 +3462,16 @@ ADS_CSV_SCHEMAS = {
         "conversion_action.category",
         "conversion_action.status",
     ],
+    "campaign_conversion_action": [
+        "campaign.id",
+        "campaign.name",
+        "segments.device",
+        "segments.conversion_action_name",
+        "metrics.conversions",
+        "metrics.conversions_value",
+        "metrics.all_conversions",
+        "metrics.all_conversions_value",
+    ],
     # Customer-level performance totals (avoid undercounting conversions by relying on keyword_view attribution).
     "customer_performance": [
         "customer.id",
@@ -3603,6 +3614,23 @@ SA360_QUERIES = {
         FROM conversion_action
         WHERE conversion_action.status != 'REMOVED'
     """,
+    # Campaign-level + device-level conversion-action breakdown.
+    # Used by custom-metric driver analysis so excluded-from-conversions actions (e.g., Store visits)
+    # can still produce campaign/device drivers instead of empty lists.
+    "campaign_conversion_action": """
+        SELECT
+          campaign.id,
+          campaign.name,
+          segments.device,
+          segments.conversion_action_name,
+          metrics.conversions,
+          metrics.conversions_value,
+          metrics.all_conversions,
+          metrics.all_conversions_value
+        FROM campaign
+        WHERE campaign.status != 'REMOVED'
+          AND segments.conversion_action_name IS NOT NULL
+    """,
     # Customer-level totals (fast + complete for account-level performance questions).
     "customer_performance": """
         SELECT
@@ -3699,7 +3727,15 @@ def _parse_human_date(message: str, default: str | None = None) -> str | None:
         return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
 
     # Fixed spans
-    if "last 7" in msg or "past 7" in msg or "previous 7" in msg or "last week" in msg or "previous week" in msg:
+    # "Last week" is interpreted as the previous *calendar* week (Mon-Sun), not "last 7 days".
+    # This avoids including partial "today" data and matches typical paid-search reporting expectations.
+    if "last week" in msg or "previous week" in msg:
+        today = date.today()
+        this_week_start = today - timedelta(days=today.weekday())  # Monday
+        start = this_week_start - timedelta(days=7)
+        end = this_week_start - timedelta(days=1)  # Sunday
+        return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
+    if "last 7" in msg or "past 7" in msg or "previous 7" in msg:
         return _range_days(7)
     if "last 14" in msg or "past 14" in msg or "previous 14" in msg or "last two weeks" in msg or "last 2 weeks" in msg:
         return _range_days(14)
@@ -3762,6 +3798,9 @@ def _parse_human_date(message: str, default: str | None = None) -> str | None:
             end = start + timedelta(days=6)
             return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
 
+    # Fallback: if the user didn't specify a timeframe, honor the caller-provided default.
+    return default
+
 
 def _has_timeframe_hint(message: str | None) -> bool:
     if not message:
@@ -3777,9 +3816,6 @@ def _has_timeframe_hint(message: str | None) -> bool:
     if re.search(r"\bLAST_(7|14|30|90)_DAYS\b", message.upper()):
         return True
     return False
-
-    # Fallback to provided default
-    return default
 
 
 def _build_sa360_plan_from_chat(message: str, customer_ids: list[str], account_name: str | None, default_date: str | None) -> dict:
@@ -5197,7 +5233,7 @@ def _compute_custom_metric_breakdown(
     metric_key: str,
     limit: int = 3,
 ) -> list[dict]:
-    priority = ["keyword_performance_conv", "keyword_performance", "campaign", "ad_group", "ad"]
+    priority = ["campaign_conversion_action", "keyword_performance_conv", "keyword_performance", "campaign", "ad_group", "ad"]
     for frame_name in priority:
         cur_df = frames_current.get(frame_name)
         if cur_df is None or cur_df.empty:
@@ -5816,6 +5852,7 @@ async def _chat_plan_and_run_core(req: PlanRequest, request: Request | None = No
                 for name in ("campaign", "ad_group"):
                     if name not in perf_reports:
                         perf_reports.append(name)
+
             if needs_custom_context:
                 # For custom metrics (often conversion actions / custom columns), we need:
                 # - conversion_action_summary: customer-level action totals (most complete)
@@ -5823,19 +5860,27 @@ async def _chat_plan_and_run_core(req: PlanRequest, request: Request | None = No
                 for name in ["conversion_action_summary", "conversion_actions"]:
                     if name not in perf_reports:
                         perf_reports.append(name)
-                # Only pull keyword-level conversion-action rows when the user asks for drivers/breakdowns.
-                wants_drivers = _has_relational_cue(req.message) or ("driver" in msg_lower) or ("drivers" in msg_lower) or ("which" in msg_lower)
+                # Only pull conversion-action segmented rows when the user asks for drivers/breakdowns.
+                wants_drivers = (
+                    _has_relational_cue(req.message)
+                    or ("driver" in msg_lower)
+                    or ("drivers" in msg_lower)
+                    or ("which" in msg_lower)
+                )
+                if wants_drivers and "campaign_conversion_action" not in perf_reports:
+                    perf_reports.append("campaign_conversion_action")
                 if wants_drivers and "keyword_performance_conv" not in perf_reports:
                     perf_reports.append("keyword_performance_conv")
 
+            plan_bypass_cache = SA360_PLAN_BYPASS_CACHE
             use_batched = len(plan.get("customer_ids") or []) > SA360_PLAN_MAX_SYNC_ACCOUNTS
             if use_batched:
                 def _fetch_batched(range_value: str):
                     return _collect_sa360_frames_batched(
                         plan["customer_ids"],
                         range_value,
-                        bypass_cache=False,
-                        write_cache=True,
+                        bypass_cache=plan_bypass_cache,
+                        write_cache=(not plan_bypass_cache),
                         max_workers=SA360_PLAN_CONCURRENCY,
                         chunk_size=SA360_PLAN_CHUNK_SIZE,
                         report_names=perf_reports,
@@ -5856,6 +5901,8 @@ async def _chat_plan_and_run_core(req: PlanRequest, request: Request | None = No
                 frames_current = _collect_sa360_frames(
                     plan["customer_ids"],
                     current_range,
+                    bypass_cache=plan_bypass_cache,
+                    write_cache=(not plan_bypass_cache),
                     report_names=perf_reports,
                     session_id=sa360_sid,
                 )
@@ -5863,6 +5910,8 @@ async def _chat_plan_and_run_core(req: PlanRequest, request: Request | None = No
                     _collect_sa360_frames(
                         plan["customer_ids"],
                         previous_range,
+                        bypass_cache=plan_bypass_cache,
+                        write_cache=(not plan_bypass_cache),
                         report_names=perf_reports,
                         session_id=sa360_sid,
                     )
