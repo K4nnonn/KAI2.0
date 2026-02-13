@@ -1008,7 +1008,8 @@ $summary = [ordered]@{
   default_account_saved = $routerPerf.default_account_saved
   plan_empty_ids_ok = $routerPerf.plan_empty_ids_ok
   plan_latency_ms = $routerPerf.latency_ms
-  plan_latency_ok = ($routerPerf.latency_ms -ne $null -and $routerPerf.latency_ms -le $MaxPlanLatencyMs)
+  # When SA360 is skipped/unavailable, routerPerf is intentionally skipped; do not mark latency as a failure.
+  plan_latency_ok = $null
   router_verify_failed = $routerPerf.router_verify_failed
   chat_latency_ms = $chatLatency.latency_ms
   chat_latency_ok = $chatLatency.ok
@@ -1076,6 +1077,9 @@ if ($routerPerf.audit_plan_and_run) {
   $summary.audit_plan_and_run_ok = $routerPerf.audit_plan_and_run.ok
   $summary.audit_plan_and_run_signature_error = $routerPerf.audit_plan_and_run.signature_error
 }
+if (-not $routerPerf.skipped) {
+  $summary.plan_latency_ok = ($routerPerf.latency_ms -ne $null -and $routerPerf.latency_ms -le $MaxPlanLatencyMs)
+}
 if ($sa360.fetch) { $summary.sa360_fetch_ok = $sa360.fetch.ok }
 if ($sa360.fetch_and_audit) { $summary.sa360_fetch_and_audit_ok = $sa360.fetch_and_audit.ok }
 if ($sa360.conversion_actions) { 
@@ -1134,4 +1138,5 @@ Write-Json (Join-Path $RunDir "summary.json") $summary
 
 Write-Host "Full QA run folder: $RunDir"
 Write-Host "Summary:"
-$summary | ConvertTo-Json -Depth 4
+$summaryJson = ($summary | ConvertTo-Json -Depth 4)
+Write-Host (Redact-JsonText $summaryJson)

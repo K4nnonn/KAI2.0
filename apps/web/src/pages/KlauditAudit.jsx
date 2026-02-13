@@ -653,7 +653,9 @@ Supports: 50K+ rows, 14 file types`
                   accept=".csv,.xlsx,.xls"
                   id="file-upload-input"
                   data-testid="audit-file-input"
-                  style={{ position: 'absolute', opacity: 0, width: 1, height: 1, pointerEvents: 'auto' }}
+                  // Keep the input accessible via the <label htmlFor="...">, but prevent it from
+                  // accidentally intercepting pointer events over the action chips.
+                  style={{ position: 'absolute', opacity: 0, width: 1, height: 1, pointerEvents: 'none' }}
                   onChange={(e) => handleFiles(e.target.files)}
                 />
                 <label htmlFor="file-upload-input">
@@ -737,4 +739,3 @@ Supports: 50K+ rows, 14 file types`
     </>
   )
 }
-
