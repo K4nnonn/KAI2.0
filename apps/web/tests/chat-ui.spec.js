@@ -173,6 +173,99 @@ test.describe('Kai Chat UI', () => {
     await expect(page.getByRole('button', { name: /connect sa360/i })).toBeVisible({ timeout: 60000 })
   })
 
+  test('SA360 connect opens OAuth popup with opener context (regression guard)', async ({ page }) => {
+    requireFrontend()
+
+    const ctx = page.context()
+    const newSession = `ui-${Date.now()}`
+    await page.addInitScript(({ key, value, accessKey }) => {
+      sessionStorage.setItem(accessKey, 'true')
+      sessionStorage.setItem(key, value)
+    }, { key: 'kai_chat_session_id', value: newSession, accessKey: 'kai_access_granted_v2' })
+
+    await ctx.route('**/api/sa360/oauth/status**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ connected: false, login_customer_id: null, default_customer_id: null }),
+      })
+    })
+    await ctx.route('**/api/sa360/oauth/start-url**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ url: `${frontendUrl}/oauth-popup-probe` }),
+      })
+    })
+    // Popup runs in a separate Playwright page; route at the browser-context level.
+    await ctx.route('**/oauth-popup-probe', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: `<!doctype html><html><body><div id="probe"></div><script>
+          const hasOpener = !!window.opener;
+          document.getElementById('probe').textContent = hasOpener ? 'opener-ok' : 'opener-missing';
+        </script></body></html>`,
+      })
+    })
+
+    await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
+    const connectBtn = page.getByRole('button', { name: /connect sa360/i })
+    await expect(connectBtn).toBeVisible({ timeout: 60000 })
+
+    const popupPromise = page.waitForEvent('popup', { timeout: 15000 })
+    const startReq = page.waitForRequest((req) => req.url().includes('/api/sa360/oauth/start-url') && req.method() === 'GET', { timeout: 15000 })
+    await connectBtn.click()
+    await startReq
+    const popup = await popupPromise
+    await popup.waitForLoadState('domcontentloaded')
+    await expect(popup.locator('#probe')).toHaveText(/opener-ok/i, { timeout: 10000 })
+    await expect(page.getByText(/popup blocked/i)).toHaveCount(0)
+  })
+
+  test('SA360 connect falls back to same-tab redirect when popup handle is unavailable', async ({ page }) => {
+    requireFrontend()
+
+    const ctx = page.context()
+    const newSession = `ui-${Date.now()}`
+    await page.addInitScript(({ key, value, accessKey }) => {
+      sessionStorage.setItem(accessKey, 'true')
+      sessionStorage.setItem(key, value)
+      window.open = () => null
+    }, { key: 'kai_chat_session_id', value: newSession, accessKey: 'kai_access_granted_v2' })
+
+    await ctx.route('**/api/sa360/oauth/status**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ connected: false, login_customer_id: null, default_customer_id: null }),
+      })
+    })
+    await ctx.route('**/api/sa360/oauth/start-url**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ url: `${frontendUrl}/oauth-fallback-test` }),
+      })
+    })
+    await ctx.route('**/oauth-fallback-test', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>oauth-fallback-ok</body></html>' })
+    })
+
+    await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
+    const connectBtn = page.getByRole('button', { name: /connect sa360/i })
+    await expect(connectBtn).toBeVisible({ timeout: 60000 })
+    const startReq = page.waitForRequest((req) => req.url().includes('/api/sa360/oauth/start-url') && req.method() === 'GET', { timeout: 15000 })
+    await connectBtn.click()
+    await startReq
+
+    await expect.poll(async () => {
+      const inFallbackUrl = /oauth-fallback-test/i.test(page.url())
+      const hasFallbackBanner = (await page.getByText(/continuing sign-in in this tab/i).count()) > 0
+      return inFallbackUrl || hasFallbackBanner
+    }, { timeout: 15000 }).toBe(true)
+  })
+
   test('SA360 not-connected blocks performance planner with clear CTA', async ({ page }) => {
     requireFrontend()
     test.skip(!backendUrl, 'BACKEND_URL not set; skipping planner block check')
@@ -333,6 +426,92 @@ test.describe('Kai Chat UI', () => {
 
     // UX requirement: user gets an explicit, visible confirmation that the MCC was saved.
     await expect(page.getByText(/Manager ID saved/i)).toBeVisible({ timeout: 60000 })
+  })
+
+  test('selected account is propagated into PMax chat requests', async ({ page }) => {
+    requireFrontend()
+
+    const ctx = page.context()
+    const newSession = `ui-${Date.now()}`
+    await page.addInitScript(({ key, value, accessKey }) => {
+      sessionStorage.setItem(accessKey, 'true')
+      sessionStorage.setItem(key, value)
+    }, { key: 'kai_chat_session_id', value: newSession, accessKey: 'kai_access_granted_v2' })
+
+    await ctx.route('**/api/sa360/oauth/status**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          connected: true,
+          login_customer_id: '4146247196',
+          default_customer_id: '7902313748',
+          default_account_name: 'Havas_Shell_GoogleAds_US_Mobility Loyalty',
+        }),
+      })
+    })
+    await ctx.route('**/api/sa360/accounts**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { customer_id: '7902313748', name: 'Havas_Shell_GoogleAds_US_Mobility Loyalty', manager: false },
+          { customer_id: '4301133105', name: 'Havas_Shell_GoogleAds_CA_Retail_Mobility', manager: false },
+        ]),
+      })
+    })
+    await ctx.route('**/api/chat/route', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          intent: 'pmax',
+          tool: 'pmax',
+          run_planner: false,
+          run_trends: false,
+          customer_ids: [],
+          needs_ids: false,
+        }),
+      })
+    })
+
+    let chatSendPayload = null
+    await ctx.route('**/api/chat/send', async (route) => {
+      try {
+        chatSendPayload = route.request().postDataJSON()
+      } catch {
+        chatSendPayload = null
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          reply: 'PMax analysis started for your selected account.',
+          role: 'assistant',
+          model: 'rules',
+          sources: [],
+        }),
+      })
+    })
+
+    await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
+    await expect(page.getByText(/SA360 connected/i)).toBeVisible({ timeout: 60000 })
+
+    const accountInput = page.getByRole('combobox', { name: 'Account (by name)' })
+    await accountInput.click()
+    await accountInput.fill('Mobility Loyalty')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
+
+    const input = page.getByPlaceholder('Ask Kai anything... audit, analyze, create, or explore')
+    await input.fill('Analyze my PMax placements')
+    await page.keyboard.press('Enter')
+
+    await expect.poll(() => chatSendPayload !== null, { timeout: 15000 }).toBe(true)
+    expect(Array.isArray(chatSendPayload?.context?.customer_ids)).toBeTruthy()
+    expect(chatSendPayload.context.customer_ids).toContain('7902313748')
+    expect(String(chatSendPayload?.account_name || '')).toContain('Mobility Loyalty')
+    await expect(page.getByText(/need to know which SA360 account to use/i)).toHaveCount(0)
   })
 })
 

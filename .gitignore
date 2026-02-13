@@ -1,6 +1,10 @@
 # --- Kai repo ignores ---
 verification_runs/
 **/verification_runs/
+integrity_runs/
+runtime/
+scripts/verification/tmp_specs_oauth/
+nuitka-crash-report.xml
 playwright-report/
 test-results/
 **/test-results/

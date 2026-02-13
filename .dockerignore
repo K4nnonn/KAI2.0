@@ -4,6 +4,13 @@
 **/dist
 **/.env
 **/.env.*
+integrity_runs
+verification_runs
+runtime
+scripts/verification/tmp_specs_oauth
+scripts/verification/tmp_specs_single
+nuitka-crash-report.xml
+build
 .git
 .gitignore
 .vscode

@@ -1008,13 +1008,9 @@ export default function KaiChat() {
     setSa360StatusError(null)
     setSa360StatusSuccess('Opening Google sign-in…')
     // Open popup synchronously (prevents popup blockers), then navigate once we fetch the OAuth URL.
-    // NOTE: we intentionally fetch the URL via XHR so Authorization headers (Entra SSO) can scope tokens per-user.
-    const w = window.open('about:blank', 'kai_sa360_oauth', 'popup,width=520,height=720,noopener,noreferrer')
-    if (!w) {
-      setSa360StatusSuccess(null)
-      setSa360StatusError('Popup blocked. Please allow popups for this site and try again.')
-      return
-    }
+    // NOTE: do not use noopener/noreferrer here; callback relies on window.opener.postMessage.
+    // Some browsers return null when noopener is set, causing a blank about:blank popup.
+    const w = window.open('about:blank', 'kai_sa360_oauth', 'popup,width=520,height=720')
 
     axios
       .get(`${API_BASE_URL}/api/sa360/oauth/start-url`, {
@@ -1025,10 +1021,19 @@ export default function KaiChat() {
         if (!nextUrl) {
           throw new Error('No OAuth URL returned.')
         }
-        try {
-          w.location.href = nextUrl
-        } catch {
-          // best-effort fallback; popup may have been blocked after open
+        let navigatedPopup = false
+        if (w) {
+          try {
+            w.location.href = nextUrl
+            if (typeof w.focus === 'function') w.focus()
+            navigatedPopup = true
+          } catch {
+            navigatedPopup = false
+          }
+        }
+        if (!navigatedPopup) {
+          // Popup was blocked or inaccessible; continue OAuth in the same tab as a safe fallback.
+          setSa360StatusSuccess('Popup unavailable; continuing sign-in in this tab…')
           window.location.assign(nextUrl)
         }
         // Fallback polling in case postMessage is blocked by the browser.
