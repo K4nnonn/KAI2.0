@@ -47,6 +47,13 @@ test.describe('SA360 OAuth Live Smoke', () => {
     const connectBtn = page.getByRole('button', { name: /connect sa360/i })
     await expect(connectBtn).toBeVisible({ timeout: 60000 })
 
+    // Avoid flaky external network dependencies while still validating that the UI:
+    // - opens a popup (not null)
+    // - navigates it away from about:blank to the expected Google OAuth URL (with critical params).
+    await page.context().route('https://accounts.google.com/**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>oauth-ok</body></html>' })
+    })
+
     const popupPromise = page.waitForEvent('popup', { timeout: 15000 })
     await connectBtn.click()
     const popup = await popupPromise

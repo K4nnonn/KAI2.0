@@ -1,8 +1,7 @@
-import { test, expect, request } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
 const frontendUrl = (process.env.FRONTEND_URL || '').trim()
-const backendUrl = (process.env.BACKEND_URL || '').trim()
-const sessionId = (process.env.KAI_SESSION_ID || '').trim()
+const sessionId = (process.env.KAI_SESSION_ID || '').trim() || 'ui_account_picker_session'
 
 const requireFrontend = () => {
   test.skip(!frontendUrl, 'FRONTEND_URL not set; skipping UI tests')
@@ -22,42 +21,72 @@ test.describe('Account Picker UX', () => {
 
   test('selecting an account by name triggers plan-and-run with that customer_id', async ({ page }) => {
     requireFrontend()
-    test.skip(!backendUrl || !sessionId, 'BACKEND_URL or KAI_SESSION_ID not set')
-
-    const ctx = await request.newContext()
-    const statusResp = await ctx.get(`${backendUrl}/api/sa360/oauth/status?session_id=${encodeURIComponent(sessionId)}`)
-    test.skip(!statusResp.ok(), 'SA360 status unavailable')
-    const statusBody = await statusResp.json()
-    test.skip(!statusBody?.connected, 'SA360 not connected')
+    // Deterministic sandbox: this test validates UI wiring (account selection -> plan-and-run payload),
+    // not live SA360 quota/availability. Live SA360 coverage is handled in planner.spec.js.
+    await page.route('**/api/sa360/oauth/status**', async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          connected: true,
+          login_customer_id: '4146247196',
+          default_customer_id: null,
+          default_account_name: null,
+        }),
+      })
+    })
+    await page.route('**/api/sa360/accounts**', async (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { customer_id: '7902313748', name: 'Havas_Shell_GoogleAds_US_Mobility Loyalty', manager: false },
+        ]),
+      })
+    })
+    await page.route('**/api/chat/route', async (route) => {
+      // Ensure the UI uses the planner path and relies on the active account selection.
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          tool: 'performance',
+          intent: 'performance',
+          run_planner: true,
+          needs_ids: false,
+        }),
+      })
+    })
+    let observedPlanBody = null
+    await page.route('**/api/chat/plan-and-run', async (route) => {
+      try {
+        observedPlanBody = JSON.parse(route.request().postData() || '{}')
+      } catch {
+        observedPlanBody = null
+      }
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          executed: true,
+          result: { mode: 'performance' },
+          analysis: {
+            drivers: {
+              campaign: [{ id: 'camp_1', name: 'Brand', delta: 10 }],
+              device: [{ name: 'Mobile', delta: 5 }],
+            },
+          },
+          summary: 'Stubbed performance summary.',
+        }),
+      })
+    })
 
     await seedSession(page)
     await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
 
     // Broad-beta UX: account selection is explicit and visible in the header ("Account (by name)").
-    // If the MCC isn't set yet, set it so the account picker can load accounts.
-    const ensureAccountPicker = async () => {
-      const picker = page.getByLabel('Account (by name)')
-      try {
-        await expect(picker).toBeVisible({ timeout: 5000 })
-        return picker
-      } catch {
-        // MCC not set; set it and wait for the picker to appear.
-        const mccInput = page.getByLabel('Manager ID (MCC)')
-        await expect(mccInput).toBeVisible({ timeout: 60000 })
-        await mccInput.fill('4146247196')
-        await page.getByRole('button', { name: /save mcc/i }).click()
-        // UX copy can vary; contract is that save succeeds and account picker becomes usable.
-        const saveToast = page.getByText(/Manager ID saved|Manager \(MCC\) saved/i)
-        await Promise.race([
-          saveToast.waitFor({ state: 'visible', timeout: 20000 }),
-          picker.waitFor({ state: 'visible', timeout: 60000 }),
-        ])
-        await expect(picker).toBeVisible({ timeout: 60000 })
-        return picker
-      }
-    }
-
-    const accountPicker = await ensureAccountPicker()
+    const accountPicker = page.getByLabel('Account (by name)')
+    await expect(accountPicker).toBeVisible({ timeout: 60000 })
 
     // Select the intended account by name (not by ID copy/paste).
     await accountPicker.fill('Loyalty')
@@ -68,12 +97,7 @@ test.describe('Account Picker UX', () => {
     const planRespPromise = page.waitForResponse(async (resp) => {
       if (!resp.url().includes('/api/chat/plan-and-run')) return false
       if (resp.request().method() !== 'POST') return false
-      try {
-        const body = JSON.parse(resp.request().postData() || '{}')
-        return body.session_id === sessionId && Array.isArray(body.customer_ids) && body.customer_ids.includes('7902313748')
-      } catch {
-        return false
-      }
+      return true
     }, { timeout: 210000 })
 
     const chatInput = page.getByPlaceholder('Ask Kai anything... audit, analyze, create, or explore')
@@ -84,6 +108,12 @@ test.describe('Account Picker UX', () => {
     const planResp = await planRespPromise
     expect(planResp.ok()).toBeTruthy()
     const json = await planResp.json()
+
+    // Contract: UI must send the selected account id (not rely on a baked-in router list).
+    expect(observedPlanBody).toBeTruthy()
+    expect(Array.isArray(observedPlanBody.customer_ids)).toBeTruthy()
+    expect(observedPlanBody.customer_ids).toContain('7902313748')
+    expect(observedPlanBody.session_id).toBeTruthy()
 
     // Contract: selecting an account should run the planner and return a performance payload.
     expect(json.executed).toBeTruthy()
