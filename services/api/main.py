@@ -6933,7 +6933,9 @@ async def diagnostics_advisor(req: AdvisorCheckRequest):
     reply, meta = _call_local_llm(
         messages,
         intent="advisor_check",
-        max_tokens=240,
+        # Keep this fast and reliable: we only need a small JSON rubric object.
+        # (Large token budgets can exceed LOCAL_LLM_TIMEOUT_SECONDS and cause false failures.)
+        max_tokens=120,
         force_json=True,
     )
     if not reply:
