@@ -2125,7 +2125,7 @@ export default function KaiChat() {
                       <TextField
                         {...params}
                         label="Account (by name)"
-                        placeholder={accountsLoading ? 'Loading accounts…' : 'Select an account'}
+                        placeholder={accountsLoading ? 'Loading accounts…' : 'Search accounts or paste an ID'}
                         InputProps={{
                           ...params.InputProps,
                           endAdornment: (
