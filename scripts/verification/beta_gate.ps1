@@ -102,11 +102,15 @@ try {
     status = "running"
   }
   $uiOut = & powershell -ExecutionPolicy Bypass @uiArgs 2>&1
+  $uiExit = $LASTEXITCODE
   $uiLog = Join-Path $RunDir "ui_e2e_output.txt"
   (Redact-Text ($uiOut | Out-String)) | Set-Content -Path $uiLog -Encoding UTF8
-  $meta.steps[-1].status = "ok"
+  $meta.steps[-1].status = if ($uiExit -eq 0) { "ok" } else { "error" }
   $meta.steps[-1].finished_at = (Get-Date).ToString("o")
   $meta.steps[-1].output_log = $uiLog
+  if ($uiExit -ne 0) {
+    throw ("ui_e2e failed (exit " + [string]$uiExit + "). See: " + $uiLog)
+  }
 
   $qaArgs = @("-File", $fullQaScript, "-Backend", $Backend)
   if ($Mode -eq "offline") { $qaArgs += "-SkipSa360" } else { $qaArgs += @("-SessionId", $effectiveSession) }
@@ -118,11 +122,15 @@ try {
     status = "running"
   }
   $qaOut = & powershell -ExecutionPolicy Bypass @qaArgs 2>&1
+  $qaExit = $LASTEXITCODE
   $qaLog = Join-Path $RunDir "full_qa_output.txt"
   (Redact-Text ($qaOut | Out-String)) | Set-Content -Path $qaLog -Encoding UTF8
-  $meta.steps[-1].status = "ok"
+  $meta.steps[-1].status = if ($qaExit -eq 0) { "ok" } else { "error" }
   $meta.steps[-1].finished_at = (Get-Date).ToString("o")
   $meta.steps[-1].output_log = $qaLog
+  if ($qaExit -ne 0) {
+    throw ("full_qa failed (exit " + [string]$qaExit + "). See: " + $qaLog)
+  }
 
   # Attach summaries (share-safe) + enforce online lane (no "false green" when SA360 is broken).
   $uiRunDir = $null
@@ -185,6 +193,46 @@ try {
     } catch {}
     if ($failed.Count -gt 0) {
       throw ("Online gate failed: " + ($failed -join ", "))
+    }
+  } else {
+    # Offline gate should still be strict (no "false green" runs).
+    if (-not $meta.ui_e2e) { throw "Offline gate failed: missing ui_e2e summary." }
+    if (-not $meta.ui_e2e.playwright_counts -or -not $meta.ui_e2e.playwright_counts.gate_ok) {
+      $reason = $meta.ui_e2e.playwright_counts.gate_reason
+      if ([string]::IsNullOrWhiteSpace($reason)) { $reason = "unknown" }
+      throw ("Offline gate failed: ui_e2e gate not OK (" + $reason + ").")
+    }
+    if (-not $meta.full_qa) { throw "Offline gate failed: missing full_qa summary." }
+
+    $hardChecks = @(
+      @{ key = "health_ok"; label = "API health" },
+      @{ key = "diagnostics_ok"; label = "API diagnostics" },
+      @{ key = "auth_wrong_rejected_ok"; label = "Auth wrong password rejected" },
+      @{ key = "chat_latency_ok"; label = "Chat latency budget" },
+      @{ key = "creative_ok"; label = "Creative endpoint" },
+      @{ key = "audit_expected_fail"; label = "Audit missing data returns 400" },
+      @{ key = "pmax_ok"; label = "PMax endpoint" },
+      @{ key = "serp_ok"; label = "SERP endpoint" },
+      @{ key = "competitor_ok"; label = "Competitor endpoint" },
+      @{ key = "intel_ok"; label = "Intel endpoint" },
+      @{ key = "multisheet_upload_ok"; label = "Multi-sheet upload" },
+      @{ key = "audit_uploaded_data_ok"; label = "Audit via uploaded data" }
+    )
+
+    # If we were given an access password, require the correct-password auth verify check.
+    try {
+      if ($meta.full_qa.auth_correct_skipped -ne $true) {
+        $hardChecks += @{ key = "auth_correct_ok"; label = "Auth correct password accepted" }
+      }
+    } catch {}
+
+    $failed = @()
+    foreach ($check in $hardChecks) {
+      $val = $meta.full_qa.$($check.key)
+      if ($val -ne $true) { $failed += ($check.label + " (" + $check.key + ")") }
+    }
+    if ($failed.Count -gt 0) {
+      throw ("Offline gate failed: " + ($failed -join ", "))
     }
   }
 
