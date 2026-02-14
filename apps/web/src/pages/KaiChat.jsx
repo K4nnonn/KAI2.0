@@ -1021,9 +1021,25 @@ export default function KaiChat() {
         if (!nextUrl) {
           throw new Error('No OAuth URL returned.')
         }
+        let fallbackTriggered = false
+        const fallbackToSameTab = (reason) => {
+          if (fallbackTriggered) return
+          fallbackTriggered = true
+          try {
+            if (w && typeof w.close === 'function') w.close()
+          } catch {
+            // ignore
+          }
+          // Popup was blocked or inaccessible; continue OAuth in the same tab as a safe fallback.
+          setSa360StatusSuccess(reason || 'Popup unavailable; continuing sign-in in this tab…')
+          window.location.assign(nextUrl)
+        }
+
         let navigatedPopup = false
         if (w) {
           try {
+            // Some COOP/COEP browser policies can block popup.location navigation without throwing.
+            // We still attempt it first, then verify the popup left about:blank before assuming success.
             w.location.href = nextUrl
             if (typeof w.focus === 'function') w.focus()
             navigatedPopup = true
@@ -1032,9 +1048,21 @@ export default function KaiChat() {
           }
         }
         if (!navigatedPopup) {
-          // Popup was blocked or inaccessible; continue OAuth in the same tab as a safe fallback.
-          setSa360StatusSuccess('Popup unavailable; continuing sign-in in this tab…')
-          window.location.assign(nextUrl)
+          fallbackToSameTab('Popup unavailable; continuing sign-in in this tab…')
+        } else if (w) {
+          // If the popup stays on about:blank, the navigation was blocked (common with strict COOP).
+          // Fall back to same-tab OAuth so the user isn't left with a blank window.
+          setTimeout(() => {
+            if (fallbackTriggered) return
+            try {
+              const href = String(w.location?.href || '')
+              if (href && href.startsWith('about:blank')) {
+                fallbackToSameTab('Popup blocked by browser policy; continuing sign-in in this tab…')
+              }
+            } catch {
+              // Cross-origin access throws once navigated; treat that as success.
+            }
+          }, 250)
         }
         // Fallback polling in case postMessage is blocked by the browser.
         setTimeout(fetchSa360Status, 2500)
