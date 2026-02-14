@@ -5268,37 +5268,60 @@ def _compute_custom_metric_breakdown(
     priority = ["campaign_conversion_action", "keyword_performance_conv", "keyword_performance", "campaign", "ad_group", "ad"]
     for frame_name in priority:
         cur_df = frames_current.get(frame_name)
-        if cur_df is None or cur_df.empty:
+        prev_df = frames_previous.get(frame_name) if frames_previous else None
+        cur_has_rows = cur_df is not None and not cur_df.empty
+        prev_has_rows = prev_df is not None and not prev_df.empty
+        if not cur_has_rows and not prev_has_rows:
             continue
-        key_col = _find_key_col(cur_df, key_candidates)
+
+        # Prefer a stable key that exists in both windows when possible (prevents mismatched names across weeks).
+        base_df = cur_df if cur_has_rows else prev_df
+        key_col = _find_key_col(base_df, key_candidates) if base_df is not None else None
         if not key_col:
             continue
-        # If we have a previous window and schema evolved (e.g., added campaign.name), prefer a key that exists in both.
-        prev_df = frames_previous.get(frame_name) if frames_previous else None
-        if prev_df is not None and not prev_df.empty and key_col not in prev_df.columns:
+
+        if cur_has_rows and prev_has_rows:
             both = [c for c in key_candidates if c in cur_df.columns and c in prev_df.columns]
             if both:
                 key_col = both[0]
-        cur_sub, metric_col = _filter_custom_metric_rows(cur_df, metric_key)
-        if cur_sub is None or metric_col is None:
-            continue
-        cur_metrics = _aggregate_frame_custom(cur_sub, key_col, metric_key, metric_col)
-        if not cur_metrics:
-            continue
-        prev_metrics = {}
-        if prev_df is not None and not prev_df.empty:
+
+        cur_sub, cur_col = (None, None)
+        if cur_has_rows:
+            cur_sub, cur_col = _filter_custom_metric_rows(cur_df, metric_key)
+        prev_sub, prev_col = (None, None)
+        if prev_has_rows:
             prev_sub, prev_col = _filter_custom_metric_rows(prev_df, metric_key)
-            if prev_sub is not None and prev_col is not None:
-                try:
-                    prev_metrics = _aggregate_frame_custom(prev_sub, key_col, metric_key, prev_col)
-                except KeyError:
-                    # Last-resort safety: if key_col isn't present in prev_sub due to older cached schema, skip prev metrics.
-                    prev_metrics = {}
+
+        # If the metric appears only in the previous window (common for "dropped to 0" scenarios),
+        # we still want to surface the drivers. Treat the missing window as 0 only when the report
+        # itself has rows (meaning the query succeeded and the metric simply had no rows).
+        if cur_sub is None and prev_sub is None:
+            continue
+
+        cur_metrics = (
+            _aggregate_frame_custom(cur_sub, key_col, metric_key, cur_col)
+            if (cur_sub is not None and cur_col)
+            else {}
+        )
+        prev_metrics = (
+            _aggregate_frame_custom(prev_sub, key_col, metric_key, prev_col)
+            if (prev_sub is not None and prev_col)
+            else {}
+        )
+        if not cur_metrics and not prev_metrics:
+            continue
 
         items: list[dict] = []
         for name in set(cur_metrics) | set(prev_metrics):
             cur = (cur_metrics.get(name) or {}).get(metric_key)
             prev = (prev_metrics.get(name) or {}).get(metric_key)
+
+            # If one side is missing for this dimension, treat it as 0 when that side's report has rows.
+            # This avoids empty "drivers" when a conversion action drops to 0 in the current window.
+            if cur is None and prev is not None and cur_has_rows:
+                cur = 0.0
+            if prev is None and cur is not None and prev_has_rows:
+                prev = 0.0
             if cur is None and prev is None:
                 continue
             change = None if (cur is None or prev is None) else (cur - prev)
