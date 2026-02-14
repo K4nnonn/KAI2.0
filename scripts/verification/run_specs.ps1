@@ -263,7 +263,7 @@ function Parse-MetricFromSummary([string]$Summary, [string]$Label) {
   switch ($Label) {
     "conversions" {
       # PowerShell single-quoted strings do not treat backslash as an escape. Use \s for whitespace (not \\s).
-      if ($Summary -match 'Conversions:\s*([0-9]+(?:\.[0-9]+)?)') { return [double]$matches[1] }
+      if ($Summary -match 'Conversions:\s*([0-9,]+(?:\.[0-9]+)?)') { return [double]($matches[1] -replace ',', '') }
     }
     "cost" {
       if ($Summary -match 'Cost:\s*\$([0-9,]+(?:\.[0-9]+)?)') { return [double]($matches[1] -replace ',', '') }
