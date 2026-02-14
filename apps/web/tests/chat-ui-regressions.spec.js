@@ -34,6 +34,17 @@ test.describe('Kai Chat UI regressions', () => {
         }),
       })
     })
+    await page.route('**/api/sa360/accounts**', async (route) => {
+      // Keep this test fully deterministic: avoid calling the live SA360 accounts endpoint,
+      // which can add 30s+ latency and cause false negatives in request watchers.
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { customer_id: '7902313748', name: 'QA Account', manager: false },
+        ]),
+      })
+    })
 
     await page.route('**/api/chat/route', async (route) => {
       return route.fulfill({
@@ -153,6 +164,18 @@ test.describe('Kai Chat UI regressions', () => {
           default_customer_id: '7902313748',
           default_account_name: 'QA Account',
         }),
+      })
+    })
+    await page.route('**/api/sa360/accounts**', async (route) => {
+      // Deterministic sandboxing: avoid the live SA360 accounts endpoint.
+      // The chat send handler awaits this call when routing resolves a customer_id
+      // but the local account cache is empty.
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { customer_id: '7902313748', name: 'QA Account', manager: false },
+        ]),
       })
     })
 
