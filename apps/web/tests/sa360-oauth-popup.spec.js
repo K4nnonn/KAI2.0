@@ -77,6 +77,7 @@ test.describe('SA360 OAuth Popup Robustness', () => {
     await expect(connect).toBeVisible()
 
     const startReq = page.waitForRequest(/\/api\/sa360\/oauth\/start-url/i)
+    const oauthReqPromise = page.waitForRequest(/accounts\.google\.com/i, { timeout: 15_000 }).catch(() => null)
 
     // If a real popup is created, this test isn't exercising the blank-popup fallback.
     const popupPromise = page.waitForEvent('popup', { timeout: 2000 }).catch(() => null)
@@ -84,8 +85,13 @@ test.describe('SA360 OAuth Popup Robustness', () => {
     await connect.click()
     await startReq
 
+    // Capture openCalled *before* the app falls back to same-tab navigation.
+    // Once navigation happens, our init script runs again on the new document and the counter resets.
+    await page.waitForTimeout(50)
+    const openCalledEarly = await page.evaluate(() => window.__pwOpenCalled || 0)
+
     const popup = await popupPromise
-    const openCalled = await page.evaluate(() => window.__pwOpenCalled || 0)
+    const openCalled = openCalledEarly
 
     if (popup) {
       await testInfo.attach('console.txt', {
@@ -98,8 +104,9 @@ test.describe('SA360 OAuth Popup Robustness', () => {
     // Sanity: ensure our stub window.open was invoked.
     expect(openCalled).toBeGreaterThan(0)
 
-    // The app should detect the popup stayed blank and fall back to same-tab OAuth.
-    await page.waitForURL(/accounts\.google\.com/i, { timeout: 15_000 })
-    expect(page.url()).toMatch(/accounts\.google\.com/i)
+    // The app should detect the popup stayed blank and fall back to same-tab OAuth,
+    // issuing a request to Google OAuth in the main page (not via the popup stub).
+    const oauthReq = await oauthReqPromise
+    expect(oauthReq, 'Expected same-tab OAuth request to accounts.google.com').not.toBeNull()
   })
 })
