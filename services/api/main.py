@@ -3387,6 +3387,21 @@ ADS_CSV_SCHEMAS = {
         "segments.device",
         "segments.geo_target_region",
     ],
+    # Lightweight performance slice for driver breakdowns (campaign + device).
+    # This keeps "Which campaigns drove it?" answers grounded without pulling keyword-level rows.
+    "campaign_performance": [
+        "campaign.id",
+        "campaign.name",
+        "segments.device",
+        "metrics.impressions",
+        "metrics.clicks",
+        "metrics.cost_micros",
+        "metrics.conversions",
+        "metrics.conversions_value",
+        "metrics.ctr",
+        "metrics.average_cpc",
+        "metrics.cost_per_conversion",
+    ],
     "ad_group": [
         "ad_group.id",
         "ad_group.name",
@@ -3520,6 +3535,23 @@ SA360_QUERIES = {
           campaign.campaign_budget,
           campaign.target_cpa.target_cpa_micros,
           campaign.target_roas.target_roas
+        FROM campaign
+        WHERE campaign.status != 'REMOVED'
+    """,
+    # Campaign performance rows for driver analysis (campaign/device rollups).
+    "campaign_performance": """
+        SELECT
+          campaign.id,
+          campaign.name,
+          segments.device,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros,
+          metrics.conversions,
+          metrics.conversions_value,
+          metrics.ctr,
+          metrics.average_cpc,
+          metrics.cost_per_conversion
         FROM campaign
         WHERE campaign.status != 'REMOVED'
     """,
@@ -5181,7 +5213,7 @@ def _compute_dimension_breakdown(
     metric_key: str,
     limit: int = 3,
 ) -> list[dict]:
-    priority = ["campaign", "ad_group", "ad", "keyword_performance"]
+    priority = ["campaign_performance", "campaign", "ad_group", "ad", "keyword_performance"]
     for frame_name in priority:
         cur_df = frames_current.get(frame_name)
         if cur_df is None or cur_df.empty:
@@ -5821,6 +5853,17 @@ async def _chat_plan_and_run_core(req: PlanRequest, request: Request | None = No
             perf_reports = ["customer_performance", "account"]
             msg_lower = (req.message or "").lower()
             is_action_request_prefetch = _is_performance_action_request(req.message)
+            # Driver/breakdown questions need a metric-bearing campaign slice. The existing "campaign" report is
+            # mostly configuration fields, so we add a lightweight campaign_performance frame when the user
+            # asks "which campaigns"/"drivers" style questions.
+            wants_driver_breakdown = (
+                _has_dimension_cue(req.message)
+                or ("driver" in msg_lower)
+                or ("drivers" in msg_lower)
+                or ("which" in msg_lower)
+            )
+            if wants_driver_breakdown and "campaign_performance" not in perf_reports:
+                perf_reports.append("campaign_performance")
             wants_campaign = any(t in msg_lower for t in ("campaign", "campaigns", "pmax", "performance max"))
             wants_ad_group = any(t in msg_lower for t in ("ad group", "adgroup", "ad groups", "adgroups"))
             wants_ads = any(t in msg_lower for t in ("ad copy", "rsa", "headline", "headlines", "description", "descriptions"))
@@ -9631,7 +9674,7 @@ def _aggregate_account_performance(frames: dict[str, pd.DataFrame]) -> dict:
     if not frames:
         return {}
 
-    priority = ["customer_performance", "keyword_performance", "campaign", "ad_group", "ad"]
+    priority = ["customer_performance", "campaign_performance", "keyword_performance", "campaign", "ad_group", "ad"]
 
     def pick_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
         for c in candidates:
@@ -9686,6 +9729,7 @@ def _get_perf_frame_debug(frames: dict[str, pd.DataFrame]) -> dict:
     """
     priority = [
         "customer_performance",
+        "campaign_performance",
         "keyword_performance",
         "campaign",
         "ad_group",

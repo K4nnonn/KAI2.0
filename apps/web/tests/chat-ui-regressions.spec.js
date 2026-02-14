@@ -194,13 +194,20 @@ test.describe('Kai Chat UI regressions', () => {
       if (req.method() !== 'POST') return route.continue()
       let body = {}
       try { body = JSON.parse(req.postData() || '{}') } catch {}
-      if (body?.context?.prompt_kind !== 'planner_summary') return route.continue()
+      if (body?.context?.prompt_kind === 'planner_summary') {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            reply: `${injectedMarker}. No date specified; defaulting to LAST_7_DAYS.`,
+          }),
+        })
+      }
+      // Never fall through to the real backend in regression tests (keeps runs deterministic).
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({
-          reply: `${injectedMarker}. No date specified; defaulting to LAST_7_DAYS.`,
-        }),
+        body: JSON.stringify({ reply: 'ok' }),
       })
     })
 
@@ -211,21 +218,27 @@ test.describe('Kai Chat UI regressions', () => {
     await expect(input).toBeVisible()
 
     const firstMsg = 'Show me last week performance for 7902313748'
+    // Register the request watcher *before* sending the message to avoid a race
+    // where the request completes before waitForRequest is attached.
+    const summaryReqPromise = page
+      .waitForRequest((req) => {
+        if (!req.url().includes('/api/chat/send')) return false
+        if (req.method() !== 'POST') return false
+        try {
+          const body = JSON.parse(req.postData() || '{}')
+          return body.context?.prompt_kind === 'planner_summary'
+        } catch {
+          return false
+        }
+      }, { timeout: 30000 })
+      .then(() => true)
+      .catch(() => false)
     await input.fill(firstMsg)
     await page.keyboard.press('Enter')
 
     // Ensure the UI actually invoked the planner_summary follow-up (otherwise the marker
     // may never appear if the request was skipped due to a regression).
-    const summaryReqObserved = await page.waitForRequest((req) => {
-      if (!req.url().includes('/api/chat/send')) return false
-      if (req.method() !== 'POST') return false
-      try {
-        const body = JSON.parse(req.postData() || '{}')
-        return body.context?.prompt_kind === 'planner_summary'
-      } catch {
-        return false
-      }
-    }, { timeout: 30000 }).then(() => true).catch(() => false)
+    const summaryReqObserved = await summaryReqPromise
 
     if (summaryReqObserved) {
       await expect(page.getByText(new RegExp(injectedMarker))).toBeVisible({ timeout: 30000 })
