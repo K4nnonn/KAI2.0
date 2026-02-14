@@ -3732,6 +3732,33 @@ def _parse_human_date(message: str, default: str | None = None) -> str | None:
     # Expanded natural-language span parsing for PPC-style queries
     msg = message.lower()
 
+    def _parse_explicit_range(span: str | None) -> tuple[date, date] | None:
+        """
+        Accept only explicit yyyy-mm-dd,yyyy-mm-dd spans. Used to honor UI-supplied stable windows
+        (e.g., exclude recent days with reporting backfill) without changing behavior when the
+        caller passes relative presets.
+        """
+        if not span or not isinstance(span, str):
+            return None
+        raw = span.strip()
+        match = re.fullmatch(r"(\\d{4}-\\d{2}-\\d{2})\\s*,\\s*(\\d{4}-\\d{2}-\\d{2})", raw)
+        if not match:
+            return None
+        try:
+            start = datetime.strptime(match.group(1), "%Y-%m-%d").date()
+            end = datetime.strptime(match.group(2), "%Y-%m-%d").date()
+        except Exception:
+            return None
+        if end < start:
+            return None
+        return start, end
+
+    def _inclusive_days(sp: tuple[date, date]) -> int:
+        try:
+            return int((sp[1] - sp[0]).days) + 1
+        except Exception:
+            return 0
+
     def _range_days(n: int) -> str:
         end = date.today()
         start = end - timedelta(days=max(n - 1, 0))
@@ -3768,16 +3795,34 @@ def _parse_human_date(message: str, default: str | None = None) -> str | None:
         end = this_week_start - timedelta(days=1)  # Sunday
         return f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
     if "last 7" in msg or "past 7" in msg or "previous 7" in msg:
+        explicit = _parse_explicit_range(default)
+        if explicit and _inclusive_days(explicit) == 7:
+            return default
         return _range_days(7)
     if "last 14" in msg or "past 14" in msg or "previous 14" in msg or "last two weeks" in msg or "last 2 weeks" in msg:
+        explicit = _parse_explicit_range(default)
+        if explicit and _inclusive_days(explicit) == 14:
+            return default
         return _range_days(14)
     if "last 30" in msg or "past 30" in msg or "previous 30" in msg or "last month" in msg:
+        explicit = _parse_explicit_range(default)
+        if explicit and _inclusive_days(explicit) == 30:
+            return default
         return _range_days(30)
     if "last 90" in msg or "past 90" in msg or "previous 90" in msg or "last quarter" in msg:
+        explicit = _parse_explicit_range(default)
+        if explicit and _inclusive_days(explicit) == 90:
+            return default
         return _range_days(90)
     if "last 3 days" in msg or "past 3 days" in msg or "3 days ago" in msg:
+        explicit = _parse_explicit_range(default)
+        if explicit and _inclusive_days(explicit) == 3:
+            return default
         return _range_days(3)
     if "last 14 days" in msg:
+        explicit = _parse_explicit_range(default)
+        if explicit and _inclusive_days(explicit) == 14:
+            return default
         return _range_days(14)
 
     # Week-to-date / Month-to-date / Quarter-to-date / Year-to-date
