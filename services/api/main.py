@@ -6019,18 +6019,35 @@ async def _chat_plan_and_run_core(req: PlanRequest, request: Request | None = No
                     report_names=perf_reports,
                     session_id=sa360_sid,
                 )
-                frames_previous = (
-                    _collect_sa360_frames(
-                        plan["customer_ids"],
-                        previous_range,
-                        bypass_cache=plan_bypass_cache,
-                        write_cache=(not plan_bypass_cache),
-                        report_names=perf_reports,
-                        session_id=sa360_sid,
-                    )
-                    if previous_range
-                    else {}
-                )
+                if previous_range:
+                    # Fetch current + previous windows in parallel to avoid exceeding ingress timeouts.
+                    # (SA360 calls can take tens of seconds even for small queries; sequential fetches risk >60s.)
+                    from concurrent.futures import ThreadPoolExecutor
+
+                    ids_copy = list(plan["customer_ids"] or [])
+                    with ThreadPoolExecutor(max_workers=2) as executor:
+                        future_current = executor.submit(
+                            _collect_sa360_frames,
+                            ids_copy,
+                            current_range,
+                            bypass_cache=plan_bypass_cache,
+                            write_cache=(not plan_bypass_cache),
+                            report_names=perf_reports,
+                            session_id=sa360_sid,
+                        )
+                        future_previous = executor.submit(
+                            _collect_sa360_frames,
+                            ids_copy,
+                            previous_range,
+                            bypass_cache=plan_bypass_cache,
+                            write_cache=(not plan_bypass_cache),
+                            report_names=perf_reports,
+                            session_id=sa360_sid,
+                        )
+                        frames_current = future_current.result()
+                        frames_previous = future_previous.result()
+                else:
+                    frames_previous = {}
 
             custom_inferred = False
             custom_match: dict[str, Any] | None = None
