@@ -3741,7 +3741,9 @@ def _parse_human_date(message: str, default: str | None = None) -> str | None:
         if not span or not isinstance(span, str):
             return None
         raw = span.strip()
-        match = re.fullmatch(r"(\\d{4}-\\d{2}-\\d{2})\\s*,\\s*(\\d{4}-\\d{2}-\\d{2})", raw)
+        # NOTE: This regex is intentionally written without double-escaping. We want to match a plain
+        # ISO span like "2026-02-01,2026-02-14" so the caller-supplied default window can be honored.
+        match = re.fullmatch(r"(\d{4}-\d{2}-\d{2})\s*,\s*(\d{4}-\d{2}-\d{2})", raw)
         if not match:
             return None
         try:

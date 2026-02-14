@@ -18,7 +18,11 @@ def test_parse_human_date_uses_explicit_default_for_matching_last_14_days():
     This prevents parity/accuracy gates from drifting when SA360 data backfills for very recent days.
     """
     main = _load_main()
-    default_span = "2026-02-01,2026-02-14"
+    # Use an explicit stable span that intentionally differs from the dynamic "last 14 days" computation
+    # (which ends on today). This catches regressions where the explicit default is ignored.
+    stable_end = date.today() - timedelta(days=2)
+    stable_start = stable_end - timedelta(days=13)
+    default_span = f"{stable_start:%Y-%m-%d},{stable_end:%Y-%m-%d}"
     out = main._parse_human_date("give me last 14 days performance", default_span)  # noqa: WPS437
     assert out == default_span
 
@@ -39,4 +43,3 @@ def test_parse_human_date_last_7_days_matches_expected_when_no_default():
     expected = f"{start:%Y-%m-%d},{end:%Y-%m-%d}"
     out = main._parse_human_date("past 7 days performance")  # noqa: WPS437
     assert out == expected
-
