@@ -601,6 +601,83 @@ test.describe('Kai Chat UI', () => {
     expect(String(chatSendPayload?.account_name || '')).toContain('Mobility Loyalty')
     await expect(page.getByText(/need to know which SA360 account to use/i)).toHaveCount(0)
   })
+
+  test('PMax routing clarification prompts account picker when no account is selected', async ({ page }) => {
+    requireFrontend()
+
+    const ctx = page.context()
+    const newSession = `ui-${Date.now()}-pmax-clarify`
+    await page.addInitScript(({ key, value, accessKey }) => {
+      sessionStorage.setItem(accessKey, 'true')
+      sessionStorage.setItem(key, value)
+    }, { key: 'kai_chat_session_id', value: newSession, accessKey: 'kai_access_granted_v2' })
+
+    await ctx.route('**/api/sa360/oauth/status**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          connected: true,
+          login_customer_id: '4146247196',
+          default_customer_id: null,
+          default_account_name: null,
+        }),
+      })
+    })
+    await ctx.route('**/api/sa360/accounts**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { customer_id: '7902313748', name: 'Havas_Shell_GoogleAds_US_Mobility Loyalty', manager: false },
+          { customer_id: '4301133105', name: 'Havas_Shell_GoogleAds_CA_Retail_Mobility', manager: false },
+        ]),
+      })
+    })
+    await ctx.route('**/api/chat/route', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          intent: 'pmax',
+          tool: 'pmax',
+          run_planner: false,
+          run_trends: false,
+          customer_ids: [],
+          needs_ids: false,
+          needs_clarification: true,
+          clarification: 'Which account should I use?',
+          candidates: [
+            { customer_id: '7902313748', name: 'Havas_Shell_GoogleAds_US_Mobility Loyalty', manager: false },
+            { customer_id: '4301133105', name: 'Havas_Shell_GoogleAds_CA_Retail_Mobility', manager: false },
+          ],
+        }),
+      })
+    })
+
+    let chatSendCalled = false
+    await ctx.route('**/api/chat/send', async (route) => {
+      chatSendCalled = true
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ reply: 'unexpected', role: 'assistant', model: 'rules', sources: [] }),
+      })
+    })
+
+    await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
+    await expect(page.getByText(/SA360 connected/i)).toBeVisible({ timeout: 60000 })
+
+    const input = page.getByPlaceholder('Ask Kai anything... audit, analyze, create, or explore')
+    await input.fill('Analyze my PMax placements')
+    await page.keyboard.press('Enter')
+
+    // Contract: when router requests clarification (pmax) and no account is selected, show account picker prompt.
+    const picker = page.getByPlaceholder('Search accounts or paste an ID')
+    await expect(picker).toBeVisible({ timeout: 30000 })
+
+    expect(chatSendCalled).toBe(false)
+  })
 })
 
 test.describe('Tool Chat UI', () => {

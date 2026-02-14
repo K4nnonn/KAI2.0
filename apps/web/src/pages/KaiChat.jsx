@@ -1515,10 +1515,13 @@ export default function KaiChat() {
 
     if (!usePlannerContext) {
       // Only performance/audit planners should prompt for SA360 account selection.
-      // Tools like PMax/SERP/Competitor/Creative can operate without a SA360 customer id.
+      // SERP/Competitor/Creative can run without SA360 account context. PMax may still need an
+      // account when placements are fetched from SA360, so honor router-driven clarification.
+      const toolCanRunWithoutAccount = ['serp', 'competitor', 'creative'].includes(routedSystem)
       const needsAccountClarification =
-        !['pmax', 'serp', 'competitor', 'creative'].includes(routedSystem) &&
-        (routing?.needs_ids || (routing?.needs_clarification && routing?.run_planner))
+        !toolCanRunWithoutAccount &&
+        (routing?.needs_ids ||
+          (routing?.needs_clarification && (routing?.run_planner || routedSystem === 'pmax')))
       if (needsAccountClarification && mergedIds.length === 0) {
         // If SA360 isn't connected, an account picker is a dead-end. Prompt to connect first.
         if (!sa360Status.connected) {
