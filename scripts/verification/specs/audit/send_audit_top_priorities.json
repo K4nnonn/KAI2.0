@@ -1,0 +1,25 @@
+{
+  "id": "SEND_AUDIT_TOP_PRIORITIES",
+  "pillar": "purpose",
+  "kind": "send",
+  "capabilities": ["chat_send", "audit", "advisor_response"],
+  "request": {
+    "message": "Audit this account and tell me the top 3 priorities. Keep it short and actionable.",
+    "ai_enabled": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["audit", "priority", "recommend", "fix"],
+    "min_any_matches": 2,
+    "must_not_include": ["sa360_fetch_and_audit() missing", "traceback", "exception"]
+  },
+  "assert": {
+    "reply_min_len": 120,
+    "reply_not_contains": ["sa360_fetch_and_audit() missing", "traceback", "exception"]
+  }
+}
+

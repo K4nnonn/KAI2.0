@@ -1,0 +1,52 @@
+{
+  "id": "SEND_PERF_ADAPTIVE_NO_INTERNAL_TOKENS",
+  "pillar": "purpose",
+  "kind": "send",
+  "capabilities": ["chat_send", "performance", "advisor_response"],
+  "request": {
+    "message": "Based on the current account context, give me 3 levers to improve performance. Keep it concise and actionable.",
+    "ai_enabled": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["budget", "bid", "keyword", "creative", "landing", "cpa", "cpc", "ctr"],
+    "min_any_matches": 2,
+    "must_not_include": [
+      "router_verify_failed",
+      "router_no_route",
+      "LAST_7_DAYS",
+      "LAST_14_DAYS",
+      "LAST_30_DAYS",
+      "No date specified",
+      "pick an account",
+      "paste an id",
+      "confirm the account"
+    ]
+  },
+  "budgets": {
+    "p95_latency_ms": 8000,
+    "samples": 3
+  },
+  "assert": {
+    "reply_min_len": 140,
+    "reply_not_contains": [
+      "router_verify_failed",
+      "router_no_route",
+      "LAST_7_DAYS",
+      "LAST_14_DAYS",
+      "LAST_30_DAYS",
+      "No date specified",
+      "pick an account",
+      "paste an id",
+      "confirm the account"
+    ],
+    "regex_match": {
+      "__body.reply": "(?is)(budget|bid|keyword|creative|landing|cpa|cpc|ctr)"
+    }
+  }
+}
+

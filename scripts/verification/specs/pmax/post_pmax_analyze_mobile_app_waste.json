@@ -1,0 +1,31 @@
+{
+  "id": "POST_PMAX_ANALYZE_MOBILE_APP_WASTE",
+  "pillar": "quality",
+  "kind": "post",
+  "capabilities": ["pmax", "api_contract"],
+  "request": {
+    "url": "/api/pmax/analyze",
+    "body": {
+      "total_cost": 70.0,
+      "placements": [
+        { "Placement": "mobileapp::1-com.foo", "Cost": 60.0, "Conversions": 0 },
+        { "Placement": "example.com", "Cost": 10.0, "Conversions": 1 }
+      ]
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success"
+  },
+  "assert": {
+    "paths_exist": [
+      "body.result.spend_split.total_cost",
+      "body.result.mobile_app_waste"
+    ],
+    "array_min_len": {
+      "body.result.mobile_app_waste": 1
+    }
+  }
+}
+

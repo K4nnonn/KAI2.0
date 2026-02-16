@@ -2,6 +2,7 @@
   "id": "PLAN_PERF_LAST_WEEK",
   "pillar": "quality",
   "kind": "plan_and_run",
+  "capabilities": ["planner", "performance", "sa360_parity", "sa360_accuracy"],
   "request": {
     "message": "give me last week performance",
     "customer_ids": ["${TARGET_CUSTOMER_ID}"],

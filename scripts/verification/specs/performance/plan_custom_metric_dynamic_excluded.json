@@ -1,0 +1,23 @@
+{
+  "id": "PLAN_CUSTOM_METRIC_DYN_EXCLUDED",
+  "pillar": "quality",
+  "kind": "plan_and_run",
+  "capabilities": ["planner", "performance", "custom_metric_inference"],
+  "request": {
+    "message": "Why did \"${DYN_EXCLUDED_ACTION_NAME}\" change week over week? Which campaigns drove it?",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "default_date_range": "${STABLE_LAST_30_DAYS}",
+    "include_previous": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "executed": true,
+    "result.mode": "performance",
+    "result.data_quality.custom_metric_inferred": true,
+    "result.data_quality.custom_metric_key": "${DYN_EXCLUDED_ACTION_METRIC_KEY}"
+  },
+  "assert": {
+    "drivers_min": 1
+  }
+}
+

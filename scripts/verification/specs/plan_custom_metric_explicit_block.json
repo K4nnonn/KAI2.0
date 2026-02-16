@@ -2,6 +2,7 @@
   "id": "PLAN_CUSTOM_METRIC_EXPLICIT_BLOCK",
   "pillar": "quality",
   "kind": "plan_and_run",
+  "capabilities": ["performance", "custom_metric_inference", "sa360_accuracy"],
   "request": {
     "message": "Why did FR_Intent_Clicks change week over week? Which campaigns drove it?",
     "customer_ids": ["${TARGET_CUSTOMER_ID}"],

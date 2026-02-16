@@ -2,6 +2,7 @@
   "id": "ROUTE_HELP_FASTPATH",
   "pillar": "functionality",
   "kind": "route",
+  "capabilities": ["routing", "general_chat"],
   "request": {
     "message": "What can you do?",
     "customer_ids": [],

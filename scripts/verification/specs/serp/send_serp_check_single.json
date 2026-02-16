@@ -1,0 +1,25 @@
+{
+  "id": "SEND_SERP_CHECK_SINGLE",
+  "pillar": "purpose",
+  "kind": "send",
+  "capabilities": ["chat_send", "serp", "advisor_response"],
+  "request": {
+    "message": "Check URL health for https://example.com and summarize the result.",
+    "ai_enabled": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["url", "status", "http", "404", "200", "soft"],
+    "min_any_matches": 2,
+    "must_not_include": ["pick an account", "paste an id", "confirm the account"]
+  },
+  "assert": {
+    "reply_min_len": 80,
+    "reply_not_contains": ["pick an account", "paste an id", "confirm the account"]
+  }
+}
+

@@ -2,6 +2,7 @@
   "id": "PLAN_AUDIT_QUEUED_JOB",
   "pillar": "functionality",
   "kind": "plan_and_run",
+  "capabilities": ["audit", "planner", "jobs"],
   "request": {
     "message": "Run a PPC audit for this account.",
     "customer_ids": ["${TARGET_CUSTOMER_ID}"],

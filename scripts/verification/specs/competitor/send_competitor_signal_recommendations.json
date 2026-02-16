@@ -1,0 +1,25 @@
+{
+  "id": "SEND_COMPETITOR_SIGNAL_RECOMMENDATIONS",
+  "pillar": "purpose",
+  "kind": "send",
+  "capabilities": ["chat_send", "competitor", "advisor_response"],
+  "request": {
+    "message": "My competitor is outranking me more often lately. Are they ramping up? What should I do next?",
+    "ai_enabled": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["ramping", "stable", "declin", "confidence", "next step", "monitor"],
+    "min_any_matches": 2,
+    "must_not_include": ["pick an account", "paste an id", "confirm the account"]
+  },
+  "assert": {
+    "reply_min_len": 120,
+    "reply_not_contains": ["pick an account", "paste an id", "confirm the account"]
+  }
+}
+

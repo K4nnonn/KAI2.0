@@ -1,0 +1,35 @@
+{
+  "id": "POST_SERP_CHECK_SINGLE",
+  "pillar": "functionality",
+  "kind": "post",
+  "capabilities": ["serp", "api_contract"],
+  "request": {
+    "url": "/api/serp/check",
+    "body": {
+      "urls": ["https://example.com"]
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success"
+  },
+  "assert": {
+    "array_min_len": {
+      "body.results": 1
+    },
+    "paths_exist": [
+      "body.results.0.url",
+      "body.results.0.status"
+    ],
+    "regex_match": {
+      "body.results.0.status": "^[23][0-9]{2}$"
+    },
+    "text_not_contains": {
+      "body.results.0.error": [
+        "HTTPSConnectionPool",
+        "CERTIFICATE_VERIFY_FAILED"
+      ]
+    }
+  }
+}

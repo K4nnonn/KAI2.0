@@ -36,7 +36,7 @@ $meta = [ordered]@{
   ok = $false
 }
 
-# 1) Generate a tiny deterministic XLSX with 2 sheets.
+# 1) Generate a tiny deterministic XLSX with 7+ sheets.
 $xlsxPath = Join-Path $OutDir "multisheet.xlsx"
 $genScript = Join-Path $PSScriptRoot "gen_multisheet_xlsx.py"
 if (-not (Test-Path $genScript)) {
@@ -84,14 +84,19 @@ function Assert($Name, $Ok, $Details) {
 }
 
 Assert "manifest_status_success" ($manifestJson.status -eq "success") @{ status = $manifestJson.status }
-Assert "manifest_has_entries" ($manifestJson.manifest.Count -ge 2) @{ count = $manifestJson.manifest.Count }
+Assert "manifest_has_entries" ($manifestJson.manifest.Count -ge 7) @{ count = $manifestJson.manifest.Count }
 
 $sheets = @()
 try {
   $sheets = $manifestJson.manifest | ForEach-Object { $_.sheet } | Where-Object { $_ -ne $null } | Select-Object -Unique
 } catch {}
 Assert "manifest_includes_campaigns_sheet" ($sheets -contains "Campaigns") @{ sheets = $sheets }
+Assert "manifest_includes_adgroups_sheet" ($sheets -contains "AdGroups") @{ sheets = $sheets }
+Assert "manifest_includes_ads_sheet" ($sheets -contains "Ads") @{ sheets = $sheets }
 Assert "manifest_includes_keywords_sheet" ($sheets -contains "Keywords") @{ sheets = $sheets }
+Assert "manifest_includes_search_terms_sheet" ($sheets -contains "SearchTerms") @{ sheets = $sheets }
+Assert "manifest_includes_conversions_sheet" ($sheets -contains "Conversions") @{ sheets = $sheets }
+Assert "manifest_includes_landing_pages_sheet" ($sheets -contains "LandingPages") @{ sheets = $sheets }
 
 $meta.ok = $true
 $meta.ended_at = (Get-Date).ToString("o")

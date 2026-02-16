@@ -1,0 +1,30 @@
+{
+  "id": "POST_PMAX_ANALYZE_CHANNEL_BREAKOUT",
+  "pillar": "functionality",
+  "kind": "post",
+  "capabilities": ["pmax", "api_contract"],
+  "request": {
+    "url": "/api/pmax/analyze",
+    "body": {
+      "total_cost": 12.0,
+      "placements": [
+        { "Placement": "youtube.com", "Conversions": 0, "cost": 5.0, "ad_network_type": "YOUTUBE" },
+        { "Placement": "example.com", "Conversions": 1, "cost": 7.0, "ad_network_type": "DISPLAY" }
+      ]
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success",
+    "body.result.channel_breakout.total_cost": 12.0,
+    "body.result.channel_breakout.video_cost": 5.0,
+    "body.result.channel_breakout.display_cost": 7.0
+  },
+  "assert": {
+    "paths_exist": [
+      "body.result.channel_breakout.search_cost",
+      "body.result.channel_breakout.remainder_cost"
+    ]
+  }
+}

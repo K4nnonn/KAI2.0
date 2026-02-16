@@ -3,6 +3,7 @@ param(
   [string]$SessionId = $env:KAI_QA_SESSION_ID,
   [string]$LoginCustomerId = $env:KAI_SA360_LOGIN_CUSTOMER_ID,
   [string]$EnvGuiPassword = $env:KAI_ENV_GUI_PASSWORD,
+  [string]$AccessPassword = $env:KAI_ACCESS_PASSWORD,
   [string]$TargetCustomerId = $env:KAI_QA_TARGET_CUSTOMER_ID,
   [int]$MaxChatLatencyMs = 20000,
   [int]$MaxPlanLatencyMs = 25000,
@@ -191,6 +192,26 @@ $health = Safe-Request "GET" "$Backend/api/health"
 $diag = Safe-Request "GET" "$Backend/api/diagnostics/health"
 Write-Json (Join-Path $RunDir "01_health.json") $health
 Write-Json (Join-Path $RunDir "02_diagnostics_health.json") $diag
+
+# Auth verify checks (no secrets stored; request body is not written into artifacts).
+$authChecks = [ordered]@{
+  wrong_password_denied = $null
+  correct_password_ok = $null
+  correct_password_reason = $null
+}
+try {
+  $wrong = Safe-Request "POST" "$Backend/api/auth/verify" @{ password = "wrong-password" }
+  $authChecks.wrong_password_denied = ($wrong.status -eq 401)
+} catch {}
+if ([string]::IsNullOrWhiteSpace($AccessPassword)) {
+  $authChecks.correct_password_reason = "missing_access_password"
+} else {
+  try {
+    $ok = Safe-Request "POST" "$Backend/api/auth/verify" @{ password = $AccessPassword }
+    $authChecks.correct_password_ok = ($ok.ok -and $ok.body -and $ok.body.authenticated -eq $true)
+  } catch {}
+}
+Write-Json (Join-Path $RunDir "02b_auth_verify.json") $authChecks
 
 # Env checks
 $envChecks = [ordered]@{
@@ -848,6 +869,8 @@ $summary = [ordered]@{
   integrity_status = $integrity.status
   health_ok = $health.ok
   diagnostics_ok = $diag.ok
+  auth_wrong_denied = $authChecks.wrong_password_denied
+  auth_correct_ok = $authChecks.correct_password_ok
   env_checked = (-not $envChecks.skipped)
   creative_ok = $creative.ok
   audit_expected_fail = ($audit.status -eq 400)

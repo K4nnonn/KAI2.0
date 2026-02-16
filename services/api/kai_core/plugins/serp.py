@@ -139,6 +139,10 @@ def check_url_health(url_list: List[str], timeout: int = 3) -> List[Dict[str, An
                 entry["status"] = status
                 entry["soft_404"] = detect_soft_404(resp.text) if status == 200 else False
             except requests.RequestException as exc:
+                # Schema stability: always return status + soft_404 fields even on failure.
+                # This keeps downstream UI + QA assertions deterministic.
+                entry["status"] = 0
+                entry["soft_404"] = False
                 entry["error"] = str(exc)
         results.append(entry)
     return results

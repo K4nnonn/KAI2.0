@@ -2,6 +2,7 @@
   "id": "ADVISOR_DIAG_POSITIVE",
   "pillar": "purpose",
   "kind": "advisor_diag",
+  "capabilities": ["advisor_diag", "advisor_evidence_schema"],
   "request": {
     "text": "My CPA is up 20% week over week. What should I do next?",
     "use_case": "performance"

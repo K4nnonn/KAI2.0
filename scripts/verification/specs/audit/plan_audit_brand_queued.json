@@ -1,0 +1,19 @@
+{
+  "id": "PLAN_AUDIT_BRAND_QUEUED",
+  "pillar": "functionality",
+  "kind": "plan_and_run",
+  "capabilities": ["audit", "planner", "jobs"],
+  "request": {
+    "message": "Run a PPC audit for this account (Brand) and summarize the top 3 priorities.",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "session_id": "${SESSION_ID}",
+    "intent_hint": "audit",
+    "async_mode": false,
+    "generate_report": false
+  },
+  "expect": {
+    "status": "queued",
+    "executed": false
+  }
+}
+

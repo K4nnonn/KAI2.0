@@ -38,3 +38,4 @@ build/
 ._codex_*
 $out
 $out/
+last_built_*_tag.txt

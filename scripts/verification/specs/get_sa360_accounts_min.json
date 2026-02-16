@@ -2,6 +2,7 @@
   "id": "GET_SA360_ACCOUNTS_MIN",
   "pillar": "functionality",
   "kind": "get",
+  "capabilities": ["sa360", "sa360_accounts", "oauth"],
   "request": {
     "url": "/api/sa360/accounts?session_id=${SESSION_ID}"
   },

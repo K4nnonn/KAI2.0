@@ -1,0 +1,25 @@
+{
+  "id": "SEND_COMPETITOR_METRICS_DELTA",
+  "pillar": "purpose",
+  "kind": "send",
+  "capabilities": ["chat_send", "competitor", "advisor_response"],
+  "request": {
+    "message": "Competitor.com impression share was 25% and is now 45%. What does that imply and what are 2 options to respond?",
+    "ai_enabled": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["25", "45", "ramping", "option", "monitor", "brand"],
+    "min_any_matches": 2,
+    "must_not_include": ["pick an account", "paste an id", "confirm the account"]
+  },
+  "assert": {
+    "reply_min_len": 120,
+    "reply_not_contains": ["pick an account", "paste an id", "confirm the account"]
+  }
+}
+

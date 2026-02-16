@@ -1,0 +1,35 @@
+{
+  "id": "ROUTE_AUDIT_BRAND",
+  "pillar": "intent",
+  "kind": "route",
+  "capabilities": ["routing", "audit", "account_context"],
+  "request": {
+    "message": "Run a Brand PPC audit for this account.",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "intent": "audit",
+    "tool": "audit",
+    "run_planner": true,
+    "run_trends": false,
+    "needs_ids": false
+  },
+  "intent_goal": {
+    "intent_path": "intent",
+    "allowed_intents": ["audit"]
+  },
+  "metamorphic": [
+    {
+      "name": "greeting",
+      "message": "Hey - run a Brand PPC audit for this account.",
+      "expect_same": ["intent", "tool", "run_planner", "needs_ids"]
+    },
+    {
+      "name": "punctuation",
+      "message": "Run a Brand PPC audit for this account??",
+      "expect_same": ["intent", "tool", "run_planner", "needs_ids"]
+    }
+  ]
+}
+

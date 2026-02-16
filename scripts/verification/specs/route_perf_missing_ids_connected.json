@@ -2,6 +2,7 @@
   "id": "ROUTE_PERF_MISSING_IDS_CONNECTED",
   "pillar": "intent",
   "kind": "route",
+  "capabilities": ["routing", "performance", "account_context"],
   "request": {
     "message": "How did performance look in the last 7 days?",
     "customer_ids": [],

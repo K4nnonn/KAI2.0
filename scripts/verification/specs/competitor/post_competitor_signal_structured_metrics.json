@@ -1,0 +1,27 @@
+{
+  "id": "POST_COMPETITOR_SIGNAL_STRUCTURED_METRICS",
+  "pillar": "quality",
+  "kind": "post",
+  "capabilities": ["competitor", "api_contract"],
+  "request": {
+    "url": "/api/serp/competitor-signal",
+    "body": {
+      "competitor_domain": "competitor.com",
+      "impression_share_current": 60,
+      "impression_share_previous": 40,
+      "outranking_rate": 80,
+      "top_of_page_rate": 75,
+      "position_above_rate": 70
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success",
+    "body.result.signal": "ramping_up"
+  },
+  "assert": {
+    "paths_exist": ["body.result.confidence", "body.result.interpretation", "body.result.metrics_used"]
+  }
+}
+

@@ -1,0 +1,25 @@
+{
+  "id": "GET_AUDIT_BUSINESS_UNITS",
+  "pillar": "functionality",
+  "kind": "get",
+  "capabilities": ["audit", "api_contract"],
+  "request": {
+    "path": "/api/audit/business-units"
+  },
+  "expect": {
+    "status": 200,
+    "ok": true
+  },
+  "assert": {
+    "array_min_len": {
+      "body.business_units": 3
+    },
+    "paths_exist": [
+      "body.business_units.0.id",
+      "body.business_units.0.name",
+      "body.business_units.1.id",
+      "body.business_units.2.id"
+    ]
+  }
+}
+

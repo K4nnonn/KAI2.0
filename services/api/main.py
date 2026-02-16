@@ -672,6 +672,12 @@ def _call_local_llm(
             timeout = float(os.environ.get("LOCAL_LLM_ROUTER_TIMEOUT_SECONDS", "8") or "8")
         except Exception:
             pass
+    if intent == "performance_advice" and not require_local:
+        # Keep advisor responses interactive: if local is slow/unhealthy, fail fast and fall back to Azure.
+        try:
+            timeout = float(os.environ.get("LOCAL_LLM_PERF_ADVICE_TIMEOUT_SECONDS", "6") or "6")
+        except Exception:
+            pass
     meta = {"model": "local", "intent": intent or "", "used": False}
 
     if not allow_local or not endpoint:
@@ -1302,8 +1308,9 @@ def _advisor_missing_data_reply(question: str) -> str | None:
     # Keep this user-facing: the main Kai Chat UX should not force "Evidence/Hypothesis/Next step" scaffolding.
     # (That structure is useful for internal diagnostics, but reads like debug output to beta users.)
     return (
-        "I can’t run that analysis yet because I don’t have performance data for the requested account/timeframe. "
-        "Connect SA360 (or upload the relevant exports), then retry."
+        "I can't run that analysis yet because I don't have account data / performance data for the requested account/timeframe. "
+        "This may be because SA360 isn't connected in this session or the relevant exports weren't uploaded. "
+        "Next step: connect SA360 (or upload the relevant exports), then retry."
     )
 
 
@@ -1324,25 +1331,30 @@ def _advisor_missing_data_reply_for_session(question: str, session_id: str | Non
 
     if not connected:
         return (
-            "SA360 isn't connected for this session yet. Click 'Connect SA360' at the top of Kai and complete Google OAuth, "
-            "then select an account (by name) and retry."
+            "I can't pull performance data because I don't have any account data for this session yet (SA360 isn't connected). "
+            "This may be because Google OAuth wasn't completed for this session. "
+            "Next step: click 'Connect SA360' at the top of Kai, complete Google OAuth, then select an account (by name) and retry."
         )
 
     if not login_cid:
         return (
-            "You're connected to SA360, but I can't list accounts yet because your Manager (MCC) isn't saved for this session. "
-            "Enter your MCC at the top of Kai and click 'Save MCC', then pick an account (by name) and retry."
+            "You're connected to SA360, but I can't list accounts yet because your Manager (MCC) isn't saved for this session "
+            "(so I don't have account data to query yet). "
+            "This could be because the MCC wasn't saved in this session. "
+            "Next step: enter your MCC at the top of Kai and click 'Save MCC', then pick an account (by name) and retry."
         )
 
     if not default_cid:
         return (
-            "I can run that analysis, but I need to know which SA360 account to use. "
-            "Pick an account from the 'Account (by name)' picker at the top of Kai (or paste a customer ID), then retry."
+            "I can run that analysis, but this request didn't include a customer account, so I don't have report output / account data to query. "
+            "It could be that you haven't selected an account yet. "
+            "Next step: pick an account from the 'Account (by name)' picker at the top of Kai (or paste a customer ID), then retry."
         )
 
     return (
-        "I can run that analysis, but I need to know which SA360 account to use. "
-        "Confirm the account in the 'Account (by name)' picker at the top of Kai (or paste a customer ID), then retry."
+        "I can run that analysis, but this request didn't include a customer account, so I don't have report output / account data to query. "
+        "It could be that the selected account isn't saved for this session yet. "
+        "Next step: confirm the account in the 'Account (by name)' picker at the top of Kai (or paste a customer ID), then retry."
     )
 
 
@@ -4087,7 +4099,9 @@ def _extract_metric_mentions(message: str) -> list[str]:
 
 
 _CUSTOM_METRIC_LABELS: dict[str, str] = {}
-_CUSTOM_METRIC_RE = re.compile(r"\b[A-Za-z][A-Za-z0-9_]{2,}\b")
+# Custom metrics frequently contain underscores and may contain hyphens (e.g., "ENG_Shell_USA_OnClick-...").
+# Use a permissive token regex, then filter downstream so we don't accidentally treat ordinary hyphenated words as metrics.
+_CUSTOM_METRIC_RE = re.compile(r"\b[A-Za-z][A-Za-z0-9_-]{2,}\b")
 _CUSTOM_METRIC_HINT_TERMS = {
     "intent",
     "action",
@@ -4162,6 +4176,8 @@ _CUSTOM_METRIC_STOPWORDS = {
     "performance",
     "change",
     "changed",
+    "changes",
+    "changing",
     "move",
     "moved",
     "increase",
@@ -6118,8 +6134,6 @@ async def _chat_plan_and_run_core(req: PlanRequest, request: Request | None = No
                 match_kind = custom_match.get("kind") or "header"
                 match_raw = custom_match.get("match") or match_label
                 summary_text += f" Interpreting metric as {match_label} (matched {match_kind} '{match_raw}')."
-            if needs_custom_context and not custom_key and custom_suggestions:
-                summary_text += " No close metric match found. Example SA360 headers: " + ", ".join(custom_suggestions[:3]) + "."
             if missing_spend:
                 summary_text += " (Spend not returned for this window; data may be missing for this date range.)"
             if custom_key and custom_missing:
@@ -7101,6 +7115,53 @@ async def chat_route(req: RouteRequest, request: Request):
             clarification=clarification,
             candidates=candidates or [],
         )
+
+    # Fast-path: deterministic routing for SERP / competitor prompts.
+    # These tools do not require SA360 account IDs, so avoid the router latency and avoid misrouting
+    # into the performance planner which then asks the user to pick an account.
+    if msg_slim:
+        serp_cues = (
+            "serp monitor:",
+            "url health",
+            "broken url",
+            "broken link",
+            "soft 404",
+            "soft-404",
+            "landing page",
+            "landing pages",
+        )
+        if msg_slim.startswith("serp monitor:") or any(cue in msg_slim for cue in serp_cues):
+            return RouteResponse(
+                intent="serp",
+                tool="serp",
+                run_planner=False,
+                run_trends=False,
+                customer_ids=merged_ids,
+                needs_ids=False,
+                notes=(default_route.notes or "") + " router_fastpath_serp",
+                confidence=1.0,
+            )
+
+        competitor_cues = (
+            "competitor intel:",
+            "competitor",
+            "outranking",
+            "impression share",
+            "position above",
+            "top of page",
+            "auction insights",
+        )
+        if msg_slim.startswith("competitor intel:") or any(cue in msg_slim for cue in competitor_cues):
+            return RouteResponse(
+                intent="competitor",
+                tool="competitor",
+                run_planner=False,
+                run_trends=False,
+                customer_ids=merged_ids,
+                needs_ids=False,
+                notes=(default_route.notes or "") + " router_fastpath_competitor",
+                confidence=1.0,
+            )
 
     route: RouteResponse | None = None
     local_meta: dict = {}
@@ -12441,7 +12502,10 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                         if llm_meta and llm_meta.get("model"):
                             model_used = llm_meta.get("model")
                         if not draft_reply:
-                            draft_reply = "I'm having trouble connecting to AI services right now. Please try again in a moment."
+                            draft_reply = (
+                                "I'm having trouble connecting to AI services right now, so I didn't get any report output for this request. "
+                                "This may be a temporary timeout. Next step: try again in a moment; if it keeps failing, reload the page."
+                            )
                             fallback_reason = "llm_no_reply"
                         if draft_reply and is_concept_intent(chat.message) and _needs_concept_rewrite(draft_reply):
                             if not (require_local or fast_prompt):
@@ -12545,7 +12609,11 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 print(traceback.format_exc(), file=sys.stderr, flush=True)
             except Exception:
                 pass
-            reply = f"I'm having trouble connecting to AI services. Error: {str(exc)[:100]}"
+            # Keep errors server-side; do not leak exception strings to end users.
+            reply = (
+                "I'm having trouble connecting to AI services right now, so I didn't get any report output for this request. "
+                "This may be a temporary error. Next step: try again in a moment."
+            )
         finally:
             if llm_trace["calls"]:
                 log_event(

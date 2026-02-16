@@ -2,6 +2,7 @@
   "id": "GET_HEALTH",
   "pillar": "functionality",
   "kind": "get",
+  "capabilities": ["health", "api_contract"],
   "request": {
     "url": "/api/health"
   },

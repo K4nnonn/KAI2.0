@@ -1,0 +1,24 @@
+{
+  "id": "POST_AUDIT_GENERATE_ASYNC_NONBRAND",
+  "pillar": "functionality",
+  "kind": "post",
+  "capabilities": ["audit", "jobs", "api_contract"],
+  "request": {
+    "url": "/api/audit/generate",
+    "body": {
+      "business_unit": "NonBrand",
+      "account_name": "QA MultiSheet",
+      "async_mode": true,
+      "use_mock_data": false
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "queued"
+  },
+  "assert": {
+    "paths_exist": ["body.job_id"]
+  }
+}
+

@@ -3,6 +3,21 @@ import { test, expect } from '@playwright/test'
 const frontendUrl = (process.env.FRONTEND_URL || '').trim()
 const sessionId = (process.env.KAI_SESSION_ID || '').trim() || 'ui_regression_session'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+
+const fulfillJson = async (route, status, bodyObj) => {
+  await route.fulfill({
+    status,
+    contentType: 'application/json',
+    headers: corsHeaders,
+    body: bodyObj === null ? '' : JSON.stringify(bodyObj),
+  })
+}
+
 const requireFrontend = () => {
   test.skip(!frontendUrl, 'FRONTEND_URL not set; skipping UI chat tests')
 }
@@ -23,70 +38,66 @@ test.describe('Kai Chat UI regressions', () => {
     // Deterministic sandboxing: stub SA360 connected + route + planner so this test does not
     // depend on the live backend. This isolates the regression to UI state persistence.
     await page.route('**/api/sa360/oauth/status**', async (route) => {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          connected: true,
-          login_customer_id: '1111111111',
-          default_customer_id: '7902313748',
-          default_account_name: 'QA Account',
-        }),
+      if (route.request().method() === 'OPTIONS') {
+        return route.fulfill({ status: 204, headers: corsHeaders, body: '' })
+      }
+      return fulfillJson(route, 200, {
+        connected: true,
+        login_customer_id: '1111111111',
+        default_customer_id: '7902313748',
+        default_account_name: 'QA Account',
       })
     })
 
     await page.route('**/api/chat/route', async (route) => {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          tool: 'performance',
-          intent: 'performance',
-          run_planner: true,
-          needs_ids: false,
-          customer_ids: ['7902313748'],
-        }),
+      if (route.request().method() === 'OPTIONS') {
+        return route.fulfill({ status: 204, headers: corsHeaders, body: '' })
+      }
+      return fulfillJson(route, 200, {
+        tool: 'performance',
+        intent: 'performance',
+        run_planner: true,
+        needs_ids: false,
+        customer_ids: ['7902313748'],
       })
     })
 
     await page.route('**/api/chat/plan-and-run', async (route) => {
+      if (route.request().method() === 'OPTIONS') {
+        return route.fulfill({ status: 204, headers: corsHeaders, body: '' })
+      }
       const req = route.request()
       let body = {}
       try { body = JSON.parse(req.postData() || '{}') } catch {}
       const msg = String(body?.message || '')
 
       // Minimal executed plan snapshot that should enable follow-up reuse.
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          executed: true,
-          plan: {
-            account_name: 'QA Account',
-            customer_ids: ['7902313748'],
-            date_range: 'LAST_7_DAYS',
-          },
-          summary: 'Conversions up 10% WoW; CTR down 5%.',
-          analysis: {
-            summary: 'Option A: tighten queries; Option B: test new creative. Watch CTR and conv rate.',
-          },
-          notes: `stubbed planner for: ${msg}`,
-        }),
+      return fulfillJson(route, 200, {
+        executed: true,
+        plan: {
+          account_name: 'QA Account',
+          customer_ids: ['7902313748'],
+          date_range: 'LAST_7_DAYS',
+        },
+        summary: 'Conversions up 10% WoW; CTR down 5%.',
+        analysis: {
+          summary: 'Option A: tighten queries; Option B: test new creative. Watch CTR and conv rate.',
+        },
+        notes: `stubbed planner for: ${msg}`,
       })
     })
 
     await page.route('**/api/chat/send', async (route) => {
+      if (route.request().method() === 'OPTIONS') {
+        return route.fulfill({ status: 204, headers: corsHeaders, body: '' })
+      }
       const req = route.request()
       if (req.method() !== 'POST') return route.continue()
       let body = {}
       try { body = JSON.parse(req.postData() || '{}') } catch {}
       if (body?.context?.prompt_kind !== 'planner_summary') return route.continue()
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          reply: 'Option A: fix CTR drop with query/creative tests. Option B: isolate budgets by campaign. Monitor CTR and conv rate for 3-5 days.',
-        }),
+      return fulfillJson(route, 200, {
+        reply: 'Option A: fix CTR drop with query/creative tests. Option B: isolate budgets by campaign. Monitor CTR and conv rate for 3-5 days.',
       })
     })
 

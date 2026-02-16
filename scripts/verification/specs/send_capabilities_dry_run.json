@@ -2,6 +2,7 @@
   "id": "SEND_CAPABILITIES_DRY_RUN",
   "pillar": "functionality",
   "kind": "send",
+  "capabilities": ["chat_send", "general_chat"],
   "request": {
     "message": "What can you do?",
     "ai_enabled": true,

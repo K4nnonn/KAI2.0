@@ -2,6 +2,7 @@
   "id": "GET_SA360_CONVERSION_ACTIONS_MIN",
   "pillar": "functionality",
   "kind": "get",
+  "capabilities": ["sa360", "sa360_conversion_actions", "custom_metric_catalog"],
   "request": {
     "url": "/api/sa360/conversion-actions?session_id=${SESSION_ID}&customer_id=${TARGET_CUSTOMER_ID}&date_range=LAST_30_DAYS"
   },

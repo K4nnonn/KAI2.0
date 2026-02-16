@@ -1,0 +1,27 @@
+{
+  "id": "POST_PMAX_ANALYZE_SPEND_SPLIT",
+  "pillar": "functionality",
+  "kind": "post",
+  "capabilities": ["pmax", "api_contract"],
+  "request": {
+    "url": "/api/pmax/analyze",
+    "body": {
+      "spend": 123.45,
+      "placements": []
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success",
+    "body.result.spend_split.total_cost": 123.45
+  },
+  "assert": {
+    "paths_exist": [
+      "body.result.spend_split.other_cost",
+      "body.result.asset_group_efficiency",
+      "body.result.mobile_app_waste"
+    ]
+  }
+}
+

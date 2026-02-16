@@ -19,6 +19,9 @@ export default defineConfig({
   outputDir,
   use: {
     baseURL: process.env.FRONTEND_URL || 'http://localhost:5173',
+    screenshot: 'only-on-failure',
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure',
     extraHTTPHeaders: {
       // Allow tests to reach the backend if CORS blocks UI context; API tests use request context directly.
     },

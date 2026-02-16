@@ -1,0 +1,21 @@
+{
+  "id": "POST_SERP_CHECK_EMPTY",
+  "pillar": "functionality",
+  "kind": "post",
+  "capabilities": ["serp", "api_contract"],
+  "request": {
+    "url": "/api/serp/check",
+    "body": {
+      "urls": []
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success"
+  },
+  "assert": {
+    "paths_exist": ["body.results"]
+  }
+}
+

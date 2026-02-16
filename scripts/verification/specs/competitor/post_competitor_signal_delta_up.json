@@ -1,0 +1,23 @@
+{
+  "id": "POST_COMPETITOR_SIGNAL_DELTA_UP",
+  "pillar": "quality",
+  "kind": "post",
+  "capabilities": ["competitor", "api_contract"],
+  "request": {
+    "url": "/api/serp/competitor-signal",
+    "body": {
+      "competitor_domain": "competitor.com",
+      "raw_description": "Impression share went from 25% to 45% over the last month."
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success",
+    "body.result.signal": "ramping_up"
+  },
+  "assert": {
+    "paths_exist": ["body.result.confidence", "body.result.interpretation", "body.result.metrics_used"]
+  }
+}
+

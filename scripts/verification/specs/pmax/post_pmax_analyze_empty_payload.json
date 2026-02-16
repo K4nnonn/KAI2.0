@@ -1,0 +1,26 @@
+{
+  "id": "POST_PMAX_ANALYZE_EMPTY_PAYLOAD",
+  "pillar": "functionality",
+  "kind": "post",
+  "capabilities": ["pmax", "api_contract"],
+  "request": {
+    "url": "/api/pmax/analyze",
+    "body": {
+      "placements": []
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success",
+    "body.result.spend_split.total_cost": 0.0
+  },
+  "assert": {
+    "paths_exist": [
+      "body.result.spend_split.other_cost",
+      "body.result.asset_group_efficiency",
+      "body.result.mobile_app_waste"
+    ]
+  }
+}
+

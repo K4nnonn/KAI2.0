@@ -1,0 +1,24 @@
+{
+  "id": "PLAN_PERF_STABLE_90D_DRIVERS",
+  "pillar": "purpose",
+  "kind": "plan_and_run",
+  "capabilities": ["planner", "performance", "drivers", "advisor_decision_support", "date_ranges"],
+  "request": {
+    "message": "What drove performance changes? Give top drivers and next steps.",
+    "customer_ids": ["${TARGET_CUSTOMER_ID}"],
+    "default_date_range": "${STABLE_LAST_90_DAYS}",
+    "include_previous": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "executed": true,
+    "result.mode": "performance"
+  },
+  "assert": {
+    "drivers_min": 1,
+    "text_not_contains": {
+      "summary": ["No close metric match found"]
+    }
+  }
+}
+

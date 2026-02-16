@@ -695,6 +695,7 @@ Supports: 50K+ rows, 14 file types`
               multiline
               maxRows={3}
               placeholder={currentPlaceholder}
+              inputProps={{ 'data-testid': 'audit-chat-input' }}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -715,6 +716,7 @@ Supports: 50K+ rows, 14 file types`
               color="primary"
               onClick={sendMessage}
               disabled={!input.trim() || loading || generating || queueing}
+              data-testid="audit-chat-send"
               sx={{
                 background: theme.primaryGradient,
                 color: '#fff',

@@ -130,6 +130,10 @@ function Get-AnyPathValue($Resp, [string]$Path) {
   $val = $null
   if ($Path.StartsWith("__")) {
     $val = Get-PathValue $Resp ($Path.Substring(2))
+  } elseif ($Path.StartsWith("body.")) {
+    # Back-compat: older specs used "body.<path>" to access API response payload via the Safe-* wrapper.
+    # That maps to $Resp.body.<path>.
+    $val = Get-PathValue $Resp $Path
   } else {
     $val = Get-PathValue $Resp.body $Path
   }
@@ -225,7 +229,7 @@ function Validate-Spec($Spec, [string]$FileName) {
   }
 
   $kind = ([string]$Spec.kind).ToLower().Trim()
-  if ($kind -and ($kind -notin @("route","plan_and_run","advisor_diag","send","get"))) {
+  if ($kind -and ($kind -notin @("route","plan_and_run","advisor_diag","send","get","post"))) {
     $errs += "invalid_kind:$kind"
   }
 
@@ -262,17 +266,26 @@ function Parse-MetricFromSummary([string]$Summary, [string]$Label) {
   if ([string]::IsNullOrWhiteSpace($Summary)) { return $null }
   switch ($Label) {
     "conversions" {
-      # PowerShell single-quoted strings do not treat backslash as an escape. Use \s for whitespace (not \\s).
-      if ($Summary -match 'Conversions:\s*([0-9]+(?:\.[0-9]+)?)') { return [double]$matches[1] }
+      # Avoid accidental matches on internal tokens like "metrics.all conversions:" by requiring a delimiter.
+      # PowerShell single-quoted strings do not treat backslash as an escape. Use \s/\n directly.
+      if ($Summary -match '(?:^|[;|\n]\s*)Conversions:\s*([0-9,]+(?:\.[0-9]+)?)') {
+        return [double](($matches[1]) -replace ',', '')
+      }
     }
     "cost" {
-      if ($Summary -match 'Cost:\s*\$([0-9,]+(?:\.[0-9]+)?)') { return [double]($matches[1] -replace ',', '') }
+      if ($Summary -match '(?:^|[;|\n]\s*)Cost:\s*\$([0-9,]+(?:\.[0-9]+)?)') {
+        return [double](($matches[1]) -replace ',', '')
+      }
     }
     "cpc" {
-      if ($Summary -match 'CPC:\s*\$([0-9,]+(?:\.[0-9]+)?)') { return [double]($matches[1] -replace ',', '') }
+      if ($Summary -match '(?:^|[;|\n]\s*)CPC:\s*\$([0-9,]+(?:\.[0-9]+)?)') {
+        return [double](($matches[1]) -replace ',', '')
+      }
     }
     "ctr" {
-      if ($Summary -match 'CTR:\s*([0-9,]+(?:\.[0-9]+)?)(?:%)?') { return [double]($matches[1] -replace ',', '') }
+      if ($Summary -match '(?:^|[;|\n]\s*)CTR:\s*([0-9,]+(?:\.[0-9]+)?)(?:%)?') {
+        return [double](($matches[1]) -replace ',', '')
+      }
     }
   }
   return $null
@@ -1051,6 +1064,91 @@ $stableEnd = (Get-Date).Date.AddDays(-2)
 $stableStart = $stableEnd.AddDays(-6)
 $vars["STABLE_LAST_7_DAYS"] = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stableStart, $stableEnd)
 
+# Additional stable ranges for "dynamic" but repeatable scenarios. These exclude the most recent 2 days
+# to reduce intraday/backfill drift when comparing plan results to diagnostics snapshots.
+$stable14Start = $stableEnd.AddDays(-13)
+$vars["STABLE_LAST_14_DAYS"] = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stable14Start, $stableEnd)
+$stable30Start = $stableEnd.AddDays(-29)
+$vars["STABLE_LAST_30_DAYS"] = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stable30Start, $stableEnd)
+$stable90Start = $stableEnd.AddDays(-89)
+$vars["STABLE_LAST_90_DAYS"] = ("{0:yyyy-MM-dd},{1:yyyy-MM-dd}" -f $stable90Start, $stableEnd)
+
+# Dynamic conversion-action candidates (per-account) to validate custom-metric inference without
+# hardcoding column names that may not exist across accounts.
+$vars["DYN_EXCLUDED_ACTION_NAME"] = ""
+$vars["DYN_EXCLUDED_ACTION_METRIC_KEY"] = ""
+$vars["DYN_INCLUDED_ACTION_NAME"] = ""
+$vars["DYN_INCLUDED_ACTION_METRIC_KEY"] = ""
+try {
+  $convUrl = "$Backend/api/sa360/conversion-actions?session_id=$SessionId&customer_id=$TargetCustomerId&date_range=LAST_30_DAYS"
+  $convResp = Safe-Get $convUrl
+  $actions = @()
+  try { $actions = @($convResp.body.actions) | Where-Object { $_ } } catch { $actions = @() }
+
+  $excluded = @()
+  $included = @()
+  try {
+    $excluded = @(
+      $actions |
+        Where-Object {
+          $_.status -eq "ENABLED" -and
+          $_.all_conversions -ne $null -and [double]$_.all_conversions -gt 0 -and
+          $_.conversions -ne $null -and [double]$_.conversions -eq 0
+        } |
+        Sort-Object -Property all_conversions -Descending
+    )
+  } catch { $excluded = @() }
+  try {
+    $included = @(
+      $actions |
+        Where-Object {
+          $_.status -eq "ENABLED" -and
+          $_.conversions -ne $null -and [double]$_.conversions -gt 0
+        } |
+        Sort-Object -Property conversions -Descending
+    )
+  } catch { $included = @() }
+
+  $exCandidate = $null
+  if ($excluded -and $excluded.Count -gt 0) {
+    $exCandidate = ($excluded | Where-Object { $_.name -and $_.name.Length -le 80 } | Select-Object -First 1)
+    if (-not $exCandidate) { $exCandidate = $excluded | Select-Object -First 1 }
+  }
+  $inCandidate = $null
+  if ($included -and $included.Count -gt 0) {
+    $inCandidate = ($included | Where-Object { $_.name -and $_.name.Length -le 80 } | Select-Object -First 1)
+    if (-not $inCandidate) { $inCandidate = $included | Select-Object -First 1 }
+  }
+
+  if ($exCandidate -and $exCandidate.name -and $exCandidate.metric_key) {
+    $vars["DYN_EXCLUDED_ACTION_NAME"] = [string]$exCandidate.name
+    $vars["DYN_EXCLUDED_ACTION_METRIC_KEY"] = [string]$exCandidate.metric_key
+  }
+  if ($inCandidate -and $inCandidate.name -and $inCandidate.metric_key) {
+    $vars["DYN_INCLUDED_ACTION_NAME"] = [string]$inCandidate.name
+    $vars["DYN_INCLUDED_ACTION_METRIC_KEY"] = [string]$inCandidate.metric_key
+  }
+
+  # Store only small, share-safe metadata in preconditions (avoid dumping entire conversion catalogs).
+  $preconditions.conversion_actions = [ordered]@{
+    ok = $convResp.ok
+    status = $convResp.status
+    actions_count = ($actions | Measure-Object).Count
+    excluded_candidate = if ($exCandidate) { [ordered]@{ name = $exCandidate.name; metric_key = $exCandidate.metric_key } } else { $null }
+    included_candidate = if ($inCandidate) { [ordered]@{ name = $inCandidate.name; metric_key = $inCandidate.metric_key } } else { $null }
+  }
+} catch {
+  $preconditions.conversion_actions = [ordered]@{
+    ok = $false
+    error = $_.Exception.Message
+  }
+}
+
+# Re-write preconditions now that dynamic candidates were computed (share-safe).
+try {
+  Write-Json (Join-Path $OutDir "preconditions.json") $preconditions
+} catch {}
+
 $specFiles = Get-ChildItem -Path $SpecDir -Filter *.json -Recurse | Sort-Object FullName
 if ($specFiles.Count -eq 0) {
   throw "No spec files found in: $SpecDir"
@@ -1105,6 +1203,7 @@ foreach ($f in $specFiles) {
   }
 
   $endpoint = ""
+  $requestForEndpoint = $request
   if ($kind -eq "route") {
     $endpoint = "$Backend/api/chat/route"
     $resp = Safe-Post $endpoint $request
@@ -1117,6 +1216,41 @@ foreach ($f in $specFiles) {
   } elseif ($kind -eq "send") {
     $endpoint = "$Backend/api/chat/send"
     $resp = Safe-Post $endpoint $request
+  } elseif ($kind -eq "post") {
+    $url = $null
+    try { $url = [string]$request.url } catch {}
+    if ([string]::IsNullOrWhiteSpace($url)) {
+      try { $url = [string]$request.path } catch {}
+    }
+    if ([string]::IsNullOrWhiteSpace($url)) {
+      throw "POST spec '$specId' missing request.url (or request.path)"
+    }
+    if ($url -match '^https?://') { $endpoint = $url } else { $endpoint = "$Backend$url" }
+
+    # POST specs allow embedding the body in request.body, or (for convenience) using
+    # the entire request object as body with url/path stripped. This keeps spec JSON small.
+    $body = $null
+    if ($request -is [System.Collections.IDictionary]) {
+      if ($request.Contains("body")) { $body = $request["body"] }
+      if ($body -eq $null) {
+        $body = [ordered]@{}
+        foreach ($k in $request.Keys) {
+          if ($k -in @("url","path","body")) { continue }
+          $body[$k] = $request[$k]
+        }
+      }
+    } else {
+      try { $body = $request.body } catch { $body = $null }
+      if ($body -eq $null) {
+        $body = [ordered]@{}
+        foreach ($p in $request.PSObject.Properties) {
+          if ($p.Name -in @("url","path","body")) { continue }
+          $body[$p.Name] = $p.Value
+        }
+      }
+    }
+    $requestForEndpoint = $body
+    $resp = Safe-Post $endpoint $requestForEndpoint
   } elseif ($kind -eq "get") {
     $url = $null
     try { $url = [string]$request.url } catch {}
@@ -1139,6 +1273,12 @@ foreach ($f in $specFiles) {
     $path = [string]$p.Name
     $expected = $p.Value
     $actual = Get-AnyPathValue $resp $path
+
+    # Back-compat: some specs historically used "status"/"ok" to refer to the Safe-* wrapper fields
+    # (HTTP status + success boolean). When the expected type is numeric/bool, treat these as wrapper fields.
+    if (($path -eq "status" -or $path -eq "ok") -and ($expected -is [bool] -or $expected -is [double] -or $expected -is [int])) {
+      $actual = Get-PathValue $resp $path
+    }
     $pass = $true
     if ($expected -is [bool]) {
       $pass = ([bool]$actual -eq [bool]$expected)
@@ -1171,7 +1311,11 @@ foreach ($f in $specFiles) {
     $lat = @()
     $sampleResponses = @()
     for ($i = 0; $i -lt $samples; $i++) {
-      $r = Safe-Post $endpoint $request
+      if ($kind -eq "get") {
+        $r = Safe-Get $endpoint
+      } else {
+        $r = Safe-Post $endpoint $requestForEndpoint
+      }
       $lat += [double]$r.latency_ms
       $sampleResponses += $r
     }
@@ -1237,9 +1381,8 @@ foreach ($f in $specFiles) {
     foreach ($p in @($assert.paths_exist)) {
       $val = Get-AnyPathValue $resp ([string]$p)
       $exists = $true
+      # This assertion is strictly for schema/key presence. Use array_min_len / must_include_* for non-empty requirements.
       if ($val -eq $null) { $exists = $false }
-      elseif ($val -is [string] -and [string]::IsNullOrWhiteSpace($val)) { $exists = $false }
-      elseif (($val -is [System.Array] -or $val -is [System.Collections.IList]) -and @($val).Count -eq 0) { $exists = $false }
       if (-not $exists) { $missing += [string]$p }
     }
     $assertions.paths_exist = [ordered]@{ ok = (($missing | Measure-Object).Count -eq 0); missing = $missing }

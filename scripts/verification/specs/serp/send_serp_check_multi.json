@@ -1,0 +1,25 @@
+{
+  "id": "SEND_SERP_CHECK_MULTI",
+  "pillar": "purpose",
+  "kind": "send",
+  "capabilities": ["chat_send", "serp", "advisor_response"],
+  "request": {
+    "message": "Check these URLs for broken links: https://example.com, https://www.wikipedia.org. Summarize what you find.",
+    "ai_enabled": true,
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["example.com", "wikipedia", "status", "http", "broken"],
+    "min_any_matches": 2,
+    "must_not_include": ["pick an account", "paste an id", "confirm the account"]
+  },
+  "assert": {
+    "reply_min_len": 80,
+    "reply_not_contains": ["pick an account", "paste an id", "confirm the account"]
+  }
+}
+

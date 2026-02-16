@@ -1,0 +1,30 @@
+{
+  "id": "ROUTE_SERP_URL_HEALTH",
+  "pillar": "intent",
+  "kind": "route",
+  "capabilities": ["routing", "serp"],
+  "request": {
+    "message": "SERP Monitor: check URL health for https://example.com and tell me if it's broken.",
+    "customer_ids": [],
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "intent": "serp",
+    "tool": "serp",
+    "run_planner": false,
+    "run_trends": false,
+    "needs_ids": false
+  },
+  "intent_goal": {
+    "intent_path": "intent",
+    "allowed_intents": ["serp"]
+  },
+  "metamorphic": [
+    {
+      "name": "greeting",
+      "message": "Hey - SERP Monitor: check URL health for https://example.com",
+      "expect_same": ["intent", "tool", "run_planner", "needs_ids"]
+    }
+  ]
+}
+
