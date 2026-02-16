@@ -209,6 +209,38 @@ def _get_router_semaphore() -> threading.BoundedSemaphore | None:
     return _LOCAL_LLM_ROUTER_SEMAPHORE
 
 
+def _requests_verify_path() -> str | bool:
+    """
+    Determine a CA bundle path for outbound HTTPS requests.
+
+    Why:
+    - In some container environments, Requests can fail TLS verification due to missing/overridden CA bundles.
+    - We allow an explicit override for enterprise networks while keeping a safe default for Azure.
+    """
+    override = (os.environ.get("KAI_SSL_CA_BUNDLE") or os.environ.get("REQUESTS_CA_BUNDLE") or "").strip()
+    if override:
+        try:
+            if Path(override).exists():
+                return override
+        except Exception:
+            pass
+    try:
+        import certifi  # type: ignore
+
+        ca = certifi.where()
+        if ca and Path(ca).exists():
+            return ca
+    except Exception:
+        pass
+    sys_ca = "/etc/ssl/certs/ca-certificates.crt"
+    try:
+        if Path(sys_ca).exists():
+            return sys_ca
+    except Exception:
+        pass
+    return True
+
+
 def _local_llm_health_check(endpoint: str, timeout: float | None = None) -> tuple[bool, str | None]:
     """
     Lightweight health probe. For Ollama-compatible endpoints, /api/tags is cheap.
@@ -223,7 +255,8 @@ def _local_llm_health_check(endpoint: str, timeout: float | None = None) -> tupl
     try:
         _, tags_url = _local_llm_endpoints(endpoint)
         url = tags_url
-        resp = requests.get(url, timeout=timeout)
+        verify = _requests_verify_path() if str(url).lower().startswith("https://") else True
+        resp = requests.get(url, timeout=timeout, verify=verify)
         allow_404 = os.environ.get("LOCAL_LLM_HEALTH_ALLOW_404", "false").lower() == "true"
         if allow_404 and resp.status_code == 404:
             _LOCAL_LLM_HEALTH_OK_UNTIL = now + 60
@@ -709,7 +742,8 @@ def _call_local_llm(
         payload["format"] = "json"
     try:
         start = time.perf_counter()
-        resp = requests.post(url, json=payload, timeout=timeout)
+        verify = _requests_verify_path() if str(url).lower().startswith("https://") else True
+        resp = requests.post(url, json=payload, timeout=timeout, verify=verify)
         latency_ms = (time.perf_counter() - start) * 1000
         meta.update({"latency_ms": latency_ms, "used": True})
         resp.raise_for_status()
@@ -7244,6 +7278,52 @@ async def chat_route(req: RouteRequest, request: Request):
             candidates=candidates or [],
         )
 
+    # Fast-path: deterministic routing for explicit PPC audit prompts.
+    # This avoids low-confidence router clarifications on obvious audit commands.
+    if msg_slim:
+        audit_cues = (
+            "ppc audit",
+            "klaudit",
+            "run an audit",
+            "run a audit",
+            "run the audit",
+            "audit this account",
+            "audit for this account",
+        )
+        if ("ppc audit" in msg_slim) or ("klaudit" in msg_slim) or any(cue in msg_slim for cue in audit_cues):
+            audit_ids = _normalize_customer_ids(merged_ids or [])
+            explicit_ids = bool(audit_ids or (req.customer_ids or []))
+            if not explicit_ids and not audit_ids:
+                default_ids = _normalize_customer_ids(_default_customer_ids(session_id=sa360_sid))
+                if default_ids:
+                    audit_ids = list(default_ids)
+
+            resolved_ids, _resolved_account, resolution_notes, candidates = _resolve_account_context(
+                req.message,
+                customer_ids=audit_ids,
+                account_name=req.account_name,
+                explicit_ids=explicit_ids,
+                session_id=sa360_sid,
+            )
+
+            audit_notes = (default_route.notes or "") + " router_fastpath_audit"
+            if resolution_notes:
+                audit_notes = f"{audit_notes}; {resolution_notes}"
+
+            return RouteResponse(
+                intent="audit",
+                tool="audit",
+                run_planner=True,
+                run_trends=False,
+                customer_ids=resolved_ids,
+                needs_ids=False,
+                notes=audit_notes,
+                confidence=1.0,
+                needs_clarification=bool(candidates) or (not resolved_ids),
+                clarification=("Which account should I use?" if (candidates or not resolved_ids) else None),
+                candidates=candidates or [],
+            )
+
     # Fast-path: deterministic routing for SERP / competitor prompts.
     # These tools do not require SA360 account IDs, so avoid the router latency and avoid misrouting
     # into the performance planner which then asks the user to pick an account.
@@ -7273,6 +7353,10 @@ async def chat_route(req: RouteRequest, request: Request):
         competitor_cues = (
             "competitor intel:",
             "competitor",
+            "investment signals",
+            "ramping up",
+            "ramp up",
+            "ramping",
             "outranking",
             "impression share",
             "position above",

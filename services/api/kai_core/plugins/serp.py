@@ -3,10 +3,12 @@ SERP Screener plugin with stealth headers and soft-404 detection.
 """
 from __future__ import annotations
 
+import os
 import random
 import time
 from typing import Any, Dict, List, Optional
 
+import certifi
 import requests
 
 try:
@@ -119,6 +121,22 @@ class SerpScanner:
         return results
 
 
+def _requests_verify_path() -> str | bool:
+    override = (os.environ.get("KAI_SSL_CA_BUNDLE") or os.environ.get("REQUESTS_CA_BUNDLE") or "").strip()
+    if override and os.path.exists(override):
+        return override
+    try:
+        ca = certifi.where()
+        if ca and os.path.exists(ca):
+            return ca
+    except Exception:
+        pass
+    sys_ca = "/etc/ssl/certs/ca-certificates.crt"
+    if os.path.exists(sys_ca):
+        return sys_ca
+    return True
+
+
 def check_url_health(url_list: List[str], timeout: int = 3) -> List[Dict[str, Any]]:
     """
     Lightweight URL health check using HEAD; falls back to GET on failure.
@@ -127,14 +145,15 @@ def check_url_health(url_list: List[str], timeout: int = 3) -> List[Dict[str, An
     session = requests.Session()
     for url in url_list:
         entry: Dict[str, Any] = {"url": url}
+        verify = _requests_verify_path() if str(url).lower().startswith("https://") else True
         try:
-            resp = session.head(url, timeout=timeout, allow_redirects=True)
+            resp = session.head(url, timeout=timeout, allow_redirects=True, verify=verify)
             status = resp.status_code
             entry["status"] = status
             entry["soft_404"] = detect_soft_404(resp.text) if status == 200 else False
         except requests.RequestException:
             try:
-                resp = session.get(url, timeout=timeout, allow_redirects=True)
+                resp = session.get(url, timeout=timeout, allow_redirects=True, verify=verify)
                 status = resp.status_code
                 entry["status"] = status
                 entry["soft_404"] = detect_soft_404(resp.text) if status == 200 else False
