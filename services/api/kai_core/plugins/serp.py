@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 
 import certifi
 import requests
+from requests.exceptions import SSLError
 
 try:
     from bs4 import BeautifulSoup  # type: ignore
@@ -146,22 +147,42 @@ def check_url_health(url_list: List[str], timeout: int = 3) -> List[Dict[str, An
     for url in url_list:
         entry: Dict[str, Any] = {"url": url}
         verify = _requests_verify_path() if str(url).lower().startswith("https://") else True
+        resp = None
+        # 1) Prefer HEAD for speed, but fall back to GET (HEAD can be blocked/unsupported).
         try:
             resp = session.head(url, timeout=timeout, allow_redirects=True, verify=verify)
-            status = resp.status_code
-            entry["status"] = status
-            entry["soft_404"] = detect_soft_404(resp.text) if status == 200 else False
+        except SSLError:
+            # Some environments inject TLS certificates that are not in the CA bundle.
+            # Retry once with verification disabled so we can still determine link health.
+            if verify is not False:
+                try:
+                    resp = session.head(url, timeout=timeout, allow_redirects=True, verify=False)
+                except requests.RequestException:
+                    resp = None
         except requests.RequestException:
+            resp = None
+
+        if resp is None or resp.status_code == 405:
             try:
                 resp = session.get(url, timeout=timeout, allow_redirects=True, verify=verify)
-                status = resp.status_code
-                entry["status"] = status
-                entry["soft_404"] = detect_soft_404(resp.text) if status == 200 else False
-            except requests.RequestException as exc:
-                # Schema stability: always return status + soft_404 fields even on failure.
-                # This keeps downstream UI + QA assertions deterministic.
-                entry["status"] = 0
-                entry["soft_404"] = False
-                entry["error"] = str(exc)
+            except SSLError:
+                if verify is not False:
+                    try:
+                        resp = session.get(url, timeout=timeout, allow_redirects=True, verify=False)
+                    except requests.RequestException:
+                        resp = None
+            except requests.RequestException:
+                resp = None
+
+        if resp is not None:
+            status = int(resp.status_code)
+            entry["status"] = status
+            entry["soft_404"] = detect_soft_404(resp.text) if status == 200 else False
+        else:
+            # Schema stability: always return status + soft_404 fields even on failure.
+            # Keep error messages sanitized (no raw requests/SSL exception strings in client responses).
+            entry["status"] = 0
+            entry["soft_404"] = False
+            entry["error"] = "request_failed"
         results.append(entry)
     return results

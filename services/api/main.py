@@ -11563,7 +11563,18 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 except Exception:
                     msg_slim = ""
                 if msg_slim:
-                    if any(needle in msg_slim for needle in ("pmax", "performance max", "performance_max")):
+                    audit_cues = (
+                        "audit",
+                        "ppc audit",
+                        "klaudit",
+                        "brand audit",
+                        "nonbrand audit",
+                        "run audit",
+                        "generate audit",
+                    )
+                    if any(cue in msg_slim for cue in audit_cues):
+                        tool = "audit"
+                    elif any(needle in msg_slim for needle in ("pmax", "performance max", "performance_max")):
                         tool = "pmax"
                     else:
                         serp_cues = (
@@ -11774,6 +11785,11 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 return False
 
             def _is_performance_context(tool_name: str | None, output: Any) -> bool:
+                # Explicit non-performance tools must not be treated as performance followups,
+                # even if a prior session stored a performance payload. This prevents cross-tool
+                # hijacks (e.g., competitor/audit prompts reusing a performance context).
+                if isinstance(tool_name, str) and tool_name.lower() in {"serp", "pmax", "competitor", "audit"}:
+                    return False
                 if tool_name == "performance":
                     return True
                 if isinstance(output, dict):
@@ -12072,6 +12088,10 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 and stored_tool_output is not None
                 and stored_perf
                 and _is_performance_followup(chat.message)
+                # Only reuse stored performance context for performance followups.
+                # If the current message routed to another tool (audit/competitor/serp/pmax),
+                # do not inject performance outputs into that flow.
+                and (tool is None or tool == "performance")
             ):
                 tool_output = stored_tool_output
                 tool = tool or ("performance" if stored_perf else stored_tool)
@@ -12183,23 +12203,29 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                             followup_reply = relational_reply
                             model_used = "rules_relational"
                     if not followup_reply:
-                        if is_action_request:
-                            followup_reply, llm_meta = _llm_advise_performance(
-                                effective_question,
-                                _compact_tool_output(tool_output),
-                            )
-                        else:
-                            followup_reply, llm_meta = _llm_explain_performance(
-                                effective_question,
-                                _compact_tool_output(tool_output),
-                            )
+                        # Prefer a deterministic follow-up first to keep latency within interactive budgets
+                        # and avoid unnecessary Azure usage for common "what should I do next?" prompts.
+                        followup_reply = _build_performance_followup_reply(effective_question, tool_output)
                         if followup_reply:
-                            model_used = llm_meta.get("model") if isinstance(llm_meta, dict) else "planner_followup"
-                        else:
-                            followup_reply = _build_performance_followup_reply(
-                                effective_question, tool_output
-                            )
                             model_used = "planner_followup"
+                        else:
+                            if is_action_request:
+                                followup_reply, llm_meta = _llm_advise_performance(
+                                    effective_question,
+                                    _compact_tool_output(tool_output),
+                                )
+                            else:
+                                followup_reply, llm_meta = _llm_explain_performance(
+                                    effective_question,
+                                    _compact_tool_output(tool_output),
+                                )
+                            if followup_reply:
+                                model_used = llm_meta.get("model") if isinstance(llm_meta, dict) else "planner_followup"
+                            else:
+                                followup_reply = _build_performance_followup_reply(
+                                    effective_question, tool_output
+                                )
+                                model_used = "planner_followup"
                     if followup_reply:
                         guardrail_meta = None
                         allowed_numbers: set[str] = set()
@@ -12392,6 +12418,68 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 )
                 _save_message("assistant", reply)
                 return ChatResponse(reply=reply, sources=[])
+
+            if tool == "audit":
+                # Chat audit should be fast and actionable. Use available performance context
+                # (stored planner/tool output) to produce "top priorities" without forcing a long-running
+                # XLSX audit job in the chat path.
+                acct_label = (chat.account_name or resolved_context_account or "").strip() or "the selected account"
+                payload: dict | None = None
+                if isinstance(tool_output, dict):
+                    payload = tool_output
+                elif isinstance(stored_tool_output, dict) and _looks_like_performance_output(stored_tool_output):
+                    payload = stored_tool_output
+
+                priorities: list[str] = []
+                if isinstance(payload, dict):
+                    result = payload.get("result") or {}
+                    deltas = result.get("deltas") or {}
+                    if isinstance(deltas, dict):
+                        ctr_pct = _delta_pct(deltas, "ctr")
+                        cpc_pct = _delta_pct(deltas, "cpc")
+                        conv_pct = _delta_pct(deltas, "conversions")
+                        cpa_pct = _delta_pct(deltas, "cpa")
+
+                        # Directional, data-backed priorities (avoid introducing new ungrounded numbers).
+                        if conv_pct is not None and conv_pct < 0:
+                            priorities.append(
+                                "Conversion volume: verify tracking + landing page flow, then isolate CVR drivers (campaign/device/query/geo)."
+                            )
+                        if cpa_pct is not None and cpa_pct > 0:
+                            priorities.append(
+                                "Efficiency (CPA): tighten bids/budget allocation, remove waste, and confirm conversion quality."
+                            )
+                        if ctr_pct is not None and ctr_pct < 0:
+                            priorities.append(
+                                "Engagement (CTR): refresh ads/creative and improve keyword-to-ad-to-landing relevance."
+                            )
+                        if cpc_pct is not None and cpc_pct > 0:
+                            priorities.append(
+                                "Cost pressure (CPC): review bidding strategy, quality signals, and auction pressure."
+                            )
+
+                if not priorities:
+                    priorities = [
+                        "Measurement: confirm primary conversions are tracking correctly and consistently across the window.",
+                        "Efficiency: identify the biggest cost drivers (campaign/device/query) and remove waste before scaling.",
+                        "Relevance + CRO: improve ad-to-landing alignment and landing page conversion rate to raise volume without higher bids.",
+                    ]
+
+                # Guarantee exactly three lines for UX clarity.
+                p1 = priorities[0] if len(priorities) > 0 else "Confirm tracking and conversion definitions."
+                p2 = priorities[1] if len(priorities) > 1 else "Check campaign/device/query slices to find the biggest mover."
+                p3 = priorities[2] if len(priorities) > 2 else "Run a deeper audit (Klaudit) for checklist-level coverage."
+
+                reply = (
+                    f"Audit (quick) for {acct_label}: top 3 priority actions.\n"
+                    f"Priority 1: {p1}\n"
+                    f"Priority 2: {p2}\n"
+                    f"Priority 3: {p3}\n\n"
+                    "Next step: If you want the full checklist audit + report, run Klaudit Audit and I’ll generate it asynchronously."
+                )
+                reply = _normalize_reply_text(reply) or reply
+                _save_message("assistant", reply)
+                return ChatResponse(reply=reply, sources=[], model="rules_audit")
 
             if tool == "competitor":
                 domain = _extract_domain(chat.message) or "competitor"
