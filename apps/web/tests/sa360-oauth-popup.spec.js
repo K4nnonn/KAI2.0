@@ -35,7 +35,26 @@ test.describe('SA360 OAuth Popup Robustness', () => {
       sessionStorage.setItem('kai_chat_session_id', sid)
       localStorage.setItem('kai_chat_session_id', sid)
 
-      window.__pwOpenCalled = 0
+      // Persist the counter across navigations so the test can assert window.open was invoked
+      // even if the app immediately falls back to a same-tab navigation (which destroys the
+      // current execution context). We use window.name because it persists across cross-origin
+      // navigations (localStorage/sessionStorage do not).
+      const openCalledPrefix = 'pw-openCalled:'
+      const existing = (() => {
+        try {
+          const name = String(window.name || '')
+          if (name.startsWith(openCalledPrefix)) {
+            const raw = name.slice(openCalledPrefix.length)
+            const n = Number.parseInt(raw || '0', 10)
+            return Number.isFinite(n) ? n : 0
+          }
+        } catch {
+          // ignore
+        }
+        return 0
+      })()
+      window.name = `${openCalledPrefix}${existing}`
+      window.__pwOpenCalled = existing
       window.__pwOpenIsStub = true
 
       // Simulate a popup where setting location.href is silently ignored (COOP/COEP-style failure),
@@ -49,7 +68,22 @@ test.describe('SA360 OAuth Popup Robustness', () => {
       })
 
       window.open = () => {
-        window.__pwOpenCalled += 1
+        const prev = (() => {
+          try {
+            const name = String(window.name || '')
+            if (name.startsWith(openCalledPrefix)) {
+              const raw = name.slice(openCalledPrefix.length)
+              const n = Number.parseInt(raw || '0', 10)
+              return Number.isFinite(n) ? n : 0
+            }
+          } catch {
+            // ignore
+          }
+          return 0
+        })()
+        const next = prev + 1
+        window.name = `${openCalledPrefix}${next}`
+        window.__pwOpenCalled = next
         return {
           location: locationStub,
           focus: () => {},
@@ -85,13 +119,17 @@ test.describe('SA360 OAuth Popup Robustness', () => {
     await connect.click()
     await startReq
 
-    // Capture openCalled *before* the app falls back to same-tab navigation.
-    // Once navigation happens, our init script runs again on the new document and the counter resets.
-    await page.waitForTimeout(50)
-    const openCalledEarly = await page.evaluate(() => window.__pwOpenCalled || 0)
-
     const popup = await popupPromise
-    const openCalled = openCalledEarly
+
+    // Wait briefly so any same-tab navigation (fallback) can complete and the document is stable.
+    await page.waitForTimeout(50)
+    const openCalled = await page.evaluate(() => {
+      const prefix = 'pw-openCalled:'
+      const name = String(window.name || '')
+      if (!name.startsWith(prefix)) return 0
+      const raw = name.slice(prefix.length)
+      return Number.parseInt(raw || '0', 10) || 0
+    })
 
     if (popup) {
       await testInfo.attach('console.txt', {
