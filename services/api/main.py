@@ -6973,7 +6973,45 @@ async def diagnostics_advisor(req: AdvisorCheckRequest):
         intent="advisor_check",
         max_tokens=240,
         force_json=True,
+        record_usage=True,
     )
+    if not reply:
+        # Diagnostics should be resilient to transient local LLM hiccups. Use Azure fallback (budgeted)
+        # to keep CI checks stable while still reporting the root cause in meta.
+        try:
+            start = time.perf_counter()
+            azure_text = call_azure_openai(
+                messages,
+                session_id=None,
+                intent="advisor_check",
+                tenant_id=None,
+                use_json_mode=True,
+                max_tokens=240,
+                temperature=0.0,
+                purpose="fallback",
+            )
+            latency_ms = (time.perf_counter() - start) * 1000
+            meta = {
+                "model": "azure",
+                "intent": "advisor_check",
+                "used": True,
+                "latency_ms": latency_ms,
+                # Preserve local error signal for debugging without exposing env/secrets.
+                "local_error": (meta or {}).get("error"),
+                "fallback": "azure",
+            }
+            reply = azure_text
+        except Exception as exc:
+            meta = {
+                "model": "azure",
+                "intent": "advisor_check",
+                "used": False,
+                "error": str(exc),
+                "local_error": (meta or {}).get("error"),
+                "fallback": "azure_failed",
+            }
+            reply = None
+
     if not reply:
         return {
             "status": "ok",
