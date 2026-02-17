@@ -5848,30 +5848,22 @@ async def _chat_plan_and_run_core(req: PlanRequest, request: Request | None = No
                     summary="SA360 isn't connected for this session. Click Connect SA360 at the top of Kai, then retry.",
                 )
 
-            # QA stability + user intent: if the caller supplied an explicit default window and the user
-            # explicitly requested a "single window only" view, prefer the provided window over a
-            # relative "last N days" interpretation. This keeps deterministic QA stable while still
-            # allowing natural-language ranges when the UI does not provide a concrete window.
+            # QA stability + user intent: when a caller supplies a concrete window (YYYY-MM-DD,YYYY-MM-DD),
+            # prefer it for "complete days" style asks. This keeps parity/accuracy checks deterministic
+            # while still allowing natural-language ranges when the UI does not provide a concrete window.
             try:
-                if (
-                    (not bool(req.include_previous))
-                    and req.default_date_range
-                    and isinstance(req.default_date_range, str)
-                    and "," in req.default_date_range
-                ):
+                if req.default_date_range and isinstance(req.default_date_range, str) and "," in req.default_date_range:
                     msg_lower = (req.message or "").lower()
+
+                    # "Single window only" phrasing + last-30 style requests (no previous compare) should honor caller window.
                     if (
-                        ("single window" in msg_lower or "single-window" in msg_lower)
-                        and any(
-                            token in msg_lower
-                            for token in (
-                                "last 30",
-                                "past 30",
-                                "previous 30",
-                                "last month",
-                            )
-                        )
+                        (not bool(req.include_previous))
+                        and ("single window" in msg_lower or "single-window" in msg_lower)
+                        and any(token in msg_lower for token in ("last 30", "past 30", "previous 30", "last month"))
                     ):
+                        plan["date_range"] = req.default_date_range
+                    # "Last 7 complete days" should also honor caller window (the UI/QA runner provides a stable range).
+                    elif ("complete" in msg_lower and any(token in msg_lower for token in ("last 7", "past 7", "previous 7"))):
                         plan["date_range"] = req.default_date_range
             except Exception:
                 pass
@@ -12276,11 +12268,36 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 try:
                     serp_results = check_url_health(urls)
                     lines = []
+                    broken = []
                     for r in serp_results or []:
-                        status = r.get("status") or r.get("http_status")
-                        issue = r.get("issue") or r.get("message") or ""
-                        lines.append(f"{r.get('url')}: {status} {('- ' + issue) if issue else ''}".strip())
-                    reply = "URL health check:\n" + "\n".join(lines) if lines else "URLs processed, no issues found."
+                        u = str(r.get("url") or "").strip()
+                        status = int(r.get("status") or r.get("http_status") or 0)
+                        soft_404 = bool(r.get("soft_404")) if status == 200 else False
+
+                        if status:
+                            status_label = f"HTTP {status}"
+                        else:
+                            status_label = "HTTP request failed"
+
+                        line = f"- {u}: {status_label}"
+                        if status >= 400:
+                            broken.append(u)
+                            line += " (possible broken link)"
+                        if status == 200:
+                            line += f"; soft-404={str(soft_404).lower()}"
+                        lines.append(line.strip())
+
+                    summary = (
+                        "URL health check complete. I fetched HTTP status codes and a simple soft-404 signal "
+                        "(page returns 200 but looks like a 'not found' page)."
+                    )
+                    if broken:
+                        summary += f" Potential issues: {len(broken)} URL(s) returned 4xx/5xx."
+                    next_steps = (
+                        "Next: If any URL is broken or soft-404=true, fix the destination or pause ads pointing "
+                        "to it to avoid wasted spend."
+                    )
+                    reply = (summary + "\n" + "\n".join(lines) + "\n" + next_steps) if lines else (summary + " No URLs processed.")
                     _save_message("assistant", reply)
                     return ChatResponse(reply=reply, sources=[])
                 except Exception as exc:
