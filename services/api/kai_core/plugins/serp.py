@@ -144,6 +144,14 @@ def check_url_health(url_list: List[str], timeout: int = 3) -> List[Dict[str, An
     """
     results: List[Dict[str, Any]] = []
     session = requests.Session()
+    # Some sites (including wikipedia.org) return 4xx for HEAD or for "python-requests" user agents.
+    # Use a browser-like UA so we get a representative HTTP status for health checks.
+    session.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        }
+    )
     for url in url_list:
         entry: Dict[str, Any] = {"url": url}
         verify = _requests_verify_path() if str(url).lower().startswith("https://") else True
@@ -162,7 +170,8 @@ def check_url_health(url_list: List[str], timeout: int = 3) -> List[Dict[str, An
         except requests.RequestException:
             resp = None
 
-        if resp is None or resp.status_code == 405:
+        # Fall back when HEAD is blocked (405) or returns forbidden (403) but GET might still succeed.
+        if resp is None or resp.status_code in (403, 405) or resp.status_code >= 500:
             try:
                 resp = session.get(url, timeout=timeout, allow_redirects=True, verify=verify)
             except SSLError:
