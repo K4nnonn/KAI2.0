@@ -1,28 +1,33 @@
 import { test, expect } from '@playwright/test'
 
 const frontendUrl = (process.env.FRONTEND_URL || '').trim()
-const backendUrl = (process.env.BACKEND_URL || '').trim()
 
 const requireFrontend = () => {
   test.skip(!frontendUrl, 'FRONTEND_URL not set; skipping SA360 OAuth popup tests')
 }
 
 test.describe('SA360 OAuth Popup Robustness', () => {
-  test('falls back to same-tab when popup navigation is blocked (blank popup)', async ({ page }, testInfo) => {
+  test('opens the direct /oauth/start endpoint in a popup (no start-url indirection)', async ({ page }) => {
     requireFrontend()
-    test.skip(!backendUrl, 'BACKEND_URL not set')
 
-    const fakeSessionId = `pw-sa360-oauth-${Date.now()}`
+    const sid = `pw-sa360-oauth-${Date.now()}`
+    let startUrlCalled = false
 
-    const consoleLines = []
-    page.on('console', (msg) => {
-      const type = msg.type()
-      if (type === 'error' || type === 'warning') {
-        consoleLines.push(`[console.${type}] ${msg.text()}`)
-      }
+    // If the UI regresses to fetching /start-url, we want a hard signal.
+    await page.route('**/api/sa360/oauth/start-url**', async (route) => {
+      startUrlCalled = true
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ detail: 'start-url should not be called by the UI' }),
+      })
     })
-    page.on('pageerror', (err) => {
-      consoleLines.push(`[pageerror] ${err?.message || String(err)}`)
+    await page.route('**/api/sa360/oauth/status**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ connected: false, login_customer_id: null, default_customer_id: null }),
+      })
     })
 
     await page.addInitScript(({ sid }) => {
@@ -31,120 +36,72 @@ test.describe('SA360 OAuth Popup Robustness', () => {
       sessionStorage.setItem(grantKey, 'true')
       localStorage.setItem(grantKey, 'true')
 
-      // Some code paths prefer localStorage, others sessionStorage.
       sessionStorage.setItem('kai_chat_session_id', sid)
       localStorage.setItem('kai_chat_session_id', sid)
 
-      // Persist the counter across navigations so the test can assert window.open was invoked
-      // even if the app immediately falls back to a same-tab navigation (which destroys the
-      // current execution context). We use window.name because it persists across cross-origin
-      // navigations (localStorage/sessionStorage do not).
-      const openCalledPrefix = 'pw-openCalled:'
-      const existing = (() => {
-        try {
-          const name = String(window.name || '')
-          if (name.startsWith(openCalledPrefix)) {
-            const raw = name.slice(openCalledPrefix.length)
-            const n = Number.parseInt(raw || '0', 10)
-            return Number.isFinite(n) ? n : 0
-          }
-        } catch {
-          // ignore
-        }
-        return 0
-      })()
-      window.name = `${openCalledPrefix}${existing}`
-      window.__pwOpenCalled = existing
+      window.__pwOpenUrl = null
       window.__pwOpenIsStub = true
-
-      // Simulate a popup where setting location.href is silently ignored (COOP/COEP-style failure),
-      // leaving the window stuck at about:blank without throwing.
-      const locationStub = {}
-      Object.defineProperty(locationStub, 'href', {
-        configurable: true,
-        enumerable: true,
-        get: () => 'about:blank',
-        set: () => {},
-      })
-
-      window.open = () => {
-        const prev = (() => {
-          try {
-            const name = String(window.name || '')
-            if (name.startsWith(openCalledPrefix)) {
-              const raw = name.slice(openCalledPrefix.length)
-              const n = Number.parseInt(raw || '0', 10)
-              return Number.isFinite(n) ? n : 0
-            }
-          } catch {
-            // ignore
-          }
-          return 0
-        })()
-        const next = prev + 1
-        window.name = `${openCalledPrefix}${next}`
-        window.__pwOpenCalled = next
-        return {
-          location: locationStub,
-          focus: () => {},
-          close: () => {},
-        }
+      window.open = (url) => {
+        window.__pwOpenUrl = String(url || '')
+        return { focus: () => {}, close: () => {} }
       }
-    }, { sid: fakeSessionId })
-
-    // If the fallback triggers, the page will navigate to Google OAuth.
-    // Fulfill it so the test can assert the navigation without hitting Google.
-    await page.route('https://accounts.google.com/**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'text/html',
-        body: '<!doctype html><title>oauth</title><p>ok</p>',
-      })
-    })
+    }, { sid })
 
     await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
-
-    // Ensure our init-script overrides actually applied.
     await expect.poll(() => page.evaluate(() => window.__pwOpenIsStub === true)).toBe(true)
 
     const connect = page.getByRole('button', { name: /connect sa360/i })
     await expect(connect).toBeVisible()
-
-    const startReq = page.waitForRequest(/\/api\/sa360\/oauth\/start-url/i)
-    const oauthReqPromise = page.waitForRequest(/accounts\.google\.com/i, { timeout: 15_000 }).catch(() => null)
-
-    // If a real popup is created, this test isn't exercising the blank-popup fallback.
-    const popupPromise = page.waitForEvent('popup', { timeout: 2000 }).catch(() => null)
-
     await connect.click()
-    await startReq
 
-    const popup = await popupPromise
+    await expect.poll(() => page.evaluate(() => window.__pwOpenUrl)).toBeTruthy()
+    const openedUrl = await page.evaluate(() => window.__pwOpenUrl)
 
-    // Wait briefly so any same-tab navigation (fallback) can complete and the document is stable.
-    await page.waitForTimeout(50)
-    const openCalled = await page.evaluate(() => {
-      const prefix = 'pw-openCalled:'
-      const name = String(window.name || '')
-      if (!name.startsWith(prefix)) return 0
-      const raw = name.slice(prefix.length)
-      return Number.parseInt(raw || '0', 10) || 0
+    expect(openedUrl).toMatch(/\/api\/sa360\/oauth\/start/i)
+    expect(openedUrl).toContain(`session_id=${encodeURIComponent(sid)}`)
+    expect(startUrlCalled).toBe(false)
+  })
+
+  test('falls back to same-tab when popup handle is unavailable (window.open returns null)', async ({ page }) => {
+    requireFrontend()
+
+    const sid = `pw-sa360-oauth-${Date.now()}`
+
+    await page.route('**/api/sa360/oauth/status**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ connected: false, login_customer_id: null, default_customer_id: null }),
+      })
+    })
+    await page.route('**/api/sa360/oauth/start**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: '<!doctype html><title>oauth</title><p>oauth-fallback-ok</p>',
+      })
     })
 
-    if (popup) {
-      await testInfo.attach('console.txt', {
-        body: consoleLines.join('\n') || '(no console warnings/errors captured)',
-        contentType: 'text/plain',
-      })
-      throw new Error(`Unexpected real popup was created (openCalled=${openCalled}). This test must simulate a blank popup.`)
-    }
+    await page.addInitScript(({ sid }) => {
+      const grantKey = 'kai_access_granted_v2'
+      sessionStorage.setItem(grantKey, 'true')
+      localStorage.setItem(grantKey, 'true')
 
-    // Sanity: ensure our stub window.open was invoked.
-    expect(openCalled).toBeGreaterThan(0)
+      sessionStorage.setItem('kai_chat_session_id', sid)
+      localStorage.setItem('kai_chat_session_id', sid)
 
-    // The app should detect the popup stayed blank and fall back to same-tab OAuth,
-    // issuing a request to Google OAuth in the main page (not via the popup stub).
-    const oauthReq = await oauthReqPromise
-    expect(oauthReq, 'Expected same-tab OAuth request to accounts.google.com').not.toBeNull()
+      window.__pwOpenIsStub = true
+      window.open = () => null
+    }, { sid })
+
+    await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
+    await expect.poll(() => page.evaluate(() => window.__pwOpenIsStub === true)).toBe(true)
+
+    const connect = page.getByRole('button', { name: /connect sa360/i })
+    await expect(connect).toBeVisible()
+    await connect.click()
+
+    await expect(page).toHaveURL(/\/api\/sa360\/oauth\/start/i, { timeout: 15000 })
+    await expect(page.getByText('oauth-fallback-ok')).toBeVisible({ timeout: 15000 })
   })
 })

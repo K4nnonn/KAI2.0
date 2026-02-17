@@ -1007,77 +1007,28 @@ export default function KaiChat() {
     if (!sessionId) return
     setSa360StatusError(null)
     setSa360StatusSuccess('Opening Google sign-in…')
-    // Open popup synchronously (prevents popup blockers), then navigate once we fetch the OAuth URL.
-    // NOTE: do not use noopener/noreferrer here; callback relies on window.opener.postMessage.
-    // Some browsers return null when noopener is set, causing a blank about:blank popup.
-    const w = window.open('about:blank', 'kai_sa360_oauth', 'popup,width=520,height=720')
 
-    axios
-      .get(`${API_BASE_URL}/api/sa360/oauth/start-url`, {
-        params: { session_id: sessionId },
-      })
-      .then((resp) => {
-        const nextUrl = resp?.data?.url ? String(resp.data.url) : ''
-        if (!nextUrl) {
-          throw new Error('No OAuth URL returned.')
-        }
-        let fallbackTriggered = false
-        const fallbackToSameTab = (reason) => {
-          if (fallbackTriggered) return
-          fallbackTriggered = true
-          try {
-            if (w && typeof w.close === 'function') w.close()
-          } catch {
-            // ignore
-          }
-          // Popup was blocked or inaccessible; continue OAuth in the same tab as a safe fallback.
-          setSa360StatusSuccess(reason || 'Popup unavailable; continuing sign-in in this tab…')
-          window.location.assign(nextUrl)
-        }
+    // Open the redirect endpoint directly in a popup to avoid COOP/COEP issues that can block
+    // `popup.location = ...` from the opener (which can lead to a blank `about:blank` window).
+    // NOTE: do not use `noopener/noreferrer`; callback relies on `window.opener.postMessage`.
+    const nextUrl = `${API_BASE_URL}/api/sa360/oauth/start?session_id=${encodeURIComponent(sessionId)}`
+    const w = window.open(nextUrl, 'kai_sa360_oauth', 'popup,width=520,height=720')
 
-        let navigatedPopup = false
-        if (w) {
-          try {
-            // Some COOP/COEP browser policies can block popup.location navigation without throwing.
-            // We still attempt it first, then verify the popup left about:blank before assuming success.
-            w.location.href = nextUrl
-            if (typeof w.focus === 'function') w.focus()
-            navigatedPopup = true
-          } catch {
-            navigatedPopup = false
-          }
-        }
-        if (!navigatedPopup) {
-          fallbackToSameTab('Popup unavailable; continuing sign-in in this tab…')
-        } else if (w) {
-          // If the popup stays on about:blank, the navigation was blocked (common with strict COOP).
-          // Fall back to same-tab OAuth so the user isn't left with a blank window.
-          setTimeout(() => {
-            if (fallbackTriggered) return
-            try {
-              const href = String(w.location?.href || '')
-              if (href && href.startsWith('about:blank')) {
-                fallbackToSameTab('Popup blocked by browser policy; continuing sign-in in this tab…')
-              }
-            } catch {
-              // Cross-origin access throws once navigated; treat that as success.
-            }
-          }, 250)
-        }
-        // Fallback polling in case postMessage is blocked by the browser.
-        setTimeout(fetchSa360Status, 2500)
-      })
-      .catch((err) => {
-        try {
-          w.close()
-        } catch {
-          // ignore
-        }
-        setSa360StatusSuccess(null)
-        setSa360StatusError(
-          err?.response?.data?.detail || err?.message || 'Failed to start SA360 OAuth. Please retry.'
-        )
-      })
+    if (!w) {
+      // Popup blocked; continue OAuth in the same tab as a safe fallback.
+      setSa360StatusSuccess('Popup blocked. Please allow popups for this site and try again.')
+      window.location.assign(nextUrl)
+      return
+    }
+
+    try {
+      if (typeof w.focus === 'function') w.focus()
+    } catch {
+      // ignore
+    }
+
+    // Fallback polling in case postMessage is blocked by the browser.
+    setTimeout(fetchSa360Status, 2500)
   }
 
   const saveLoginCustomerId = async (overrideLoginCustomerId) => {

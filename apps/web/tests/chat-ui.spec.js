@@ -190,15 +190,10 @@ test.describe('Kai Chat UI', () => {
         body: JSON.stringify({ connected: false, login_customer_id: null, default_customer_id: null }),
       })
     })
-    await ctx.route('**/api/sa360/oauth/start-url**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ url: `${frontendUrl}/oauth-popup-probe` }),
-      })
-    })
-    // Popup runs in a separate Playwright page; route at the browser-context level.
-    await ctx.route('**/oauth-popup-probe', async (route) => {
+    // The UI should open the redirect endpoint directly (avoid about:blank -> location navigation COOP issues).
+    await ctx.route('**/api/sa360/oauth/start**', async (route) => {
+      const url = route.request().url()
+      expect(url).toContain(`session_id=${encodeURIComponent(newSession)}`)
       await route.fulfill({
         status: 200,
         contentType: 'text/html',
@@ -214,9 +209,7 @@ test.describe('Kai Chat UI', () => {
     await expect(connectBtn).toBeVisible({ timeout: 60000 })
 
     const popupPromise = page.waitForEvent('popup', { timeout: 15000 })
-    const startReq = page.waitForRequest((req) => req.url().includes('/api/sa360/oauth/start-url') && req.method() === 'GET', { timeout: 15000 })
     await connectBtn.click()
-    await startReq
     const popup = await popupPromise
     await popup.waitForLoadState('domcontentloaded')
     await expect(popup.locator('#probe')).toHaveText(/opener-ok/i, { timeout: 10000 })
@@ -241,29 +234,17 @@ test.describe('Kai Chat UI', () => {
         body: JSON.stringify({ connected: false, login_customer_id: null, default_customer_id: null }),
       })
     })
-    await ctx.route('**/api/sa360/oauth/start-url**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ url: `${frontendUrl}/oauth-fallback-test` }),
-      })
-    })
-    await ctx.route('**/oauth-fallback-test', async (route) => {
+    await ctx.route('**/api/sa360/oauth/start**', async (route) => {
       await route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>oauth-fallback-ok</body></html>' })
     })
 
     await page.goto(frontendUrl, { waitUntil: 'domcontentloaded' })
     const connectBtn = page.getByRole('button', { name: /connect sa360/i })
     await expect(connectBtn).toBeVisible({ timeout: 60000 })
-    const startReq = page.waitForRequest((req) => req.url().includes('/api/sa360/oauth/start-url') && req.method() === 'GET', { timeout: 15000 })
     await connectBtn.click()
-    await startReq
 
-    await expect.poll(async () => {
-      const inFallbackUrl = /oauth-fallback-test/i.test(page.url())
-      const hasFallbackBanner = (await page.getByText(/continuing sign-in in this tab/i).count()) > 0
-      return inFallbackUrl || hasFallbackBanner
-    }, { timeout: 15000 }).toBe(true)
+    await expect(page).toHaveURL(/\/api\/sa360\/oauth\/start/i, { timeout: 15000 })
+    await expect(page.getByText('oauth-fallback-ok')).toBeVisible({ timeout: 15000 })
   })
 
   test('SA360 not-connected blocks performance planner with clear CTA', async ({ page }) => {
