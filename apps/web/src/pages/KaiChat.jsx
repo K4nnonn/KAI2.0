@@ -1399,11 +1399,10 @@ export default function KaiChat() {
     const routedSystem = routing?.tool || (routing?.intent === 'performance' ? 'performance' : null) || detectedSystem
 
     const hasExplicitIds = extractCustomerIds(userMessage).length > 0
-    const hasFollowupContext = !!(
-      lastPlannerSnapshot?.analysis?.summary ||
-      lastPlannerSnapshot?.summary ||
-      lastPlannerSnapshot?.enhanced_summary
-    )
+    // A planner snapshot is valid follow-up context even if the backend did not populate `summary` fields
+    // (the UI may still have a paraphrased summary via `prompt_kind=planner_summary`).
+    // Key off the presence of the planner `plan` to avoid accidentally re-running the planner on follow-ups.
+    const hasFollowupContext = !!(lastPlannerSnapshot?.plan)
     const timeframeHint = hasTimeframeHint(userMessage)
     const explicitTrendsCue = hasExplicitTrendsCue(userMessage)
     const relationalMetricPrompt = isRelationalMetricPrompt(userMessage)

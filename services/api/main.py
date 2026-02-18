@@ -12749,6 +12749,31 @@ async def send_chat_message(chat: ChatMessage, request: Request):
 
             # If account/metric intent and no connected data, provide a clear gate with choices
             elif is_metric_or_account_intent(chat.message):
+                # Fast advisor path: "what should I do / give me levers / recommendations" asks should not
+                # trigger the SA360 planner when no timeframe or tool output is provided. The planner can be
+                # slow and may fail when SA360 fetch is disabled in the current environment. Instead, return
+                # a deterministic, advisor-grade answer and tell the user how to ground it next.
+                if (
+                    _is_performance_action_request(chat.message)
+                    and has_account_context
+                    and not has_timeframe
+                    and not has_tool_context
+                ):
+                    reply = (
+                        "Here are 3 levers to improve performance (prioritize based on whether you care most about CPA, ROAS, or volume):\n"
+                        "1) Budget & pacing: shift budget toward campaigns/ad groups with the best CPA/ROAS and away from high-cost, low-return segments. "
+                        "Watch spend pacing, lost impression share (budget), and CTR so you don’t starve efficient demand.\n"
+                        "2) Bidding: adjust bid strategy targets gradually (one major change at a time). If you’re on automated bidding, expect a learning/settling period; "
+                        "monitor CPC, CPA, conversion volume, and volatility before stacking additional changes.\n"
+                        "3) Keywords / creative / landing page: mine search terms for negatives + new keyword themes, refresh RSA creatives to lift CTR, and fix landing-page speed/UX "
+                        "to improve conversion rate.\n"
+                        "Next: run a performance check for the selected account/timeframe and ask again—I’ll quantify which lever is most likely driving the change."
+                    )
+                    reply = _normalize_reply_text(reply) or reply
+                    model_used = "rules_fast_performance_advice"
+                    _save_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=sources, model=model_used)
+
                 if (effective_customer_ids or has_timeframe or has_account_context) and not tool_output:
                     try:
                         ids = list(effective_customer_ids)
@@ -12783,20 +12808,20 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                         _save_message("assistant", reply)
                     return ChatResponse(reply=reply, sources=sources, model=model_used)
                 else:
-                        advisor_reply = _advisor_missing_data_reply_for_session(chat.message, sa360_sid)
-                        if advisor_reply:
-                            reply = advisor_reply
-                            model_used = "local"
-                        else:
-                            reply = _ensure_advisor_sections(
-                                "I need connected data to answer that if it is specific to your account or campaigns.",
-                                evidence="I do not have report output or performance data (CPC/CTR/ROAS) for this account.",
-                                hypothesis="It is likely driven by bid or query mix changes, but I need account data to confirm.",
-                                next_step="Share the account and timeframe or run a performance check to ground the answer.",
-                            )
-                            model_used = "rules"
-                        _save_message("assistant", reply)
-                        return ChatResponse(reply=reply, sources=sources, model=model_used)
+                    advisor_reply = _advisor_missing_data_reply_for_session(chat.message, sa360_sid)
+                    if advisor_reply:
+                        reply = advisor_reply
+                        model_used = "local"
+                    else:
+                        reply = _ensure_advisor_sections(
+                            "I need connected data to answer that if it is specific to your account or campaigns.",
+                            evidence="I do not have report output or performance data (CPC/CTR/ROAS) for this account.",
+                            hypothesis="It is likely driven by bid or query mix changes, but I need account data to confirm.",
+                            next_step="Share the account and timeframe or run a performance check to ground the answer.",
+                        )
+                        model_used = "rules"
+                    _save_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=sources, model=model_used)
                 if is_strategy_intent(chat.message) and not effective_customer_ids:
                     strategy_reply = _advisor_strategy_reply(chat.message)
                     if not strategy_reply:
@@ -12914,60 +12939,81 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                     model_used = "rules"
                     fallback_reason = "missing_data_deterministic"
                 else:
-                    if is_strategy_intent(chat.message) and not effective_customer_ids:
-                        strategy_reply = _advisor_strategy_reply(chat.message)
-                        if not strategy_reply:
-                            strategy_reply = _ensure_advisor_sections(
-                                "Here are three actions to improve ROAS at a portfolio level.",
-                                evidence="Based on common performance data patterns (CPC/CTR/ROAS) and report output context.",
-                                hypothesis="It is likely that targeting breadth and message depth are limiting efficiency.",
-                                next_step="Review top campaigns by cost and test two new USP/CTA variations, then measure ROAS impact.",
-                            )
-                            model_used = "rules"
-                        else:
-                            model_used = "local"
-                        draft_reply = strategy_reply
-                    else:
-                        draft_reply, llm_meta = _call_llm(
-                            messages, intent="general_chat", allow_local=True, max_tokens=600
+                    # Performance "what should I do" asks can arrive without tool output (e.g., first-turn chat with
+                    # an account already selected). In that case, avoid slow LLM calls that may hallucinate account
+                    # state and violate latency budgets. Return an advisor-grade, data-minimizing answer and tell the
+                    # user how to ground it next.
+                    is_action_request = _is_performance_action_request(chat.message)
+                    is_perf_prompt = "performance" in (lower_message or "") or bool(_extract_custom_metric_mentions(chat.message))
+                    no_tool_ctx = (not tool_output_present) and (tool_output is None) and (stored_tool_output is None)
+                    if is_action_request and is_perf_prompt and no_tool_ctx and has_account_context:
+                        draft_reply = (
+                            "Here are 3 levers to improve performance (prioritize based on whether you care most about CPA, ROAS, or volume):\n"
+                            "1) Budget & pacing: shift budget toward campaigns/ad groups with the best CPA/ROAS and away from high-cost, low-return segments. "
+                            "Watch spend pacing, lost impression share (budget), and CTR so you don’t starve efficient demand.\n"
+                            "2) Bidding: adjust bid strategy targets gradually (one major change at a time). If you’re on automated bidding, expect a learning/settling period; "
+                            "monitor CPC, CPA, conversion volume, and volatility before stacking additional changes.\n"
+                            "3) Keywords / creative / landing page: mine search terms for negatives + new keyword themes, refresh RSA creatives to lift CTR, and fix landing-page speed/UX "
+                            "to improve conversion rate.\n"
+                            "Next: run the performance check for the selected account/timeframe and ask again—I’ll quantify which lever is most likely driving the change."
                         )
-                        if llm_meta and llm_meta.get("model"):
-                            model_used = llm_meta.get("model")
-                        if not draft_reply:
-                            # Deterministic advisor fallback: keep UX usable even when LLM calls fail.
-                            # Must be concise, actionable, and avoid internal debug tokens.
-                            draft_reply = (
-                                "I couldn't reach the AI service for a tailored answer, but here are 3 levers you can pull right now:\n"
-                                "1) Budget & pacing: shift spend from high-CPA segments to your most efficient campaigns; watch delivery and lost IS (budget).\n"
-                                "2) Bidding: adjust targets gradually (one change at a time) and re-check after the learning period stabilizes.\n"
-                                "3) Keywords / creative / landing: mine search terms for negatives + new keywords, refresh RSA creatives, and fix landing-page speed/UX.\n"
-                                "If you tell me whether you're optimizing for CPA, ROAS, or volume, I'll prioritize the next step."
+                        model_used = "rules_fast_performance_advice"
+                        fallback_reason = "no_tool_context_action_request"
+                    else:
+                        if is_strategy_intent(chat.message) and not effective_customer_ids:
+                            strategy_reply = _advisor_strategy_reply(chat.message)
+                            if not strategy_reply:
+                                strategy_reply = _ensure_advisor_sections(
+                                    "Here are three actions to improve ROAS at a portfolio level.",
+                                    evidence="Based on common performance data patterns (CPC/CTR/ROAS) and report output context.",
+                                    hypothesis="It is likely that targeting breadth and message depth are limiting efficiency.",
+                                    next_step="Review top campaigns by cost and test two new USP/CTA variations, then measure ROAS impact.",
+                                )
+                                model_used = "rules"
+                            else:
+                                model_used = "local"
+                            draft_reply = strategy_reply
+                        else:
+                            draft_reply, llm_meta = _call_llm(
+                                messages, intent="general_chat", allow_local=True, max_tokens=600
                             )
-                            fallback_reason = "llm_no_reply"
-                            model_used = model_used or "rules"
-                        if draft_reply and is_concept_intent(chat.message) and _needs_concept_rewrite(draft_reply):
-                            if not (require_local or fast_prompt):
-                                rewritten = _rewrite_concept_reply(chat.message, draft_reply)
+                            if llm_meta and llm_meta.get("model"):
+                                model_used = llm_meta.get("model")
+                            if not draft_reply:
+                                # Deterministic advisor fallback: keep UX usable even when LLM calls fail.
+                                # Must be concise, actionable, and avoid internal debug tokens.
+                                draft_reply = (
+                                    "I couldn't reach the AI service for a tailored answer, but here are 3 levers you can pull right now:\n"
+                                    "1) Budget & pacing: shift spend from high-CPA segments to your most efficient campaigns; watch delivery and lost IS (budget).\n"
+                                    "2) Bidding: adjust targets gradually (one change at a time) and re-check after the learning period stabilizes.\n"
+                                    "3) Keywords / creative / landing: mine search terms for negatives + new keywords, refresh RSA creatives, and fix landing-page speed/UX.\n"
+                                    "If you tell me whether you're optimizing for CPA, ROAS, or volume, I'll prioritize the next step."
+                                )
+                                fallback_reason = "llm_no_reply"
+                                model_used = model_used or "rules"
+                            if draft_reply and is_concept_intent(chat.message) and _needs_concept_rewrite(draft_reply):
+                                if not (require_local or fast_prompt):
+                                    rewritten = _rewrite_concept_reply(chat.message, draft_reply)
+                                    if rewritten:
+                                        draft_reply = rewritten
+                            if draft_reply and is_missing_data_intent(chat.message) and _needs_missing_data_rewrite(draft_reply):
+                                rewritten = _rewrite_missing_data_reply(chat.message, draft_reply)
                                 if rewritten:
                                     draft_reply = rewritten
-                        if draft_reply and is_missing_data_intent(chat.message) and _needs_missing_data_rewrite(draft_reply):
-                            rewritten = _rewrite_missing_data_reply(chat.message, draft_reply)
-                            if rewritten:
-                                draft_reply = rewritten
-                        if is_strategy_intent(chat.message) and not effective_customer_ids:
-                            draft_reply = _ensure_advisor_sections(
-                                draft_reply,
-                                evidence="Based on common performance data patterns (CPC/CTR/ROAS) and report output context.",
-                                hypothesis="It is likely that targeting breadth and message depth are limiting efficiency.",
-                                next_step="Review top campaigns by cost and test two new USP/CTA variations, then measure ROAS impact.",
-                            )
-                        if model_used == "local" and _is_low_quality_local_reply(draft_reply):
-                            fallback_reason = "local_low_quality"
-                            try:
-                                draft_reply = _call_azure(messages, intent="general_chat")
-                                model_used = "azure"
-                            except Exception:
-                                pass
+                            if is_strategy_intent(chat.message) and not effective_customer_ids:
+                                draft_reply = _ensure_advisor_sections(
+                                    draft_reply,
+                                    evidence="Based on common performance data patterns (CPC/CTR/ROAS) and report output context.",
+                                    hypothesis="It is likely that targeting breadth and message depth are limiting efficiency.",
+                                    next_step="Review top campaigns by cost and test two new USP/CTA variations, then measure ROAS impact.",
+                                )
+                            if model_used == "local" and _is_low_quality_local_reply(draft_reply):
+                                fallback_reason = "local_low_quality"
+                                try:
+                                    draft_reply = _call_azure(messages, intent="general_chat")
+                                    model_used = "azure"
+                                except Exception:
+                                    pass
                     if not tool_output_present and is_metric_or_account_intent(chat.message) and not effective_customer_ids:
                         draft_reply = _ensure_advisor_sections(
                             "I need connected performance data to answer that accurately.",
