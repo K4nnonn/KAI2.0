@@ -11037,8 +11037,24 @@ async def send_chat_message(chat: ChatMessage, request: Request):
             "annual",
             "portfolio",
             "budget framework",
+            # Common broad-beta phrasing: users ask for "recommendations" / "actions" / "next steps"
+            # without using the word "strategy". Treat these as strategy intent so we return an
+            # advisor-quality options/tradeoffs answer instead of generic tips.
+            "next steps",
+            "recommendation",
+            "recommendations",
         ]
-        return any(k in t for k in strategy_terms)
+        if any(k in t for k in strategy_terms):
+            return True
+        # Lightweight pattern match for "give me N actions" / "what should I do" style prompts.
+        # Keep this conservative: require "actions" to co-occur with an optimization cue so we
+        # don't misroute operational questions (e.g., "actions column") into strategy mode.
+        if "action" in t or "actions" in t:
+            if any(cue in t for cue in ("improve", "optimize", "increase", "decrease", "reduce", "grow", "scale")):
+                return True
+        if any(cue in t for cue in ("what should i do", "what do i do")):
+            return True
+        return False
 
     def is_concept_intent(text: str) -> bool:
         t = (text or "").lower().strip()
