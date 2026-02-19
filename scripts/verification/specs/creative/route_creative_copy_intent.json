@@ -1,0 +1,29 @@
+{
+  "id": "ROUTE_CREATIVE_COPY_INTENT",
+  "pillar": "intent",
+  "kind": "route",
+  "capabilities": ["routing", "creative"],
+  "request": {
+    "message": "Generate ad copy with 3 headlines and 2 descriptions for our loyalty campaign",
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "intent": "creative",
+    "tool": "creative",
+    "run_planner": false,
+    "run_trends": false,
+    "needs_ids": false
+  },
+  "intent_goal": {
+    "intent_path": "intent",
+    "allowed_intents": ["creative"]
+  },
+  "metamorphic": [
+    {
+      "name": "friendly_variant",
+      "message": "Can you generate ad copy with 3 headlines and 2 descriptions for our loyalty campaign?",
+      "expect_same": ["intent", "tool", "run_planner", "run_trends", "needs_ids"]
+    }
+  ]
+}
+

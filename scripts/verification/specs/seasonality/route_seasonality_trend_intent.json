@@ -1,0 +1,38 @@
+{
+  "id": "ROUTE_SEASONALITY_TREND_INTENT",
+  "pillar": "intent",
+  "kind": "route",
+  "capabilities": ["routing", "seasonality", "trends"],
+  "request": {
+    "message": "Can you show me seasonality trend for FR intent clicks in loyalty over last 12 months?",
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "intent": "seasonality",
+    "run_planner": false,
+    "run_trends": true,
+    "needs_ids": false
+  },
+  "intent_goal": {
+    "intent_path": "intent",
+    "allowed_intents": ["seasonality"]
+  },
+  "assert": {
+    "array_min_len": {
+      "customer_ids": 1
+    }
+  },
+  "metamorphic": [
+    {
+      "name": "greeting",
+      "message": "Hey - show seasonality trend for FR intent clicks in loyalty over last 12 months",
+      "expect_same": ["intent", "run_trends", "needs_ids", "customer_ids.0"]
+    },
+    {
+      "name": "punctuation",
+      "message": "Show seasonality trend for FR intent clicks in loyalty over last 12 months??",
+      "expect_same": ["intent", "run_trends", "needs_ids", "customer_ids.0"]
+    }
+  ]
+}
+

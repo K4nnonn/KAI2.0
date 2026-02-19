@@ -1,0 +1,28 @@
+{
+  "id": "SEND_CREATIVE_NO_SILENT_FALLBACK",
+  "pillar": "functionality",
+  "kind": "send",
+  "capabilities": ["chat_send", "creative", "fallback_transparency"],
+  "request": {
+    "message": "Need 3 headlines + 2 descriptions for a paid search loyalty campaign",
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "assert": {
+    "reply_min_len": 100,
+    "reply_not_contains": [
+      "router_verify_failed",
+      "router_no_route",
+      "resolved account to",
+      "range: last_",
+      "No date specified",
+      "I can run that analysis, but I need to know which SA360 account to use"
+    ],
+    "text_contains": {
+      "__body.reply": ["Headlines", "Descriptions"]
+    }
+  }
+}
+

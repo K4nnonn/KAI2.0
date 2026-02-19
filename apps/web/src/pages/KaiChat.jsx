@@ -1641,6 +1641,7 @@ export default function KaiChat() {
             : ''
           const resolvedAccountName = (routing?.account_name || activeAccount?.name || accountNameFromIds || '').trim()
 
+          let trendWarning = null
           if (shouldUseTrends) {
             try {
               const routingThemes = Array.isArray(routing?.themes)
@@ -1664,8 +1665,26 @@ export default function KaiChat() {
                 pollTrendsJob(trendsResp.data.job_id, responseSystem)
               }
             } catch (trendErr) {
-              // ignore and fall back to planner-only
+              const detail =
+                trendErr?.response?.data?.detail ||
+                trendErr?.response?.data?.error ||
+                trendErr?.message ||
+                'Trends request failed'
+              trendWarning = `I could not run seasonality trends for this request (${detail}).`
             }
+          }
+
+          if (trendWarning && !shouldUsePlanner) {
+            setMessages((prev) => [...prev, {
+              role: 'assistant',
+              content: trendWarning,
+              system: responseSystem,
+            }])
+            handled = true
+            return
+          }
+          if (trendWarning) {
+            summaryText = [summaryText, trendWarning].filter(Boolean).join('\n')
           }
 
           // Always attempt planner to keep performance context

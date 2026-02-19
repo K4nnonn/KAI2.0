@@ -2,6 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Ensure UTF-8 logging/output to avoid pip/build encoding failures in ACR.
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONIOENCODING=UTF-8 \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
 # Ensure TLS validation works for outbound HTTPS (SERP checks, external APIs).
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates \

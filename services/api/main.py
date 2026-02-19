@@ -1485,11 +1485,12 @@ def _humanize_relative_date_tokens(text: str) -> str:
     return out
 
 
+
 def _normalize_reply_text(text: str | None) -> str | None:
     if not text or not isinstance(text, str):
         return text
-    # Normalize common mojibake bullet artifacts to ASCII for readability.
-    cleaned = _humanize_relative_date_tokens(text).replace("\u0080", "")
+    cleaned = _humanize_relative_date_tokens(text)
+    cleaned = cleaned.replace("\ufeff", "")
     cleaned = re.sub(r"\?\?\s*([+-]?\d)", r"delta \1", cleaned)
     cleaned = cleaned.replace("??", "delta ")
     cleaned = re.sub(r"(?i)No date specified;\s*defaulting to\s*last\s*\d+\s*days\.?", "", cleaned)
@@ -1498,25 +1499,29 @@ def _normalize_reply_text(text: str | None) -> str | None:
     cleaned = re.sub(r"(?i)\bmodel=(?:local|azure|planner|rules)\b", "", cleaned)
     cleaned = re.sub(r"(?i)api keys?", "authorized access", cleaned)
     cleaned = re.sub(r"(?i)access tokens?", "authorized access", cleaned)
-    cleaned = cleaned.encode("ascii", "ignore").decode()
-    return (
-        cleaned.replace("ƒ›", "-")
-        .replace("ƒ?›", "-")
-        .replace("•", "-")
-        .replace("â€¢", "-")
-        .replace("â€“", "-")
-        .replace("â€”", "-")
-    )
+    cleaned = cleaned.translate(str.maketrans({
+        "\u2013": "-",
+        "\u2014": "-",
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+    }))
+    cleaned = "".join(ch for ch in cleaned if ch == "\n" or ch == "\t" or ord(ch) >= 32)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
 
 
 def _sanitize_kb_content(text: str | None, max_len: int = 800) -> str | None:
     if not text or not isinstance(text, str):
         return text
-    cleaned = text.replace("\u0080", "")
+    cleaned = text.replace("\ufeff", "")
+    cleaned = cleaned.replace("\u00A0", " ")
     cleaned = re.sub(r"\?\?\s*([+-]?\d)", r"delta \1", cleaned)
-    cleaned = cleaned.replace("??", "x")
-    cleaned = cleaned.replace("�", "")
-    cleaned = cleaned.encode("ascii", "ignore").decode()
+    cleaned = cleaned.replace("??", "delta ")
+    cleaned = cleaned.replace("???", "")
+    cleaned = "".join(ch for ch in cleaned if ch == "\n" or ch == "\t" or ord(ch) >= 32)
     cleaned = cleaned.strip()
     if len(cleaned) <= max_len:
         return cleaned
@@ -7354,6 +7359,42 @@ async def chat_route(req: RouteRequest, request: Request):
                 candidates=candidates or [],
             )
 
+    # Fast-path: deterministic routing for explicit creative generation prompts.
+    # This avoids router jitter where punctuation/greeting variants can fall back to general_chat.
+    if msg_slim and _is_copy_generation_request(req.message):
+        creative_ids = _normalize_customer_ids(merged_ids or [])
+        explicit_ids = bool(creative_ids or (req.customer_ids or []))
+        if not explicit_ids and not creative_ids:
+            default_ids = _normalize_customer_ids(_default_customer_ids(session_id=sa360_sid))
+            if default_ids:
+                creative_ids = list(default_ids)
+
+        resolved_ids, _resolved_account, resolution_notes, candidates = _resolve_account_context(
+            req.message,
+            customer_ids=creative_ids,
+            account_name=req.account_name,
+            explicit_ids=explicit_ids,
+            session_id=sa360_sid,
+        )
+
+        creative_notes = (default_route.notes or "") + " router_fastpath_creative"
+        if resolution_notes:
+            creative_notes = f"{creative_notes}; {resolution_notes}"
+
+        return RouteResponse(
+            intent="creative",
+            tool="creative",
+            run_planner=False,
+            run_trends=False,
+            customer_ids=resolved_ids,
+            needs_ids=False,
+            notes=creative_notes,
+            confidence=1.0,
+            needs_clarification=False,
+            clarification=None,
+            candidates=candidates or [],
+        )
+
     # Fast-path: deterministic routing for SERP / competitor prompts.
     # These tools do not require SA360 account IDs, so avoid the router latency and avoid misrouting
     # into the performance planner which then asks the user to pick an account.
@@ -7559,7 +7600,7 @@ async def chat_route(req: RouteRequest, request: Request):
     # If the router returns "general_chat" for an obvious performance/audit question that includes a timeframe,
     # force the intent/tool so we can apply default-account fallback and proceed.
     timeframe_hint = _has_timeframe_hint(req.message)
-    if route.intent == "general_chat" and timeframe_hint:
+    if route.intent == "general_chat" and timeframe_hint and not _has_trends_cue(req.message):
         lower_msg = (req.message or "").lower()
         has_perf_cue = (
             "performance" in lower_msg
@@ -7583,13 +7624,29 @@ async def chat_route(req: RouteRequest, request: Request):
                 route.confidence = 0.7
             route.notes = (route.notes or "") + " forced_intent_timeframe_perf_cue"
 
+    # Deterministic seasonality/trends override:
+    # explicit seasonality wording should not fall into general/performance routing.
+    if _has_trends_cue(req.message):
+        route.intent = "seasonality"
+        route.tool = None
+        route.run_planner = False
+        route.run_trends = True
+        route.needs_ids = False
+        route.needs_clarification = False
+        route.clarification = None
+        route.notes = (route.notes or "") + " seasonality_cue_override"
+        try:
+            route.confidence = max(float(route.confidence or 0.0), 0.8)
+        except Exception:
+            route.confidence = 0.8
+
     # Broad beta UX: if SA360 is connected and the user did not specify a customer_id (nor an account name),
     # use their saved default account for routing/planner decisions.
     #
     # This MUST happen before _resolve_account_context() so:
     # 1) downstream matching can override the default when the message clearly points to another account
     # 2) generic performance prompts do not dead-end into "pick an account" UX
-    if route.intent in {"performance", "audit"} and not explicit_ids and not final_ids and default_ids:
+    if route.intent in {"performance", "audit", "seasonality"} and not explicit_ids and not final_ids and default_ids:
         final_ids = list(default_ids)
         route.notes = (route.notes or "") + " default_account_fallback"
 
@@ -11157,6 +11214,8 @@ async def send_chat_message(chat: ChatMessage, request: Request):
 
     def is_market_volume_intent(text: str) -> bool:
         t = (text or "").lower()
+        # Keep this detector narrowly scoped to keyword/search-volume asks.
+        # Seasonality/trend requests are handled by _has_trends_cue + trends paths.
         market_terms = [
             "search volume",
             "keyword volume",
@@ -11164,11 +11223,98 @@ async def send_chat_message(chat: ChatMessage, request: Request):
             "volume estimates",
             "market volume",
             "query volume",
-            "google trends",
-            "trend",
-            "trends",
+            "keyword planner",
+            "avg monthly searches",
         ]
         return any(k in t for k in market_terms)
+
+    async def _run_seasonality_chat(ids: list[str], acct: str | None) -> ChatResponse:
+        themes = _derive_themes(_extract_custom_metric_mentions(chat.message), acct)
+        if not themes:
+            themes = _derive_themes([], acct)
+        try:
+            trends_req = TrendsRequest(
+                account_name=acct,
+                customer_ids=ids,
+                themes=themes[:3],
+                timeframe="now 12-m",
+                geo="US",
+                budget=None,
+                use_performance=True,
+                async_mode=False,
+                session_id=sa360_sid,
+            )
+            trends_payload = await trends_seasonality(trends_req, request=request)
+            seasonality_summary = (trends_payload or {}).get("seasonality_summary")
+            seasonality_source = (trends_payload or {}).get("seasonality_source") or "trends"
+            allocations = (trends_payload or {}).get("allocations") or []
+            next_step = "Review campaign-level deltas in the top peak months and stage budget shifts gradually."
+            if allocations and isinstance(allocations, list):
+                top = allocations[0]
+                top_theme = top.get("theme")
+                top_weight = top.get("weight_pct")
+                if top_theme and top_weight is not None:
+                    next_step = (
+                        f"Start with the highest-weight theme '{top_theme}' (~{top_weight:.1f}%), "
+                        "then validate CPC/CTR/CVR before scaling."
+                    )
+            if seasonality_summary:
+                reply = _ensure_advisor_sections(
+                    f"Seasonality summary for {acct or ids[0]}: {seasonality_summary}",
+                    evidence=f"Source={seasonality_source}; themes={', '.join(themes[:3])}.",
+                    hypothesis="Demand likely concentrates in peak windows; performance variance should map to those months.",
+                    next_step=next_step,
+                )
+            else:
+                reply = _ensure_advisor_sections(
+                    f"I could not extract a clear seasonality profile for {acct or ids[0]}.",
+                    evidence="Trends/performance summary returned no explicit peaks/lows.",
+                    hypothesis="Signal may be flat or insufficient for a directional seasonal pattern.",
+                    next_step="Try a narrower theme set or compare month-over-month performance slices directly.",
+                )
+            _save_message("assistant", reply)
+            return ChatResponse(reply=reply, sources=[], model="rules_seasonality")
+        except HTTPException as exc:
+            # Graceful fallback when trends service is disabled/unavailable.
+            detail = getattr(exc, "detail", None) or str(exc)
+        except Exception as exc:
+            detail = str(exc)
+
+        perf_profile = {}
+        try:
+            perf_profile = _seasonality_fallback_with_range(ids, "LAST_180_DAYS", session_id=sa360_sid) or {}
+        except Exception as perf_exc:
+            if not detail:
+                detail = str(perf_exc)
+        peaks = (perf_profile or {}).get("peaks") or []
+        lows = (perf_profile or {}).get("lows") or []
+        if peaks or lows:
+            def _fmt(items):
+                vals = [f"{i.get('month')} (~{float(i.get('score', 0)):.0f})" for i in items[:3] if i.get("month")]
+                return ", ".join(vals)
+            peak_txt = _fmt(peaks)
+            low_txt = _fmt(lows)
+            summary_bits = []
+            if peak_txt:
+                summary_bits.append(f"Peaks: {peak_txt}")
+            if low_txt:
+                summary_bits.append(f"Lows: {low_txt}")
+            summary = " | ".join(summary_bits) if summary_bits else "No clear peaks/lows."
+            reply = _ensure_advisor_sections(
+                f"Seasonality proxy for {acct or ids[0]} (performance-derived): {summary}",
+                evidence=f"Trends call unavailable ({str(detail)[:120]}), so I used account performance seasonality fallback.",
+                hypothesis="Observed peak/low windows in account performance likely reflect seasonal demand shifts.",
+                next_step="Validate with campaign-level month-over-month cuts before making broad bid/budget changes.",
+            )
+        else:
+            reply = _ensure_advisor_sections(
+                "I could not run seasonality trends right now.",
+                evidence=f"Trends service unavailable ({str(detail)[:120]}), and performance fallback had insufficient signal.",
+                hypothesis="This can happen during upstream trends outages or low-volume windows.",
+                next_step="Retry shortly, or ask for a performance-only month-over-month comparison.",
+            )
+        _save_message("assistant", reply)
+        return ChatResponse(reply=reply, sources=[], model="rules_seasonality_fallback")
 
     # Ultra-fast deterministic help/architecture responses.
     # Keep these before account-resolution to preserve low p95 latency for common prompts.
@@ -11622,6 +11768,20 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                         tool = "audit"
                     elif any(needle in msg_slim for needle in ("pmax", "performance max", "performance_max")):
                         tool = "pmax"
+                    elif any(
+                        cue in msg_slim
+                        for cue in (
+                            "creative studio:",
+                            "ad copy",
+                            "rsa",
+                            "headline",
+                            "headlines",
+                            "description",
+                            "descriptions",
+                            "creative",
+                        )
+                    ):
+                        tool = "creative"
                     else:
                         serp_cues = (
                             "serp monitor:",
@@ -11784,7 +11944,7 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 return any(cue in t for cue in cues)
 
             last_assistant_message = next((msg["message"] for msg in reversed(history) if msg["role"] == "assistant"), "")
-            if _is_performance_followup(chat.message) and not tool_output_present:
+            if _is_performance_followup(chat.message) and not tool_output_present and not _has_trends_cue(chat.message):
                 lower_last = (last_assistant_message or "").lower()
                 if not lower_last:
                     short_followup = len((chat.message or "").strip().split()) <= 4
@@ -12134,6 +12294,7 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 and stored_tool_output is not None
                 and stored_perf
                 and _is_performance_followup(chat.message)
+                and not _has_trends_cue(chat.message)
                 # Only reuse stored performance context for performance followups.
                 # If the current message routed to another tool (audit/competitor/serp/pmax),
                 # do not inject performance outputs into that flow.
@@ -12200,7 +12361,12 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                     )
                     return ChatResponse(reply=summary_reply, sources=[], model=model_used, guardrail=guardrail_meta)
 
-            if _is_performance_context(tool, tool_output) and not skip_tool_followup and _is_performance_followup(chat.message):
+            if (
+                _is_performance_context(tool, tool_output)
+                and not skip_tool_followup
+                and _is_performance_followup(chat.message)
+                and not _has_trends_cue(chat.message)
+            ):
                 if isinstance(tool_output, dict):
                     llm_meta: dict | None = None
                     followup_reply = None
@@ -12490,6 +12656,101 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 _save_message("assistant", reply)
                 return ChatResponse(reply=reply, sources=[])
 
+            if tool == "creative":
+                try:
+                    msg = (chat.message or "").strip()
+                    url_match = _extract_urls(msg)
+                    final_url = url_match[0] if url_match else ""
+                    if not final_url:
+                        ctx_url = (chat.context or {}).get("url") if isinstance(chat.context, dict) else None
+                        final_url = str(ctx_url).strip() if ctx_url else "https://example.com"
+
+                    business_name = (
+                        (chat.account_name or resolved_context_account or "").strip()
+                        if isinstance(chat.account_name, str) or isinstance(resolved_context_account, str)
+                        else ""
+                    )
+                    if not business_name:
+                        business_name = "Your Brand"
+                    business_name = business_name.replace("_", " ")
+
+                    quoted = [q.strip() for q in re.findall(r'"([^"]+)"', msg) if q and q.strip()]
+                    keyword_seed = _extract_keyword_from_text(msg)
+                    keywords = []
+                    if keyword_seed:
+                        keywords.append(keyword_seed)
+                    for q in quoted:
+                        if q.lower() not in [k.lower() for k in keywords]:
+                            keywords.append(q)
+                    if not keywords:
+                        tokens = [t for t in re.split(r"[^a-zA-Z0-9_]+", msg) if t]
+                        stop = {"write", "generate", "create", "creative", "ad", "copy", "headlines", "descriptions", "for"}
+                        for tok in tokens:
+                            tl = tok.lower()
+                            if tl in stop or len(tok) < 3:
+                                continue
+                            keywords.append(tok)
+                            if len(keywords) >= 3:
+                                break
+                    if not keywords:
+                        keywords = ["paid search"]
+
+                    usp_list: list[str] = []
+                    if ":" in msg:
+                        tail = msg.split(":", 1)[1]
+                        usp_list = [x.strip() for x in re.split(r"[;,|]", tail) if x.strip()][:3]
+                    if not usp_list:
+                        usp_list = ["Trusted service", "Fast support"]
+
+                    tone = "neutral"
+                    msg_l = msg.lower()
+                    if any(t in msg_l for t in ("bold", "aggressive", "punchy")):
+                        tone = "bold"
+                    elif any(t in msg_l for t in ("friendly", "warm", "conversational")):
+                        tone = "friendly"
+
+                    context = CreativeContext(
+                        final_url=final_url,
+                        keywords=keywords[:5],
+                        business_name=business_name,
+                        usp_list=usp_list[:5],
+                    )
+                    result = CreativeFactory.generate_ad_copy(context=context, tone=tone)
+                    headlines = [str(h).strip() for h in (result.get("headlines") or []) if str(h).strip()][:3]
+                    descriptions = [str(d).strip() for d in (result.get("descriptions") or []) if str(d).strip()][:2]
+
+                    if not headlines and not descriptions:
+                        reply = _ensure_advisor_sections(
+                            "I could not generate ad copy from that prompt.",
+                            evidence="The creative generator returned no usable headlines or descriptions.",
+                            hypothesis="The prompt may be missing product/offer context for strong RSA variants.",
+                            next_step="Tell me the offer, audience, and tone (for example: 'bold' or 'friendly') and I will regenerate.",
+                        )
+                        _save_message("assistant", reply)
+                        return ChatResponse(reply=reply, sources=[], model="rules_creative")
+
+                    lines = [f"Creative draft for {business_name}:"]
+                    if headlines:
+                        lines.append("Headlines:")
+                        lines.extend([f"- {h}" for h in headlines])
+                    if descriptions:
+                        lines.append("Descriptions:")
+                        lines.extend([f"- {d}" for d in descriptions])
+                    lines.append("Next step: pin 1-2 headlines per RSA variant, test in one ad group first, and compare CTR/CVR after 3-5 days.")
+                    reply = "\n".join(lines)
+                    reply = _normalize_reply_text(reply) or reply
+                    _save_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=[], model="rules_creative")
+                except Exception as exc:
+                    reply = _ensure_advisor_sections(
+                        "I hit an issue while generating creative copy.",
+                        evidence=f"Creative module raised: {str(exc)[:120]}",
+                        hypothesis="This is likely a temporary model or parsing failure.",
+                        next_step="Retry with a short prompt that includes brand, product, and one target keyword.",
+                    )
+                    _save_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=[], model="rules_creative")
+
             if tool == "audit":
                 # Chat audit should be fast and actionable. Use available performance context
                 # (stored planner/tool output) to produce "top priorities" without forcing a long-running
@@ -12627,7 +12888,7 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 _save_message("assistant", reply)
                 return ChatResponse(reply=reply, sources=[], model="rules_competitor")
 
-            # Search volume / market volume intent -> pull SA360 keyword data
+            # Search volume / market volume intent -> either seasonality trends or SA360 keyword volume.
             if is_market_volume_intent(chat.message):
                 ctx = chat.context or {}
                 ctx_ids = []
@@ -12649,6 +12910,12 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                         reply = "To pull search volume, tell me the account name or provide a customer ID (SA360)."
                     _save_message("assistant", reply)
                     return ChatResponse(reply=reply, sources=[])
+
+                # Distinguish "seasonality/trends" asks from raw keyword-volume asks.
+                # Without this split, seasonality prompts can incorrectly fall into keyword snapshot replies.
+                if _has_trends_cue(chat.message):
+                    return await _run_seasonality_chat(ids, acct)
+
                 kw = _extract_keyword_from_text(chat.message)
                 if not kw:
                     reply = "Tell me the keyword you want search volume for (e.g., \"shell gas stations\")."
@@ -12668,6 +12935,7 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                 reply = _format_volume_reply(kw, exact, close_matches, date_range)
                 if resolution_notes:
                     reply = f"{resolution_notes} {reply}"
+                reply = _normalize_reply_text(reply) or reply
                 _save_message("assistant", reply)
                 return ChatResponse(reply=reply, sources=[])
 
@@ -12747,8 +13015,45 @@ async def send_chat_message(chat: ChatMessage, request: Request):
                     else:
                         reply = fallback_market_estimate(lookup_text)
 
+            # Seasonality/trend asks must be handled explicitly, even when the message
+            # does not include classic performance metric tokens.
+            elif _has_trends_cue(chat.message):
+                ctx = chat.context or {}
+                ctx_ids = []
+                explicit_ids = False
+                if isinstance(ctx, dict):
+                    ctx_ids = ctx.get("customer_ids") or []
+                    explicit_ids = bool(ctx.get("customer_ids"))
+                ids, acct, resolution_notes, candidates = _resolve_account_context(
+                    chat.message,
+                    ctx_ids or _default_customer_ids(session_id=sa360_sid),
+                    chat.account_name,
+                    explicit_ids=explicit_ids,
+                    session_id=sa360_sid,
+                )
+                if not ids:
+                    if candidates:
+                        reply = "Which account should I use? " + " | ".join(candidates)
+                    else:
+                        reply = "To run seasonality trends, tell me the account name or provide a customer ID (SA360)."
+                    _save_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=[])
+                return await _run_seasonality_chat(ids, acct)
+
             # If account/metric intent and no connected data, provide a clear gate with choices
             elif is_metric_or_account_intent(chat.message):
+                explicit_seasonality_request = _has_trends_cue(chat.message) and not _is_relational_metric_question(chat.message)
+                if explicit_seasonality_request and not ENABLE_TRENDS and not has_tool_context:
+                    reply = _ensure_advisor_sections(
+                        "Seasonality trends are unavailable right now because trends integration is disabled in this environment.",
+                        evidence="The trends service is disabled (ENABLE_TRENDS=false), so live trend seasonality cannot be fetched.",
+                        hypothesis="I can still create a performance-only month-by-month recommendation and budget shift plan from account data.",
+                        next_step="Ask for a performance-derived month-by-month budget shift recommendation, or re-enable trends and retry.",
+                    )
+                    model_used = "rules_seasonality_guard"
+                    _save_message("assistant", reply)
+                    return ChatResponse(reply=reply, sources=sources, model=model_used)
+
                 # Fast advisor path: "what should I do / give me levers / recommendations" asks should not
                 # trigger the SA360 planner when no timeframe or tool output is provided. The planner can be
                 # slow and may fail when SA360 fetch is disabled in the current environment. Instead, return

@@ -1,0 +1,25 @@
+{
+  "id": "SEND_SEASONALITY_NO_VOLUME_FALLBACK",
+  "pillar": "purpose",
+  "kind": "send",
+  "capabilities": ["chat_send", "seasonality", "adaptive_response"],
+  "request": {
+    "message": "Can you show me seasonality trend for FR intent clicks in loyalty over last 12 months?",
+    "session_id": "${SESSION_ID}",
+    "customer_id": "${TARGET_CUSTOMER_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["Seasonality", "seasonality", "trends", "month", "Evidence:", "Peaks", "Lows"],
+    "min_any_matches": 1,
+    "must_not_include": ["Range: LAST_30_DAYS", "No date specified", "Resolved account to"]
+  },
+  "assert": {
+    "reply_min_len": 100,
+    "reply_not_contains": ["Range: LAST_30_DAYS", "No date specified", "Resolved account to", "router_no_route", "router_verify_failed"]
+  }
+}
+

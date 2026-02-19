@@ -1,0 +1,27 @@
+{
+  "id": "SEND_CREATIVE_WITH_URL_AND_TONE",
+  "pillar": "quality",
+  "kind": "send",
+  "capabilities": ["chat_send", "creative", "adaptive_response"],
+  "request": {
+    "message": "Create friendly ad copy for Mobility loyalty. URL: https://www.shell.us/motorist/loyalty-and-payment-programs/fuel-rewards-program.html",
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "intent_goal": {
+    "response_paths": ["__body.reply"],
+    "must_include_any": ["Creative draft", "Headlines:", "Descriptions:", "Next step"],
+    "min_any_matches": 3,
+    "must_not_include": ["LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS", "No date specified"]
+  },
+  "assert": {
+    "reply_min_len": 120,
+    "reply_not_contains": ["LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS", "No date specified"],
+    "regex_match": {
+      "__body.reply": "(?is)(Headlines:).*(Descriptions:).*(Next step)"
+    }
+  }
+}
+

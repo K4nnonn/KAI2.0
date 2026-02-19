@@ -1,0 +1,35 @@
+{
+  "id": "POST_CREATIVE_GENERATE_TONE_SEED",
+  "pillar": "quality",
+  "kind": "post",
+  "capabilities": ["creative", "structured_output"],
+  "request": {
+    "url": "/api/creative/generate",
+    "body": {
+      "business_name": "US Mobility Loyalty",
+      "url": "https://example.com/loyalty",
+      "keywords": ["FR intent clicks", "fuel rewards", "loyalty app"],
+      "usps": ["save on fuel", "trusted network", "easy signup"]
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success"
+  },
+  "assert": {
+    "paths_exist": [
+      "body.result.headlines.0",
+      "body.result.descriptions.0"
+    ],
+    "regex_match": {
+      "body.result.headlines.0": "(?is).+",
+      "body.result.descriptions.0": "(?is).+"
+    },
+    "text_not_contains": {
+      "body.result.headlines.0": ["router_verify_failed", "router_no_route"],
+      "body.result.descriptions.0": ["router_verify_failed", "router_no_route"]
+    }
+  }
+}
+

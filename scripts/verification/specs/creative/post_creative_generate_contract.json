@@ -1,0 +1,31 @@
+{
+  "id": "POST_CREATIVE_GENERATE_CONTRACT",
+  "pillar": "functionality",
+  "kind": "post",
+  "capabilities": ["creative", "api_contract"],
+  "request": {
+    "url": "/api/creative/generate",
+    "body": {
+      "business_name": "Kai QA",
+      "url": "https://example.com",
+      "keywords": ["paid search", "sa360"],
+      "usps": ["fast setup", "agency-ready"]
+    }
+  },
+  "expect": {
+    "status": 200,
+    "ok": true,
+    "body.status": "success"
+  },
+  "assert": {
+    "paths_exist": [
+      "body.result.headlines",
+      "body.result.descriptions"
+    ],
+    "array_min_len": {
+      "body.result.headlines": 1,
+      "body.result.descriptions": 1
+    }
+  }
+}
+

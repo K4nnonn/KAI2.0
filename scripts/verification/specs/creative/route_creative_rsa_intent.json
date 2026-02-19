@@ -1,0 +1,34 @@
+{
+  "id": "ROUTE_CREATIVE_RSA_INTENT",
+  "pillar": "intent",
+  "kind": "route",
+  "capabilities": ["routing", "creative", "account_context"],
+  "request": {
+    "message": "Write RSA headlines and descriptions for Shell Mobility loyalty",
+    "session_id": "${SESSION_ID}"
+  },
+  "expect": {
+    "intent": "creative",
+    "tool": "creative",
+    "run_planner": false,
+    "run_trends": false,
+    "needs_ids": false
+  },
+  "intent_goal": {
+    "intent_path": "intent",
+    "allowed_intents": ["creative"]
+  },
+  "metamorphic": [
+    {
+      "name": "greeting",
+      "message": "Hey - write RSA headlines and descriptions for Shell Mobility loyalty",
+      "expect_same": ["intent", "tool", "run_planner", "run_trends", "needs_ids"]
+    },
+    {
+      "name": "punctuation",
+      "message": "Write RSA headlines and descriptions for Shell Mobility loyalty??",
+      "expect_same": ["intent", "tool", "run_planner", "run_trends", "needs_ids"]
+    }
+  ]
+}
+

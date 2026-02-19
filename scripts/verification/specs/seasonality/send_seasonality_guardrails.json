@@ -1,0 +1,27 @@
+{
+  "id": "SEND_SEASONALITY_GUARDRAILS",
+  "pillar": "quality",
+  "kind": "send",
+  "capabilities": ["chat_send", "seasonality", "fallback_transparency"],
+  "request": {
+    "message": "Run a seasonality read for loyalty and explain what months to lean in or pull back.",
+    "session_id": "${SESSION_ID}",
+    "customer_id": "${TARGET_CUSTOMER_ID}"
+  },
+  "expect": {
+    "role": "assistant"
+  },
+  "assert": {
+    "reply_min_len": 100,
+    "regex_match": {
+      "__body.reply": "(?is)(seasonality|trends|month|peaks|lows|performance-derived|integration is disabled|unavailable)"
+    },
+    "reply_not_contains": [
+      "router_no_route",
+      "router_verify_failed",
+      "Range: LAST_30_DAYS",
+      "No date specified"
+    ]
+  }
+}
+
