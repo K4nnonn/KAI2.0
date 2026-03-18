@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kai — Paid Search Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+/* ─── CSS Custom Properties ─── */
+:root {
+  --kai-cool-primary: #22d3ee;
+  --kai-cool-secondary: #3b82f6;
+  --kai-warm-primary: #f59e0b;
+  --kai-warm-secondary: #ef4444;
+  --kai-gradient: linear-gradient(135deg, #22d3ee 0%, #3b82f6 40%, #f59e0b 100%);
+  --kai-gradient-subtle: linear-gradient(135deg, rgba(34,211,238,0.12) 0%, rgba(245,158,11,0.12) 100%);
+  --kai-bg: #f7f8fb;
+  --kai-surface: #ffffff;
+  --kai-surface-alt: #f1f5f9;
+  --kai-surface-muted: #e7edf4;
+  --kai-border: #d7dee7;
+  --kai-border-strong: #cbd5e1;
+  --kai-text: #0f172a;
+  --kai-text-muted: #475569;
+  --kai-text-soft: #64748b;
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Manrope', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: radial-gradient(circle at 20% 20%, rgba(34,211,238,0.08), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(245,158,11,0.06), transparent 40%),
+    var(--kai-bg);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--kai-text);
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(148,163,184,0.08); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #22d3ee, #3b82f6 50%, #f59e0b); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #0ea5e9, #2563eb 50%, #d97706); }
+
+::selection { background: rgba(34,211,238,0.25); color: #0f172a; }
+
+/* ─── Shell Layout ─── */
+.shell { display: flex; min-height: 100vh; background: transparent; }
+.shell-main {
+  margin-left: 16rem; padding: 2rem; width: calc(100% - 16rem);
+  min-height: 100vh; background: transparent;
+  display: flex; flex-direction: column;
+}
+
+/* ─── Sidebar ─── */
+.sb-container {
+  position: fixed; left: 0; top: 0; height: 100vh; width: 16rem;
+  background: linear-gradient(180deg, var(--kai-surface) 0%, var(--kai-surface-alt) 100%);
+  border-right: 1px solid var(--kai-border);
+  color: var(--kai-text-soft);
+  display: flex; flex-direction: column;
+  box-shadow: 4px 0 24px rgba(15,23,42,0.08);
+  z-index: 100;
+}
+.sb-logo {
+  height: 4.5rem; display: flex; align-items: center; gap: 0.75rem;
+  padding: 0 1.25rem; border-bottom: 1px solid var(--kai-border); position: relative;
+}
+.sb-logo::after {
+  content: ''; position: absolute; bottom: 0; left: 1.25rem; right: 1.25rem; height: 1px;
+  background: linear-gradient(90deg, #22d3ee 0%, #3b82f6 40%, #f59e0b 100%); opacity: 0.4;
+}
+.sb-logo-icon { flex-shrink: 0; transition: transform 0.2s ease; }
+.sb-logo:hover .sb-logo-icon { transform: scale(1.05); }
+.sb-logo-text-container { display: flex; flex-direction: column; line-height: 1.1; }
+.sb-logo-text {
+  font-weight: 800; font-size: 1.25rem; letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #f59e0b 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.sb-logo-subtext { font-size: 0.65rem; font-weight: 500; color: var(--kai-text-soft); letter-spacing: 0.1em; text-transform: lowercase; }
+
+.sb-nav { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.375rem; flex: 1; overflow-y: auto; padding: 0 0.5rem; }
+.sb-item {
+  display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1.125rem;
+  border-radius: 0.75rem; border: none; background: none;
+  color: var(--kai-text-muted); font-weight: 500; font-size: 0.9375rem;
+  cursor: default; position: relative; overflow: hidden; text-align: left; width: 100%;
+  font-family: inherit; transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.sb-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, #22d3ee, #f59e0b);
+  transform: scaleY(0); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  border-radius: 0 2px 2px 0;
+}
+.sb-item-active {
+  background: linear-gradient(135deg, rgba(34,211,238,0.08), rgba(245,158,11,0.08));
+  color: var(--kai-text); font-weight: 600;
+  border: 1px solid rgba(34,211,238,0.18);
+  box-shadow: 0 4px 12px rgba(34,211,238,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.sb-item-active::before { transform: scaleY(1); }
+.sb-item-active .sb-icon { color: #22d3ee; filter: drop-shadow(0 2px 4px rgba(34,211,238,0.3)); }
+.sb-icon { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; color: inherit; flex-shrink: 0; }
+.sb-icon .material-symbols-outlined { font-size: 20px; }
+
+/* ─── Header Banner ─── */
+.kai-header {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+}
+.kai-header-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+  flex-shrink: 0;
+}
+.kai-header-avatar .material-symbols-outlined { font-size: 28px; color: #fff; }
+.kai-header-info { display: flex; flex-direction: column; gap: 0.25rem; }
+.kai-header-title {
+  font-size: 1.75rem; font-weight: 700;
+  background: linear-gradient(135deg, #0f172a 0%, #4f46e5 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.kai-header-subtitle { font-size: 0.875rem; color: var(--kai-text-muted); }
+.kai-header-chips { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.2rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+}
+.chip-indigo { background: rgba(99,102,241,0.1); color: #6366f1; border: 1px solid rgba(99,102,241,0.2); }
+.chip-amber { background: rgba(245,158,11,0.1); color: #d97706; border: 1px solid rgba(245,158,11,0.2); }
+
+/* ─── Capability Cards ─── */
+.capability-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+  margin-bottom: 1.5rem; transition: opacity 0.4s ease, max-height 0.4s ease;
+  overflow: hidden;
+}
+.capability-grid.hidden { opacity: 0; max-height: 0; margin: 0; pointer-events: none; }
+.cap-card {
+  background: var(--kai-surface); border-radius: 12px; padding: 1.25rem;
+  border: 1px solid var(--kai-border); transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cap-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(15,23,42,0.08); }
+.cap-card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.cap-card-icon {
+  width: 40px; height: 40px; border-radius: 10px; display: flex;
+  align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
+}
+.cap-card-icon .material-symbols-outlined { font-size: 22px; }
+.cap-card-title { font-size: 0.95rem; font-weight: 600; color: var(--kai-text); }
+.cap-card-desc { font-size: 0.8rem; color: var(--kai-text-muted); line-height: 1.5; margin-bottom: 0.75rem; }
+.cap-card-chips { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.cap-chip {
+  padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 500;
+  background: var(--kai-surface-alt); color: var(--kai-text-soft); border: 1px solid var(--kai-border);
+}
+
+/* ─── Chat Messages ─── */
+.chat-container {
+  flex: 1; display: flex; flex-direction: column; gap: 1rem;
+  overflow-y: auto; padding: 1rem 0; min-height: 0;
+  max-height: calc(100vh - 320px);
+}
+.msg-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+.msg-row.user { justify-content: flex-end; }
+.msg-row.assistant { justify-content: flex-start; }
+
+.msg-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 14px;
+}
+.msg-avatar.ai {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  color: #fff;
+}
+.msg-avatar.user {
+  background: #3730a3; color: #fff;
+}
+.msg-avatar .material-symbols-outlined { font-size: 18px; }
+
+.msg-bubble {
+  max-width: 70%; padding: 0.875rem 1rem; border-radius: 12px;
+  font-size: 0.9rem; line-height: 1.6;
+}
+.msg-bubble.user {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border: 1px solid #8b5cf6; color: #fff;
+}
+.msg-bubble.assistant {
+  background: var(--kai-surface); border: 1px solid var(--kai-surface-muted);
+  color: var(--kai-text);
+}
+
+.msg-system-chip {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600;
+  background: rgba(139,92,246,0.08); color: #8b5cf6; margin-bottom: 0.5rem;
+  border: 1px solid rgba(139,92,246,0.15);
+}
+
+/* Message entrance animation */
+.msg-row { animation: fadeSlideUp 0.3s ease forwards; }
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Thinking Animation ─── */
+.thinking-row { display: flex; gap: 0.75rem; align-items: flex-start; animation: fadeSlideUp 0.3s ease forwards; }
+.thinking-bubble {
+  background: var(--kai-surface); border: 1px solid var(--kai-surface-muted);
+  border-radius: 12px; padding: 0.875rem 1rem; min-width: 200px;
+}
+.thinking-dots { display: flex; gap: 5px; margin-bottom: 0.5rem; }
+.thinking-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #8b5cf6;
+  animation: pulse 1s infinite;
+}
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+.thinking-text {
+  color: #94a3b8; font-size: 0.8rem; font-style: italic;
+  animation: fadeIn 0.3s ease forwards;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── Input Bar ─── */
+.input-bar {
+  background: var(--kai-surface); border: 1px solid var(--kai-surface-muted);
+  border-radius: 12px; padding: 0.75rem 1rem;
+  box-shadow: 0 -10px 40px rgba(15,23,42,0.08);
+  display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem;
+}
+.input-field {
+  flex: 1; border: 1px solid var(--kai-border); border-radius: 8px;
+  padding: 0.75rem 1rem; font-family: inherit; font-size: 0.9rem;
+  color: var(--kai-text); background: var(--kai-surface);
+  outline: none; resize: none; min-height: 44px; max-height: 88px;
+}
+.input-field::placeholder { color: var(--kai-text-soft); }
+.input-field:focus { border-color: #8b5cf6; box-shadow: 0 0 0 2px rgba(139,92,246,0.15); }
+.send-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.send-btn:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(139,92,246,0.4); }
+.send-btn .material-symbols-outlined { font-size: 20px; }
+
+/* ─── Markdown Styles (light mode) ─── */
+.kai-md p { margin: 0.4em 0; line-height: 1.6; }
+.kai-md ul, .kai-md ol { margin: 0.4em 0; padding-left: 1.4em; }
+.kai-md li { margin-bottom: 0.2em; }
+.kai-md table { border-collapse: collapse; margin: 0.6em 0; font-size: 0.88em; width: 100%; }
+.kai-md th {
+  border: 1px solid var(--kai-border); padding: 6px 10px; text-align: left;
+  font-weight: 600; background: var(--kai-surface-alt);
+}
+.kai-md td { border: 1px solid var(--kai-surface-muted); padding: 5px 10px; }
+.kai-md code {
+  background: var(--kai-surface-alt); color: #0ea5e9; padding: 1px 4px;
+  border-radius: 3px; font-size: 0.9em; font-family: 'Courier New', monospace;
+}
+.kai-md pre {
+  background: #1e293b; color: #e2e8f0; padding: 8px 12px;
+  border-radius: 6px; overflow-x: auto; font-size: 0.85em;
+}
+.kai-md h2 { margin: 0.6em 0 0.3em; font-size: 1.1em; }
+.kai-md h3 { margin: 0.5em 0 0.3em; font-size: 1em; }
+.kai-md h4 { margin: 0.4em 0 0.2em; font-size: 0.95em; }
+.kai-md hr { border: none; border-top: 1px solid var(--kai-border); margin: 0.8em 0; }
+.kai-md strong { font-weight: 600; }
+.kai-md blockquote {
+  border-left: 3px solid var(--kai-cool-primary); padding-left: 0.75em;
+  color: var(--kai-text-muted); margin: 0.4em 0;
+}
+
+/* ─── Demo Controls ─── */
+.demo-overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(247,248,251,0.85); z-index: 50; border-radius: 12px;
+  backdrop-filter: blur(4px); transition: opacity 0.4s ease;
+}
+.demo-overlay.hidden { opacity: 0; pointer-events: none; }
+.demo-start-btn {
+  padding: 1rem 2.5rem; border-radius: 999px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff;
+  font-family: inherit; font-size: 1.1rem; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(139,92,246,0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.demo-start-btn:hover { transform: scale(1.05); box-shadow: 0 12px 32px rgba(139,92,246,0.45); }
+.demo-start-btn .material-symbols-outlined { font-size: 22px; }
+
+.progress-dots {
+  display: flex; gap: 6px; justify-content: center; margin-top: 0.75rem;
+}
+.progress-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--kai-border-strong); transition: background 0.3s ease, transform 0.3s ease;
+}
+.progress-dot.active { background: #8b5cf6; transform: scale(1.3); }
+.progress-dot.done { background: #22c55e; }
+
+.hint-text {
+  text-align: center; font-size: 0.8rem; color: var(--kai-text-soft);
+  margin-top: 0.5rem; animation: fadeIn 0.5s ease forwards;
+  animation-delay: 1s; opacity: 0;
+}
+
+.restart-btn {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.5rem 1.25rem; border-radius: 999px; border: 1px solid var(--kai-border);
+  background: var(--kai-surface); color: var(--kai-text-muted);
+  font-family: inherit; font-size: 0.85rem; font-weight: 500; cursor: pointer;
+  transition: all 0.2s ease; margin-top: 0.5rem;
+}
+.restart-btn:hover { background: var(--kai-surface-alt); color: var(--kai-text); border-color: #8b5cf6; }
+
+/* ─── Chat area wrapper ─── */
+.chat-area {
+  flex: 1; display: flex; flex-direction: column; position: relative;
+  background: var(--kai-surface); border: 1px solid var(--kai-surface-muted);
+  border-radius: 12px; padding: 1.25rem;
+  box-shadow: 0 4px 24px rgba(15,23,42,0.04);
+  min-height: 0;
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- ─── Sidebar ─── -->
+  <aside class="sb-container">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">
+        <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="kaiGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#22d3ee"/><stop offset="35%" stop-color="#3b82f6"/>
+              <stop offset="65%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/>
+            </linearGradient>
+            <linearGradient id="coolGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#3b82f6"/>
+            </linearGradient>
+            <linearGradient id="warmGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/>
+            </linearGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g filter="url(#glow)">
+            <path d="M8 6 L8 28 C8 31.3 10.7 34 14 34 C17.3 34 20 31.3 20 28 L20 6 C20 4.9 19.1 4 18 4 L10 4 C8.9 4 8 4.9 8 6Z" fill="none" stroke="url(#coolGradient)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="14" cy="30" r="4" fill="url(#coolGradient)"/>
+            <line x1="12" y1="10" x2="16" y2="10" stroke="url(#coolGradient)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="12" y1="16" x2="16" y2="16" stroke="url(#coolGradient)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="12" y1="22" x2="16" y2="22" stroke="url(#coolGradient)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 18 L26 10 L32 10" fill="none" stroke="url(#warmGradient)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="33" cy="10" r="3" fill="url(#warmGradient)"/>
+            <path d="M20 20 L28 20" fill="none" stroke="url(#kaiGradient)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="30" cy="20" r="2.5" fill="url(#warmGradient)"/>
+            <path d="M18 22 L26 30 L32 30" fill="none" stroke="url(#warmGradient)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="33" cy="30" r="3" fill="url(#warmGradient)"/>
+            <circle cx="26" cy="10" r="1.5" fill="url(#kaiGradient)"/>
+            <circle cx="26" cy="30" r="1.5" fill="url(#kaiGradient)"/>
+          </g>
+        </svg>
+      </div>
+      <div class="sb-logo-text-container">
+        <span class="sb-logo-text">KAI</span>
+        <span class="sb-logo-subtext">kelvin AI</span>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <button class="sb-item sb-item-active"><span class="sb-icon"><span class="material-symbols-outlined">chat</span></span><span>Kai Chat</span></button>
+      <button class="sb-item"><span class="sb-icon"><span class="material-symbols-outlined">dashboard</span></span><span>Klaudit Audit</span></button>
+      <button class="sb-item"><span class="sb-icon"><span class="material-symbols-outlined">brush</span></span><span>Creative Studio</span></button>
+      <button class="sb-item"><span class="sb-icon"><span class="material-symbols-outlined">timeline</span></span><span>PMax Deep Dive</span></button>
+      <button class="sb-item"><span class="sb-icon"><span class="material-symbols-outlined">search</span></span><span>SERP Monitor</span></button>
+      <button class="sb-item"><span class="sb-icon"><span class="material-symbols-outlined">vpn_key</span></span><span>Env & Keys</span></button>
+      <button class="sb-item"><span class="sb-icon"><span class="material-symbols-outlined">view_column</span></span><span>SA360 Columns</span></button>
+      <button class="sb-item"><span class="sb-icon"><span class="material-symbols-outlined">info</span></span><span>Info</span></button>
+      <button class="sb-item"><span class="sb-icon"><span class="material-symbols-outlined">settings</span></span><span>Settings</span></button>
+    </nav>
+  </aside>
+
+  <!-- ─── Main ─── -->
+  <main class="shell-main">
+    <!-- Header -->
+    <div class="kai-header">
+      <div class="kai-header-avatar">
+        <span class="material-symbols-outlined">hub</span>
+      </div>
+      <div class="kai-header-info">
+        <div class="kai-header-title">Kai</div>
+        <div class="kai-header-subtitle">Your AI command center. Ask anything, route anywhere.</div>
+        <div class="kai-header-chips">
+          <span class="chip chip-indigo">AI Orchestrator</span>
+          <span class="chip chip-amber">Demo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capability Cards -->
+    <div class="capability-grid" id="capGrid">
+      <div class="cap-card" style="border-color: rgba(34,197,94,0.25)">
+        <div class="cap-card-header">
+          <div class="cap-card-icon" style="background: linear-gradient(135deg,#22c55e,#16a34a)"><span class="material-symbols-outlined">analytics</span></div>
+          <div class="cap-card-title">Performance</div>
+        </div>
+        <div class="cap-card-desc">Campaign metrics, trends, and dimensional breakdowns from SA360</div>
+        <div class="cap-card-chips"><span class="cap-chip">How are my campaigns doing?</span><span class="cap-chip">Show CTR trends</span></div>
+      </div>
+      <div class="cap-card" style="border-color: rgba(59,130,246,0.25)">
+        <div class="cap-card-header">
+          <div class="cap-card-icon" style="background: linear-gradient(135deg,#3b82f6,#2563eb)"><span class="material-symbols-outlined">fact_check</span></div>
+          <div class="cap-card-title">PPC Audit</div>
+        </div>
+        <div class="cap-card-desc">100+ point Google Ads audit with industry benchmarks</div>
+        <div class="cap-card-chips"><span class="cap-chip">Run an audit</span><span class="cap-chip">Check quality scores</span></div>
+      </div>
+      <div class="cap-card" style="border-color: rgba(244,114,182,0.25)">
+        <div class="cap-card-header">
+          <div class="cap-card-icon" style="background: linear-gradient(135deg,#f472b6,#ec4899)"><span class="material-symbols-outlined">speed</span></div>
+          <div class="cap-card-title">PMax Analysis</div>
+        </div>
+        <div class="cap-card-desc">Performance Max channel breakout and spend analysis</div>
+        <div class="cap-card-chips"><span class="cap-chip">Analyze PMax</span><span class="cap-chip">Channel spend split</span></div>
+      </div>
+      <div class="cap-card" style="border-color: rgba(167,139,250,0.25)">
+        <div class="cap-card-header">
+          <div class="cap-card-icon" style="background: linear-gradient(135deg,#a78bfa,#8b5cf6)"><span class="material-symbols-outlined">travel_explore</span></div>
+          <div class="cap-card-title">SERP Monitor</div>
+        </div>
+        <div class="cap-card-desc">URL health checks, soft 404 detection, and ranking signals</div>
+        <div class="cap-card-chips"><span class="cap-chip">Check my URLs</span><span class="cap-chip">Find soft 404s</span></div>
+      </div>
+      <div class="cap-card" style="border-color: rgba(239,68,68,0.25)">
+        <div class="cap-card-header">
+          <div class="cap-card-icon" style="background: linear-gradient(135deg,#ef4444,#dc2626)"><span class="material-symbols-outlined">monitoring</span></div>
+          <div class="cap-card-title">Competitor Intel</div>
+        </div>
+        <div class="cap-card-desc">Auction insights and competitive position analysis</div>
+        <div class="cap-card-chips"><span class="cap-chip">Who are my competitors?</span><span class="cap-chip">Overlap rate</span></div>
+      </div>
+      <div class="cap-card" style="border-color: rgba(245,158,11,0.25)">
+        <div class="cap-card-header">
+          <div class="cap-card-icon" style="background: linear-gradient(135deg,#f59e0b,#d97706)"><span class="material-symbols-outlined">edit_note</span></div>
+          <div class="cap-card-title">Creative Studio</div>
+        </div>
+        <div class="cap-card-desc">AI-powered RSA headline and description generation</div>
+        <div class="cap-card-chips"><span class="cap-chip">Write headlines</span><span class="cap-chip">Generate descriptions</span></div>
+      </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area" id="chatArea">
+      <div class="chat-container" id="chatContainer"></div>
+
+      <!-- Demo overlay -->
+      <div class="demo-overlay" id="demoOverlay">
+        <div style="text-align:center">
+          <button class="demo-start-btn" id="startBtn" onclick="startDemo()">
+            <span class="material-symbols-outlined">play_arrow</span>
+            Start Demo
+          </button>
+          <div style="margin-top:1rem;font-size:0.85rem;color:var(--kai-text-soft)">
+            Click through a live conversation with Kai
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="input-bar">
+      <textarea class="input-field" id="inputField" placeholder="Ask Kai anything... audit, analyze, create, or explore" rows="1" readonly></textarea>
+      <button class="send-btn" id="sendBtn">
+        <span class="material-symbols-outlined">send</span>
+      </button>
+    </div>
+
+    <!-- Progress + Hint -->
+    <div class="progress-dots" id="progressDots" style="display:none">
+      <div class="progress-dot" data-idx="0"></div>
+      <div class="progress-dot" data-idx="1"></div>
+      <div class="progress-dot" data-idx="2"></div>
+      <div class="progress-dot" data-idx="3"></div>
+      <div class="progress-dot" data-idx="4"></div>
+    </div>
+    <div class="hint-text" id="hintText" style="display:none">Click anywhere or press Space to continue</div>
+  </main>
+</div>
+
+<script>
+// ─── Scripted Conversation ───
+const DEMO_SCRIPT = [
+  {
+    user: "How are my campaigns doing?",
+    assistant: `## Campaign Performance — Last 30 Days
+
+| Metric | Current | Previous | Change |
+|---|---|---|---|
+| Impressions | 2,847,392 | 2,612,108 | +9.0% |
+| Clicks | 142,856 | 128,491 | +11.2% |
+| Cost | $284,712 | $267,893 | +6.3% |
+| CTR | 5.02% | 4.92% | +0.10pp |
+| CPC | $1.99 | $2.08 | -4.3% |
+| Conversions | 8,412 | 7,856 | +7.1% |
+| CPA | $33.84 | $34.10 | -0.8% |
+
+**Key Drivers:**
+- **NonBrand Search** led volume growth (+14.2% clicks) with improving efficiency (CPC -6.1%)
+- **Brand** remains stable with strong CTR (12.3%) and low CPA ($8.42)
+- **PMax** impressions up 18% but CPA rose 4.2% — worth monitoring
+
+Overall the account is trending positively: more volume at lower cost-per-click, and conversions are scaling ahead of spend.`,
+    system: "Performance"
+  },
+  {
+    user: "Which geos are performing best?",
+    assistant: `## Geographic Performance — Last 30 Days
+
+### Top Performers
+| Region | Clicks | Conv | CPA | CTR | Trend |
+|---|---|---|---|---|---|
+| California | 28,412 | 1,892 | $28.14 | 5.8% | Improving |
+| Texas | 19,847 | 1,245 | $30.22 | 5.4% | Stable |
+| New York | 16,293 | 1,087 | $31.56 | 5.1% | Improving |
+| Florida | 14,856 | 923 | $33.41 | 4.9% | Stable |
+| Illinois | 9,412 | 612 | $29.87 | 5.2% | Improving |
+
+### Underperformers
+| Region | Clicks | Conv | CPA | Trend |
+|---|---|---|---|---|
+| Ohio | 4,213 | 198 | $48.72 | Declining |
+| Michigan | 3,847 | 167 | $52.14 | Declining |
+
+**Insights:**
+- **California** is the clear leader — highest volume AND best efficiency
+- **Illinois** is a sleeper: low volume but strong CPA, potential scale candidate
+- **Ohio and Michigan** have CPAs 40%+ above average — consider geo bid adjustments or negative geo targeting`,
+    system: "Performance"
+  },
+  {
+    user: "How about device performance?",
+    assistant: `## Device Performance — Last 30 Days
+
+| Device | Impressions | Clicks | CTR | CPC | Conv | CPA | Share |
+|---|---|---|---|---|---|---|---|
+| Desktop | 1,254,812 | 71,428 | 5.69% | $2.12 | 4,856 | $31.24 | 57.7% |
+| Mobile | 1,367,293 | 58,142 | 4.25% | $1.82 | 2,914 | $35.87 | 34.6% |
+| Tablet | 225,287 | 13,286 | 5.90% | $2.08 | 642 | $36.42 | 7.6% |
+
+**Key Takeaways:**
+- **Desktop** drives the most conversions (57.7% share) with the lowest CPA
+- **Mobile** has the lowest CPC ($1.82) but conversion rate lags — landing page optimization opportunity
+- **Tablet** has the highest CTR (5.90%) but smallest volume — niche but efficient
+
+**Recommendation:** Mobile gets 48% of impressions but only 34.6% of conversions. A mobile landing page audit could close that gap — even a 10% mobile conversion rate improvement would add ~290 conversions/month.`,
+    system: "Performance"
+  },
+  {
+    user: "What's our impression share looking like?",
+    assistant: `## Impression Share Analysis — Last 30 Days
+
+| Campaign | Search IS | Lost (Rank) | Lost (Budget) | Status |
+|---|---|---|---|---|
+| Brand - Core | 94.2% | 3.1% | 2.7% | Strong |
+| Brand - Competitor | 78.4% | 14.8% | 6.8% | Monitor |
+| NonBrand - Category | 42.1% | 38.2% | 19.7% | Action Needed |
+| NonBrand - Product | 56.8% | 28.4% | 14.8% | Improve |
+| PMax - Prospecting | 61.3% | 22.1% | 16.6% | Improve |
+
+**Analysis:**
+- **Brand Core** is well-defended at 94.2% IS — minimal opportunity loss
+- **NonBrand Category** has the biggest gap: 57.9% of impressions lost, split between rank (38.2%) and budget (19.7%)
+- Budget-constrained campaigns (NonBrand Category, PMax) are leaving **estimated 3,200+ clicks/month** on the table
+
+**Priority Actions:**
+1. **NonBrand Category** — Rank loss dominates. Improve Quality Score and increase bids on top converters
+2. **PMax Prospecting** — 16.6% budget loss. Evaluate daily budget caps vs. opportunity
+3. **Brand Competitor** — 14.8% rank loss suggests competitors are bidding on your brand terms`,
+    system: "Performance"
+  },
+  {
+    user: "What should we focus on to improve?",
+    assistant: `## Strategic Recommendations
+
+Based on the full analysis — performance trends, geo distribution, device mix, and impression share — here are the top priorities ranked by estimated impact:
+
+### 1. Close the NonBrand Impression Share Gap
+**Impact: High** | **Effort: Medium**
+- NonBrand Category is losing 57.9% of impressions — the single biggest growth lever
+- Action: Reallocate $15-20K/month from PMax (where CPA is rising) to NonBrand Category
+- Expected outcome: +8,000-12,000 incremental clicks/month
+
+### 2. Mobile Landing Page Optimization
+**Impact: High** | **Effort: Medium**
+- Mobile gets 48% of impressions but only 34.6% of conversions
+- A 10% improvement in mobile conversion rate = ~290 additional conversions/month
+- Action: Audit mobile page speed, form length, and CTA placement
+
+### 3. Scale Illinois and Emerging Geos
+**Impact: Medium** | **Effort: Low**
+- Illinois shows $29.87 CPA (below average) with low volume — room to scale
+- Action: Increase geo bid adjustments +15-20% for Illinois, test similar Midwest markets
+
+### 4. Defend Brand Against Competitor Bidding
+**Impact: Medium** | **Effort: Low**
+- Brand Competitor IS at 78.4% with 14.8% rank loss
+- Action: Tighten brand exact match bids, add competitor negative keywords to prevent bleed
+
+### 5. Address Ohio/Michigan Underperformance
+**Impact: Low-Medium** | **Effort: Low**
+- CPAs 40%+ above average in these regions
+- Action: Reduce bids 20-30% or add negative geo modifiers if volume doesn't justify cost
+
+---
+*These recommendations are grounded in your actual SA360 data. Shall I drill into any of these in more detail?*`,
+    system: "Performance"
+  }
+];
+
+// ─── State Machine ───
+let state = 'IDLE'; // IDLE | TYPING_USER | THINKING | REVEALING | WAITING | COMPLETE
+let currentStep = 0;
+let thinkingInterval = null;
+let thinkingStepIdx = 0;
+
+const thinkingSteps = [
+  "Routing your request...",
+  "Analyzing intent...",
+  "Fetching SA360 data...",
+  "Processing performance metrics...",
+  "Building analysis...",
+  "Generating insights..."
+];
+
+// Configure marked
+marked.setOptions({ gfm: true, breaks: true });
+
+// ─── DOM Refs ───
+const chatContainer = document.getElementById('chatContainer');
+const demoOverlay = document.getElementById('demoOverlay');
+const capGrid = document.getElementById('capGrid');
+const inputField = document.getElementById('inputField');
+const progressDots = document.getElementById('progressDots');
+const hintText = document.getElementById('hintText');
+
+// ─── Start Demo ───
+function startDemo() {
+  demoOverlay.classList.add('hidden');
+  setTimeout(() => {
+    capGrid.classList.add('hidden');
+    progressDots.style.display = 'flex';
+    hintText.style.display = 'block';
+    state = 'WAITING';
+    advanceDemo();
+  }, 300);
+}
+
+// ─── Advance ───
+function advanceDemo() {
+  if (state === 'COMPLETE') return;
+  if (currentStep >= DEMO_SCRIPT.length) {
+    state = 'COMPLETE';
+    showComplete();
+    return;
+  }
+
+  const exchange = DEMO_SCRIPT[currentStep];
+  state = 'TYPING_USER';
+  hintText.style.display = 'none';
+  updateProgress();
+
+  // Typewriter effect in input
+  typewriter(inputField, exchange.user, 35).then(() => {
+    setTimeout(() => {
+      // Add user message bubble
+      addUserMessage(exchange.user);
+      inputField.value = '';
+      state = 'THINKING';
+      showThinking();
+
+      // Show thinking for 2.5s then reveal
+      setTimeout(() => {
+        removeThinking();
+        addAssistantMessage(exchange.assistant, exchange.system);
+        state = 'WAITING';
+        currentStep++;
+        updateProgress();
+        hintText.style.display = 'block';
+        hintText.style.animation = 'none';
+        void hintText.offsetHeight;
+        hintText.style.animation = 'fadeIn 0.5s ease forwards';
+        hintText.style.animationDelay = '0.5s';
+        hintText.style.opacity = '0';
+        scrollToBottom();
+
+        if (currentStep >= DEMO_SCRIPT.length) {
+          state = 'COMPLETE';
+          showComplete();
+        }
+      }, 2500);
+    }, 400);
+  });
+}
+
+// ─── Typewriter ───
+function typewriter(el, text, speed) {
+  return new Promise(resolve => {
+    let i = 0;
+    el.value = '';
+    const interval = setInterval(() => {
+      el.value = text.substring(0, ++i);
+      if (i >= text.length) { clearInterval(interval); resolve(); }
+    }, speed);
+  });
+}
+
+// ─── Add Messages ───
+function addUserMessage(text) {
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = `
+    <div class="msg-bubble user">${escapeHtml(text)}</div>
+    <div class="msg-avatar user"><span class="material-symbols-outlined">person</span></div>
+  `;
+  chatContainer.appendChild(row);
+  scrollToBottom();
+}
+
+function addAssistantMessage(markdown, system) {
+  const row = document.createElement('div');
+  row.className = 'msg-row assistant';
+  const systemChip = system ? `<div class="msg-system-chip">${system}</div>` : '';
+  row.innerHTML = `
+    <div class="msg-avatar ai"><span class="material-symbols-outlined">auto_awesome</span></div>
+    <div class="msg-bubble assistant">
+      ${systemChip}
+      <div class="kai-md">${marked.parse(markdown)}</div>
+    </div>
+  `;
+  chatContainer.appendChild(row);
+  scrollToBottom();
+}
+
+// ─── Thinking ───
+function showThinking() {
+  thinkingStepIdx = 0;
+  const el = document.createElement('div');
+  el.className = 'thinking-row';
+  el.id = 'thinkingEl';
+  el.innerHTML = `
+    <div class="msg-avatar ai"><span class="material-symbols-outlined">auto_awesome</span></div>
+    <div class="thinking-bubble">
+      <div class="thinking-dots">
+        <div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div>
+      </div>
+      <div class="thinking-text" id="thinkingText">${thinkingSteps[0]}</div>
+    </div>
+  `;
+  chatContainer.appendChild(el);
+  scrollToBottom();
+
+  thinkingInterval = setInterval(() => {
+    thinkingStepIdx = (thinkingStepIdx + 1) % thinkingSteps.length;
+    const txt = document.getElementById('thinkingText');
+    if (txt) {
+      txt.style.animation = 'none';
+      void txt.offsetHeight;
+      txt.style.animation = 'fadeIn 0.3s ease forwards';
+      txt.textContent = thinkingSteps[thinkingStepIdx];
+    }
+  }, 800);
+}
+
+function removeThinking() {
+  clearInterval(thinkingInterval);
+  const el = document.getElementById('thinkingEl');
+  if (el) el.remove();
+}
+
+// ─── Progress ───
+function updateProgress() {
+  const dots = progressDots.querySelectorAll('.progress-dot');
+  dots.forEach((dot, i) => {
+    dot.className = 'progress-dot';
+    if (i < currentStep) dot.classList.add('done');
+    else if (i === currentStep) dot.classList.add('active');
+  });
+}
+
+// ─── Complete ───
+function showComplete() {
+  hintText.style.display = 'none';
+  updateProgress();
+  const row = document.createElement('div');
+  row.style.textAlign = 'center';
+  row.style.padding = '1rem 0';
+  row.innerHTML = `<button class="restart-btn" onclick="restartDemo()">
+    <span class="material-symbols-outlined" style="font-size:16px">replay</span> Restart Demo
+  </button>`;
+  chatContainer.appendChild(row);
+  scrollToBottom();
+}
+
+// ─── Restart ───
+function restartDemo() {
+  currentStep = 0;
+  state = 'IDLE';
+  chatContainer.innerHTML = '';
+  capGrid.classList.remove('hidden');
+  demoOverlay.classList.remove('hidden');
+  progressDots.style.display = 'none';
+  hintText.style.display = 'none';
+  inputField.value = '';
+}
+
+// ─── Helpers ───
+function scrollToBottom() {
+  setTimeout(() => { chatContainer.scrollTop = chatContainer.scrollHeight; }, 50);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ─── Global Click/Keyboard Handler ───
+document.addEventListener('click', (e) => {
+  // Ignore clicks on buttons (start, restart, sidebar)
+  if (e.target.closest('.demo-start-btn, .restart-btn, .sb-item, .sb-logo')) return;
+  if (state === 'WAITING') advanceDemo();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    if (state === 'IDLE') startDemo();
+    else if (state === 'WAITING') advanceDemo();
+  }
+});
+</script>
+</body>
+</html>
